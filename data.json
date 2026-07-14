@@ -1,0 +1,9 @@
+{
+  "weeks": {},
+  "users": {
+    "路清召": { "password": "rhzl@2026lqz", "role": "admin" },
+    "陈礼丽": { "password": "chenlili", "role": "admin" }
+  },
+  "history": {},
+  "_token": ""
+}

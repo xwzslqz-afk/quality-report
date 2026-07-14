@@ -685,6 +685,8 @@
                     <button class="btn btn-outline" id="importBtn">📤 导入 Excel</button>
                     <input type="file" id="fileInput" class="file-input-hidden" accept=".xlsx,.xls" />
                 </div>
+                <span class="sync-badge" id="syncBadge" title="云端同步状态" style="font-size:12px;color:#64748b;margin:0 4px;white-space:nowrap;">💻 本地</span>
+                <button class="btn btn-xs btn-outline" id="tokenBtn" title="配置 GitHub Token 以启用云端同步" style="font-size:11px;">🔑 Token</button>
                 <div class="user-bar" id="userBar">
                     <!-- 动态渲染 -->
                 </div>
@@ -968,6 +970,154 @@
         const HISTORY_KEY = 'quality_team_history_v6';
         const USERS_KEY = 'quality_users_v1';
 
+        // ===== GitHub 云端同步配置 =====
+        const GH_REPO = 'xwzslqz-afk/quality-report';
+        const GH_RAW = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';
+        const GH_API = 'https://api.github.com/repos/' + GH_REPO + '/contents/data.json';
+        let _ghSha = null;
+        let _ghSyncing = false;
+        let _ghDirty = false;
+
+        function getGitHubToken() {
+            return localStorage.getItem('gh_token') || '';
+        }
+
+        async function _cloudFetch() {
+            const token = getGitHubToken();
+            if (!token) return null;
+            try {
+                const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + token, 'Cache-Control': 'no-cache' } });
+                if (!r.ok) return null;
+                const info = await r.json();
+                _ghSha = info.sha;
+                const raw = await fetch(GH_RAW + '?t=' + Date.now());
+                if (!raw.ok) return null;
+                return await raw.json();
+            } catch { return null; }
+        }
+
+        async function _cloudPush() {
+            const token = getGitHubToken();
+            if (!token || _ghSyncing) return;
+            _ghSyncing = true;
+            try {
+                // Refresh SHA
+                let sha = _ghSha;
+                if (!sha) {
+                    try {
+                        const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + token } });
+                        if (r.ok) { const info = await r.json(); sha = info.sha; }
+                    } catch {}
+                }
+                const weeks = loadAllData();
+                const users = getUsers();
+                const history = loadHistory();
+                const payload = { weeks, users, history };
+                const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+                const body = { message: 'Update: ' + new Date().toLocaleString('zh-CN'), content };
+                if (sha) body.sha = sha;
+                const r = await fetch(GH_API, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (r.ok) {
+                    const result = await r.json();
+                    _ghSha = result.content.sha;
+                    _ghDirty = false;
+                    updateSyncBadge('✅', '已同步');
+                } else if (r.status === 409) {
+                    // Conflict: pull remote, merge, retry
+                    const remote = await _cloudFetch();
+                    if (remote) {
+                        const merged = _mergeData(remote);
+                        if (merged) {
+                            const content2 = btoa(unescape(encodeURIComponent(JSON.stringify(merged, null, 2))));
+                            const body2 = { message: 'Merge & update', content: content2 };
+                            if (_ghSha) body2.sha = _ghSha;
+                            const r2 = await fetch(GH_API, {
+                                method: 'PUT',
+                                headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+                                body: JSON.stringify(body2)
+                            });
+                            if (r2.ok) {
+                                const result2 = await r2.json();
+                                _ghSha = result2.content.sha;
+                                _ghDirty = false;
+                                updateSyncBadge('✅', '已合并');
+                            } else {
+                                updateSyncBadge('⚠️', '冲突');
+                            }
+                        }
+                    } else {
+                        updateSyncBadge('⚠️', '冲突');
+                    }
+                } else {
+                    updateSyncBadge('❌', '同步失败');
+                }
+            } catch(e) {
+                updateSyncBadge('❌', '网络错误');
+            } finally {
+                _ghSyncing = false;
+            }
+        }
+
+        function _mergeData(remote) {
+            const local = {
+                weeks: loadAllData(),
+                users: getUsers(),
+                history: loadHistory()
+            };
+            // Deep merge: remote wins for same keys, local adds new keys
+            const merged = JSON.parse(JSON.stringify(remote));
+            // Merge weeks (deep)
+            for (const wk of Object.keys(local.weeks)) {
+                if (!merged.weeks[wk]) merged.weeks[wk] = local.weeks[wk];
+                else {
+                    for (const team of Object.keys(local.weeks[wk])) {
+                        if (!merged.weeks[wk][team]) merged.weeks[wk][team] = local.weeks[wk][team];
+                        else {
+                            for (const member of Object.keys(local.weeks[wk][team])) {
+                                if (!merged.weeks[wk][team][member]) merged.weeks[wk][team][member] = local.weeks[wk][team][member];
+                                else {
+                                    // Merge items arrays by id
+                                    const existIds = new Set(merged.weeks[wk][team][member].map(it => it.id));
+                                    for (const it of local.weeks[wk][team][member]) {
+                                        if (!existIds.has(it.id)) merged.weeks[wk][team][member].push(it);
+                                    }
+                                }
+                            }
+                            // Merge local-only members
+                        }
+                    }
+                    // Merge local-only teams
+                }
+            }
+            // Merge users (local adds new users)
+            for (const u of Object.keys(local.users)) {
+                if (!merged.users[u]) merged.users[u] = local.users[u];
+            }
+            // Merge history
+            for (const hk of Object.keys(local.history)) {
+                if (!merged.history[hk]) merged.history[hk] = local.history[hk];
+                else merged.history[hk] = [...merged.history[hk], ...local.history[hk].filter(lh => !merged.history[hk].some(mh => mh.timestamp === lh.timestamp))];
+            }
+            return merged;
+        }
+
+        function _schedulePush() {
+            if (!getGitHubToken()) return;
+            _ghDirty = true;
+            updateSyncBadge('⏳', '待同步');
+            clearTimeout(window._pushTimer);
+            window._pushTimer = setTimeout(() => _cloudPush(), 800);
+        }
+
+        function updateSyncBadge(icon, text) {
+            const el = document.getElementById('syncBadge');
+            if (el) { el.textContent = icon + ' ' + text; }
+        }
+
         const DIMENSION_TYPES = ['核心指标', '重点工作', '重大批量质量问题改进'];
         const STATUS_LIST = ['已完成', '开展中', '延期风险', '已延期'];
         const STATUS_CLASS = {
@@ -990,6 +1140,7 @@
 
         function saveUsers(users) {
             localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            _schedulePush();
         }
 
         // 初始化用户（若不存在则创建）
@@ -1067,6 +1218,7 @@
 
         function saveAllData(data) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            _schedulePush();
         }
 
         function loadHistory() {
@@ -1078,6 +1230,7 @@
 
         function saveHistory(history) {
             localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            _schedulePush();
         }
 
         function getWeekData(weekKey) {
@@ -2915,6 +3068,55 @@
         });
 
         // ============================================================
+        //  Token 管理
+        // ============================================================
+        document.getElementById('tokenBtn').addEventListener('click', function() {
+            const current = getGitHubToken();
+            const msg = current
+                ? `当前已配置 Token。\n\n• 点「确定」查看/更换\n• 点「取消」清除 Token（恢复纯本地模式）`
+                : `请输入 GitHub Personal Access Token 以启用云端同步：\n\n（需要 repo 权限，在 https://github.com/settings/tokens 创建）`;
+            const action = current ? prompt(msg, current) : prompt(msg);
+            if (action === null && current) {
+                // Cancel → clear token
+                if (confirm('确定要清除 Token 吗？之后将使用纯本地模式，数据不再同步。')) {
+                    setGitHubToken('');
+                    _ghSha = null;
+                    updateSyncBadge('💻', '本地');
+                    showToast('🔓 Token 已清除，切换为本地模式', 'info');
+                }
+            } else if (action && action.trim()) {
+                setGitHubToken(action.trim());
+                _ghSha = null;
+                updateSyncBadge('⏳', '验证中…');
+                // Test the token
+                fetch(GH_API, { headers: { 'Authorization': 'token ' + action.trim() } })
+                    .then(r => {
+                        if (r.ok) {
+                            updateSyncBadge('✅', '已连接');
+                            showToast('✅ Token 有效，已启用云端同步！正在拉取数据…', 'success');
+                            // Re-init data from cloud
+                            _cloudFetch().then(data => {
+                                if (data) {
+                                    if (data.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(data.weeks));
+                                    if (data.users) localStorage.setItem(USERS_KEY, JSON.stringify(data.users));
+                                    if (data.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(data.history));
+                                    renderAll();
+                                    showToast('🔄 云端数据已加载', 'success');
+                                }
+                            });
+                        } else {
+                            updateSyncBadge('❌', '无效');
+                            showToast('❌ Token 无效，请检查', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        updateSyncBadge('⚠️', '网络错误');
+                        showToast('⚠️ 网络不通，Token 已保存稍后重试', 'error');
+                    });
+            }
+        });
+
+        // ============================================================
         //  登录 / 修改密码
         // ============================================================
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -2996,9 +3198,27 @@
         // ============================================================
         //  初始化
         // ============================================================
-        function init() {
-            // 初始化用户（包含新增管理员陈礼丽）
+        async function init() {
             initUsers();
+
+            // 尝试从云端拉取数据
+            const cloudData = await _cloudFetch();
+            if (cloudData) {
+                if (cloudData.weeks && Object.keys(cloudData.weeks).length > 0) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData.weeks));
+                }
+                if (cloudData.users && Object.keys(cloudData.users).length > 0) {
+                    localStorage.setItem(USERS_KEY, JSON.stringify(cloudData.users));
+                }
+                if (cloudData.history) {
+                    localStorage.setItem(HISTORY_KEY, JSON.stringify(cloudData.history));
+                }
+                updateSyncBadge('✅', '已同步');
+            } else if (getGitHubToken()) {
+                updateSyncBadge('⚠️', '离线');
+            } else {
+                updateSyncBadge('💻', '本地');
+            }
 
             const saved = sessionStorage.getItem('quality_user');
             if (saved) {
@@ -3033,13 +3253,42 @@
             }
             currentView = 'normal';
             renderAll();
-            showToast('📋 已加载，数据自动保存', 'info', 1500);
+            showToast('📋 数据已加载' + (cloudData ? '（云端）' : '（本地）'), 'info', 1500);
 
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeModal();
                     document.getElementById('loginModal').classList.remove('active');
                     document.getElementById('changePwdModal').classList.remove('active');
+                }
+            });
+
+            // 自动刷新：每 60 秒拉取一次云端数据
+            setInterval(async () => {
+                if (getGitHubToken() && !_ghSyncing) {
+                    const fresh = await _cloudFetch();
+                    if (fresh) {
+                        if (fresh.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh.weeks));
+                        if (fresh.users) localStorage.setItem(USERS_KEY, JSON.stringify(fresh.users));
+                        if (fresh.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(fresh.history));
+                        updateSyncBadge('✅', '已同步');
+                    }
+                }
+            }, 60000);
+
+            // 页面获得焦点时也刷新
+            document.addEventListener('visibilitychange', async () => {
+                if (!document.hidden && getGitHubToken() && !_ghSyncing) {
+                    const fresh = await _cloudFetch();
+                    if (fresh) {
+                        if (fresh.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh.weeks));
+                        if (fresh.users) localStorage.setItem(USERS_KEY, JSON.stringify(fresh.users));
+                        if (fresh.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(fresh.history));
+                        updateSyncBadge('✅', '已同步');
+                        if (!document.getElementById('modalOverlay').classList.contains('active')) {
+                            renderAll();
+                        }
+                    }
                 }
             });
         }
