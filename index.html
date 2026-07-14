@@ -1081,6 +1081,11 @@
             window._pushTimer = setTimeout(() => syncPush(true), 1000);
         }
 
+        function updateSyncBadge(icon, text) {
+            const el = document.getElementById('syncBadge');
+            if (el) { el.textContent = icon + ' ' + text; }
+        }
+
 
         const DIMENSION_TYPES = ['核心指标', '重点工作', '重大批量质量问题改进'];
         const STATUS_LIST = ['已完成', '开展中', '延期风险', '已延期'];
