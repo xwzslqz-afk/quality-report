@@ -4,12 +4,12 @@
       "研发质量": {
         "杨思睿": [
           {
-            "id": "mrkl6y48_zt1jf",
+            "id": "mrkl8o9e_1pads",
             "dimension": "核心指标",
-            "category": "1",
-            "name": "1",
-            "target": "1",
-            "actual": "1",
+            "category": "2",
+            "name": "2",
+            "target": "2",
+            "actual": "2",
             "achieveStatus": "不达标",
             "workType": "",
             "problemDesc": "",
@@ -18,12 +18,12 @@
             "longTermMeasure": "",
             "nextPlan": "",
             "description": "",
-            "responsible": "1",
+            "responsible": "2",
             "deadline": "",
             "progress": "",
             "status": "开展中",
-            "deviation": "1",
-            "action": "1"
+            "deviation": "",
+            "action": ""
           }
         ],
         "吴金鹏": [],
@@ -64,7 +64,7 @@
   },
   "users": {
     "路清召": {
-      "password": "123456789.0",
+      "password": "rhzl@2026lqz",
       "role": "admin"
     },
     "陈礼丽": {
@@ -163,7 +163,7 @@
   "history": {
     "2026-07-13": [
       {
-        "timestamp": "2026-07-14T11:42:54.153Z",
+        "timestamp": "2026-07-14T11:41:56.314Z",
         "data": {
           "研发质量": {
             "杨思睿": [],
@@ -204,17 +204,17 @@
         }
       },
       {
-        "timestamp": "2026-07-14T11:47:32.792Z",
+        "timestamp": "2026-07-14T11:48:53.331Z",
         "data": {
           "研发质量": {
             "杨思睿": [
               {
-                "id": "mrkl6y48_zt1jf",
+                "id": "mrkl8o9e_1pads",
                 "dimension": "核心指标",
-                "category": "1",
-                "name": "1",
-                "target": "1",
-                "actual": "1",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
                 "achieveStatus": "不达标",
                 "workType": "",
                 "problemDesc": "",
@@ -223,12 +223,12 @@
                 "longTermMeasure": "",
                 "nextPlan": "",
                 "description": "",
-                "responsible": "1",
+                "responsible": "2",
                 "deadline": "",
                 "progress": "",
                 "status": "开展中",
-                "deviation": "1",
-                "action": "1"
+                "deviation": "",
+                "action": ""
               }
             ],
             "吴金鹏": [],
