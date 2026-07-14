@@ -2215,6 +2215,8 @@
         function renderHistorySelect() {
             const select = document.getElementById('historySelect');
             const versions = getHistoryVersions(currentWeekKey);
+            // 按时间从远到近排序
+            versions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             select.innerHTML = '<option value="">— 当前版本 —</option>';
             for (let i = 0; i < versions.length; i++) {
                 const v = versions[i];
