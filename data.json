@@ -2,7 +2,30 @@
   "weeks": {
     "2026-07-13": {
       "研发质量": {
-        "杨思睿": [],
+        "杨思睿": [
+          {
+            "id": "mrkl6y48_zt1jf",
+            "dimension": "核心指标",
+            "category": "1",
+            "name": "1",
+            "target": "1",
+            "actual": "1",
+            "achieveStatus": "不达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "1",
+            "deadline": "",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "1",
+            "action": "1"
+          }
+        ],
         "吴金鹏": [],
         "张桂群": []
       },
