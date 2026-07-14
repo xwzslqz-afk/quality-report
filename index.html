@@ -1514,6 +1514,8 @@
             return true;
         }
 
+        let _lastSnapshotHash = '';  // 5s 定时快照：跟踪变化
+
         function pushHistory(weekKey) {
             const weekData = getWeekData(weekKey);
             const history = loadHistory();
@@ -1525,6 +1527,7 @@
             history[weekKey].push(snapshot);
             if (history[weekKey].length > 50) history[weekKey] = history[weekKey].slice(-50);
             saveHistory(history);
+            _lastSnapshotHash = JSON.stringify(weekData);
         }
 
         function getHistoryVersions(weekKey) {
@@ -3398,6 +3401,15 @@
                     document.getElementById('changePwdModal').classList.remove('active');
                 }
             });
+
+            // 每 5 秒自动保存过程版本（多人编辑追踪中间状态）
+            setInterval(() => {
+                if (!currentWeekKey) return;
+                const cur = JSON.stringify(getWeekData(currentWeekKey));
+                if (cur !== _lastSnapshotHash && cur !== '{}') {
+                    pushHistory(currentWeekKey);
+                }
+            }, 5000);
 
             // 自动刷新：每 30 秒拉取一次云端数据
             setInterval(async () => {
