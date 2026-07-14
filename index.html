@@ -995,41 +995,25 @@
             return new TextDecoder().decode(bytes);
         }
 
-        // 从云端拉取数据（优先用 Pages 同域 URL，兜底用 API）
+        // 从云端拉取数据（Pages 同域 URL，永不断连）
         async function syncPull(silent) {
-            let json = null;
-            // 方案1：Pages 同域 data.json（无认证、无 CORS、永不断）
             try {
                 const r = await fetch(PAGES_DATA + '?t=' + Date.now());
-                if (r.ok) { json = await r.json(); }
-            } catch(e) { console.warn('Pages fetch failed, trying API:', e.message); }
-
-            // 方案2：GitHub API（需要 Token 且网络可达 api.github.com）
-            if (!json) {
-                const t = ghToken();
-                if (!t) { if (!silent) showToast('⚠️ 无法连接云端，请检查网络', 'error'); return null; }
-                try {
-                    const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + t, 'Cache-Control': 'no-cache' } });
-                    if (r.ok) {
-                        const info = await r.json();
-                        _ghSha = info.sha;
-                        json = JSON.parse(_b64dec(info.content));
-                    }
-                } catch(e) { console.warn('API fetch failed:', e.message); }
-            }
-
-            if (!json) {
-                if (!silent) showToast('❌ 无法连接云端（Pages & API 均失败）', 'error', 3000);
-                updateSyncBadge('❌', '离线');
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const json = await r.json();
+                console.log('syncPull OK: weeks=' + Object.keys(json.weeks||{}).length + ' users=' + Object.keys(json.users||{}).length + ' history=' + Object.keys(json.history||{}).length);
+                if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
+                if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
+                if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
+                updateSyncBadge('✅', '已同步');
+                if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
+                return json;
+            } catch(e) {
+                console.error('syncPull failed:', e.message);
+                updateSyncBadge('❌', '读取失败');
+                if (!silent) showToast('❌ 读取云端失败: ' + e.message, 'error', 3000);
                 return null;
             }
-
-            if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
-            if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
-            if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
-            updateSyncBadge('✅', '已同步');
-            if (!silent) showToast('📥 云端数据已拉取', 'success', 1500);
-            return json;
         }
 
         // 推送本地数据到云端
@@ -1038,13 +1022,14 @@
             if (!t || _ghSyncing) return false;
             _ghSyncing = true;
             updateSyncBadge('⏳', '推送中…');
+            console.log('syncPush: starting...');
             try {
                 // 刷新 SHA
                 let sha = _ghSha;
                 try {
                     const sr = await fetch(GH_API, { headers: { 'Authorization': 'token ' + t } });
                     if (sr.ok) { const si = await sr.json(); sha = si.sha; _ghSha = sha; }
-                } catch(e) {}
+                } catch(e) { console.log('syncPush: SHA refresh error:', e.message); }
 
                 const payload = {
                     weeks: JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'),
@@ -1066,9 +1051,11 @@
                     const result = await r.json();
                     _ghSha = result.content.sha;
                     updateSyncBadge('✅', '已同步');
+                    console.log('syncPush OK: SHA=' + _ghSha.substring(0,12));
                     if (!silent) showToast('📤 已推送到云端', 'success', 1500);
                     return true;
                 }
+                console.error('syncPush FAIL: HTTP ' + r.status);
                 if (r.status === 409) {
                     updateSyncBadge('⚠️', '冲突');
                     if (!silent) showToast('⚠️ 数据冲突，请先拉取再推送', 'error', 3000);
