@@ -1020,31 +1020,81 @@
             return null;
         }
 
-        // 推送本地数据到云端
+        // 推送本地数据到云端（先拉取再合并，绝不删除云端数据）
         async function syncPush(silent) {
             const t = ghToken();
             if (!t || _ghSyncing) return false;
             _ghSyncing = true;
             updateSyncBadge('⏳', '推送中…');
-            console.log('syncPush: starting...');
+            console.log('syncPush: pulling cloud first...');
             try {
-                // 刷新 SHA
-                let sha = _ghSha;
+                // 1. 先拉取云端最新数据
+                let cloud = null;
                 try {
-                    const sr = await fetch(GH_API, { headers: { 'Authorization': 'token ' + t } });
-                    if (sr.ok) { const si = await sr.json(); sha = si.sha; _ghSha = sha; }
-                } catch(e) { console.log('syncPush: SHA refresh error:', e.message); }
+                    const cr = await fetch(GH_API, { headers: { 'Authorization': 'token ' + t } });
+                    if (cr.ok) {
+                        const ci = await cr.json();
+                        _ghSha = ci.sha;
+                        cloud = JSON.parse(_b64dec(ci.content));
+                    }
+                } catch(e) { console.log('syncPush: cloud fetch error:', e.message); }
 
-                const payload = {
+                // 2. 如果没有云端数据或拉取失败，直接用本地覆盖（首次推送）
+                if (!cloud) {
+                    cloud = { weeks: {}, users: {}, history: {} };
+                }
+
+                // 3. 深度合并：本地数据合并到云端数据（云端数据为基底，不删除）
+                const local = {
                     weeks: JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'),
                     users: JSON.parse(localStorage.getItem(USERS_KEY) || '{}'),
                     history: JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}')
                 };
+
+                // 合并 weeks（保留云端所有条目，本地新增/更新）
+                for (const wk of Object.keys(local.weeks)) {
+                    if (!cloud.weeks[wk]) cloud.weeks[wk] = {};
+                    for (const team of Object.keys(local.weeks[wk])) {
+                        if (!cloud.weeks[wk][team]) cloud.weeks[wk][team] = {};
+                        for (const member of Object.keys(local.weeks[wk][team])) {
+                            if (!cloud.weeks[wk][team][member]) {
+                                cloud.weeks[wk][team][member] = local.weeks[wk][team][member];
+                            } else {
+                                // 按 ID 合并：本地有的更新，云端独有的保留
+                                const cloudItems = cloud.weeks[wk][team][member];
+                                const localItems = local.weeks[wk][team][member];
+                                const cloudMap = {};
+                                for (const ci of cloudItems) cloudMap[ci.id] = ci;
+                                for (const li of localItems) cloudMap[li.id] = li; // 本地覆盖云端同 ID
+                                cloud.weeks[wk][team][member] = Object.values(cloudMap);
+                            }
+                        }
+                    }
+                }
+
+                // 合并 users（保留云端所有用户，本地新增/更新）
+                for (const u of Object.keys(local.users)) {
+                    cloud.users[u] = local.users[u]; // 本地覆盖（含密码修改等）
+                }
+
+                // 合并 history（保留云端所有快照，本地追加）
+                for (const hk of Object.keys(local.history)) {
+                    if (!cloud.history[hk]) cloud.history[hk] = [];
+                    const existTimestamps = new Set(cloud.history[hk].map(h => h.timestamp));
+                    for (const snap of local.history[hk]) {
+                        if (!existTimestamps.has(snap.timestamp)) {
+                            cloud.history[hk].push(snap);
+                        }
+                    }
+                    if (cloud.history[hk].length > 50) cloud.history[hk] = cloud.history[hk].slice(-50);
+                }
+
+                // 4. 推送合并结果
                 const body = {
                     message: 'Update ' + new Date().toLocaleString('zh-CN'),
-                    content: _b64enc(JSON.stringify(payload, null, 2))
+                    content: _b64enc(JSON.stringify(cloud, null, 2))
                 };
-                if (sha) body.sha = sha;
+                if (_ghSha) body.sha = _ghSha;
 
                 const r = await fetch(GH_API, {
                     method: 'PUT',
@@ -1062,7 +1112,7 @@
                 console.error('syncPush FAIL: HTTP ' + r.status);
                 if (r.status === 409) {
                     updateSyncBadge('⚠️', '冲突');
-                    if (!silent) showToast('⚠️ 数据冲突，请先拉取再推送', 'error', 3000);
+                    if (!silent) showToast('⚠️ 数据冲突，请重试', 'error', 2000);
                 } else {
                     updateSyncBadge('❌', '推送失败');
                     if (!silent) showToast('❌ 推送失败 HTTP ' + r.status, 'error');
