@@ -974,6 +974,7 @@
                 // ===== GitHub 云端同步配置 =====
         const GH_REPO = 'xwzslqz-afk/quality-report';
         const GH_API = 'https://api.github.com/repos/' + GH_REPO + '/contents/data.json';
+        const PAGES_DATA = 'data.json';  // 同域读取，无需认证，永不断连
         let _ghSha = null;
         let _ghSyncing = false;
 
@@ -994,28 +995,41 @@
             return new TextDecoder().decode(bytes);
         }
 
-        // 从云端拉取数据 → 写入 localStorage
+        // 从云端拉取数据（优先用 Pages 同域 URL，兜底用 API）
         async function syncPull(silent) {
-            const t = ghToken();
-            if (!t) return null;
+            let json = null;
+            // 方案1：Pages 同域 data.json（无认证、无 CORS、永不断）
             try {
-                const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + t, 'Cache-Control': 'no-cache' } });
-                if (!r.ok) { if (!silent) showToast('❌ 拉取失败: HTTP ' + r.status, 'error'); return null; }
-                const info = await r.json();
-                _ghSha = info.sha;
-                const json = JSON.parse(_b64dec(info.content));
-                if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
-                if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
-                if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
-                updateSyncBadge('✅', '已同步');
-                if (!silent) showToast('📥 云端数据已拉取', 'success', 1500);
-                return json;
-            } catch(e) {
-                console.error('syncPull:', e);
-                if (!silent) showToast('❌ 拉取异常: ' + e.message, 'error');
-                updateSyncBadge('❌', '失败');
+                const r = await fetch(PAGES_DATA + '?t=' + Date.now());
+                if (r.ok) { json = await r.json(); }
+            } catch(e) { console.warn('Pages fetch failed, trying API:', e.message); }
+
+            // 方案2：GitHub API（需要 Token 且网络可达 api.github.com）
+            if (!json) {
+                const t = ghToken();
+                if (!t) { if (!silent) showToast('⚠️ 无法连接云端，请检查网络', 'error'); return null; }
+                try {
+                    const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + t, 'Cache-Control': 'no-cache' } });
+                    if (r.ok) {
+                        const info = await r.json();
+                        _ghSha = info.sha;
+                        json = JSON.parse(_b64dec(info.content));
+                    }
+                } catch(e) { console.warn('API fetch failed:', e.message); }
+            }
+
+            if (!json) {
+                if (!silent) showToast('❌ 无法连接云端（Pages & API 均失败）', 'error', 3000);
+                updateSyncBadge('❌', '离线');
                 return null;
             }
+
+            if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
+            if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
+            if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
+            updateSyncBadge('✅', '已同步');
+            if (!silent) showToast('📥 云端数据已拉取', 'success', 1500);
+            return json;
         }
 
         // 推送本地数据到云端
