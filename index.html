@@ -3058,14 +3058,8 @@
                 showToast('⚠️ 请先点击 🔑 Token 配置 GitHub Token', 'error');
                 return;
             }
-            const choice = confirm('🔄 手动同步\n\n点「确定」：推送本地 → 云端\n点「取消」：从云端拉取覆盖本地');
-            if (choice) {
-                _ghSha = null;
-                await syncPush(false);
-            } else {
-                const ok = await syncPull(false);
-                if (ok) renderAll();
-            }
+            _ghSha = null;
+            await syncPush(false);
         });
 
         document.getElementById('tokenBtn').addEventListener('click', function() {
