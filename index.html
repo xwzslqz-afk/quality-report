@@ -1087,12 +1087,12 @@
             }
         }
 
-        // 本地修改后自动调度推送
+        // 本地修改后自动调度推送（500ms 防抖）
         function schedulePush() {
-            if (!ghToken()) return;
+            if (!ghToken()) { updateSyncBadge('💻', '本地'); return; }
             updateSyncBadge('⏳', '待同步');
             clearTimeout(window._pushTimer);
-            window._pushTimer = setTimeout(() => syncPush(true), 1000);
+            window._pushTimer = setTimeout(() => syncPush(false), 500);
         }
 
         function updateSyncBadge(icon, text) {
