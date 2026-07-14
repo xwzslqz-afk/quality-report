@@ -3255,31 +3255,24 @@
                 }
             });
 
-            // 自动刷新：每 60 秒拉取一次云端数据
+            // 自动刷新：每 30 秒拉取一次云端数据
             setInterval(async () => {
                 if (ghToken() && !_ghSyncing) {
                     const fresh = await syncPull(true);
                     if (fresh) {
-                        if (fresh.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh.weeks));
-                        if (fresh.users) localStorage.setItem(USERS_KEY, JSON.stringify(fresh.users));
-                        if (fresh.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(fresh.history));
+                        renderAll();
                         updateSyncBadge('✅', '已同步');
                     }
                 }
-            }, 60000);
+            }, 30000);
 
             // 页面获得焦点时也刷新
             document.addEventListener('visibilitychange', async () => {
                 if (!document.hidden && ghToken() && !_ghSyncing) {
                     const fresh = await syncPull(true);
                     if (fresh) {
-                        if (fresh.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh.weeks));
-                        if (fresh.users) localStorage.setItem(USERS_KEY, JSON.stringify(fresh.users));
-                        if (fresh.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(fresh.history));
+                        renderAll();
                         updateSyncBadge('✅', '已同步');
-                        if (!document.getElementById('modalOverlay').classList.contains('active')) {
-                            renderAll();
-                        }
                     }
                 }
             });
