@@ -978,6 +978,7 @@
         const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';  // 即时更新，无 Pages 延迟
         let _ghSha = null;
         let _ghSyncing = false;
+        let _initDone = false;  // init 完成前禁止推送，防止空数据覆盖云端
 
         function ghToken() { return localStorage.getItem('gh_token') || ''; }
         function ghSetToken(t) { localStorage.setItem('gh_token', t); }
@@ -1166,6 +1167,7 @@
         // 本地修改后自动调度推送（500ms 防抖）
         function schedulePush() {
             if (!ghToken()) { updateSyncBadge('💻', '本地'); return; }
+            if (!_initDone) { console.log('schedulePush: init not done, skipped'); return; }
             updateSyncBadge('⏳', '待同步');
             clearTimeout(window._pushTimer);
             window._pushTimer = setTimeout(() => syncPush(false), 500);
@@ -3271,6 +3273,7 @@
 
             // 尝试从云端拉取数据
             const cloudData = await syncPull(false);
+            _initDone = true;
             if (cloudData) {
                 if (cloudData.weeks && Object.keys(cloudData.weeks).length > 0) {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData.weeks));
