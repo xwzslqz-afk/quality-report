@@ -686,7 +686,8 @@
                     <input type="file" id="fileInput" class="file-input-hidden" accept=".xlsx,.xls" />
                 </div>
                 <span class="sync-badge" id="syncBadge" title="云端同步状态" style="font-size:12px;color:#64748b;margin:0 4px;white-space:nowrap;">💻 本地</span>
-                <button class="btn btn-xs btn-outline" id="tokenBtn" title="配置 GitHub Token 以启用云端同步" style="font-size:11px;">🔑 Token</button>
+                <button class="btn btn-xs btn-outline" id="syncBtn" title="手动同步云端数据" style="font-size:11px;">🔄 同步</button>
+                <button class="btn btn-xs btn-outline" id="tokenBtn" title="配置 GitHub Token" style="font-size:11px;">🔑 Token</button>
                 <div class="user-bar" id="userBar">
                     <!-- 动态渲染 -->
                 </div>
@@ -982,18 +983,38 @@
             return localStorage.getItem('gh_token') || '';
         }
 
+        // Base64 编码（正确处理中文）
+        function _toBase64(str) {
+            const bytes = new TextEncoder().encode(str);
+            let bin = '';
+            for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+            return btoa(bin);
+        }
+        function _fromBase64(b64) {
+            const bin = atob(b64.replace(/\s/g, ''));
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return new TextDecoder().decode(bytes);
+        }
+
         async function _cloudFetch() {
             const token = getGitHubToken();
             if (!token) return null;
             try {
+                // 通过 API 获取（实时无缓存）+ 直接解码 base64 内容
                 const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + token, 'Cache-Control': 'no-cache' } });
                 if (!r.ok) return null;
                 const info = await r.json();
                 _ghSha = info.sha;
+                // 优先用 API 返回的 base64 内容（避免 raw URL CDN 缓存延迟）
+                if (info.content) {
+                    try { return JSON.parse(_fromBase64(info.content)); } catch(e) {}
+                }
+                // Fallback: raw URL
                 const raw = await fetch(GH_RAW + '?t=' + Date.now());
                 if (!raw.ok) return null;
                 return await raw.json();
-            } catch { return null; }
+            } catch(e) { console.warn('_cloudFetch:', e); return null; }
         }
 
         async function _cloudPush() {
@@ -1013,7 +1034,7 @@
                 const users = getUsers();
                 const history = loadHistory();
                 const payload = { weeks, users, history };
-                const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+                const content = _toBase64(JSON.stringify(payload, null, 2));
                 const body = { message: 'Update: ' + new Date().toLocaleString('zh-CN'), content };
                 if (sha) body.sha = sha;
                 const r = await fetch(GH_API, {
@@ -1032,7 +1053,7 @@
                     if (remote) {
                         const merged = _mergeData(remote);
                         if (merged) {
-                            const content2 = btoa(unescape(encodeURIComponent(JSON.stringify(merged, null, 2))));
+                            const content2 = _toBase64(JSON.stringify(merged, null, 2));
                             const body2 = { message: 'Merge & update', content: content2 };
                             if (_ghSha) body2.sha = _ghSha;
                             const r2 = await fetch(GH_API, {
@@ -1056,6 +1077,7 @@
                     updateSyncBadge('❌', '同步失败');
                 }
             } catch(e) {
+                console.error('_cloudPush error:', e);
                 updateSyncBadge('❌', '网络错误');
             } finally {
                 _ghSyncing = false;
@@ -3068,8 +3090,49 @@
         });
 
         // ============================================================
-        //  Token 管理
+        //  手动同步 & Token 管理
         // ============================================================
+        document.getElementById('syncBtn').addEventListener('click', async function() {
+            if (!getGitHubToken()) {
+                showToast('⚠️ 请先点击 🔑 Token 配置 GitHub Token', 'error');
+                return;
+            }
+            updateSyncBadge('⏳', '同步中…');
+            // 先推送本地数据
+            const weeks = loadAllData();
+            const users = getUsers();
+            const hasLocal = Object.keys(weeks).length > 0 || Object.keys(users).length > 2;
+            if (hasLocal && confirm('是否先将本地数据推送到云端？
+
+点「确定」推送本地 → 云端
+点「取消」从云端拉取覆盖本地')) {
+                // Push local to cloud
+                _ghSha = null;
+                await _cloudPush();
+                showToast('📤 本地数据已推送', 'success');
+            } else {
+                // Pull from cloud
+                const remote = await _cloudFetch();
+                if (remote) {
+                    if (remote.weeks && Object.keys(remote.weeks).length > 0) {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(remote.weeks));
+                    }
+                    if (remote.users && Object.keys(remote.users).length > 0) {
+                        localStorage.setItem(USERS_KEY, JSON.stringify(remote.users));
+                    }
+                    if (remote.history) {
+                        localStorage.setItem(HISTORY_KEY, JSON.stringify(remote.history));
+                    }
+                    updateSyncBadge('✅', '已同步');
+                    showToast('📥 云端数据已拉取并覆盖本地', 'success');
+                    renderAll();
+                } else {
+                    updateSyncBadge('⚠️', '离线');
+                    showToast('❌ 无法连接云端，请检查网络或 Token', 'error');
+                }
+            }
+        });
+
         document.getElementById('tokenBtn').addEventListener('click', function() {
             const current = getGitHubToken();
             const msg = current
