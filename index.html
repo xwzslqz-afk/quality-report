@@ -1,0 +1,3050 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>质量团队目标及重点工作管理周报</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
+    </script>
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: '微软雅黑', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 1600px;
+            height: 100%;
+            max-height: 98vh;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== 表头 ===== */
+        .header {
+            padding: 12px 24px;
+            border-bottom: 2px solid #eef2f6;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .header-left {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 6px 16px;
+        }
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0b2b4a;
+            letter-spacing: 0.5px;
+        }
+        .header-title span {
+            color: #2acc8e;
+        }
+        .archive-indicator {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+        .header-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-controls label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .header-controls select {
+            padding: 6px 12px;
+            border: 1.5px solid #d1d9e6;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+            min-width: 160px;
+        }
+        .header-controls select:focus {
+            border-color: #2acc8e;
+            box-shadow: 0 0 0 3px rgba(42, 204, 142, 0.15);
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f1f4f9;
+            color: #1e293b;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .btn-primary {
+            background: #2acc8e;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #22b57e;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #d1d9e6;
+        }
+        .btn-outline:hover {
+            border-color: #2acc8e;
+            background: #f6fdfa;
+        }
+        .btn-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+        .btn-xs {
+            padding: 2px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+        .btn-warning {
+            background: #fef3c7;
+            color: #8b5d0b;
+        }
+        .btn-warning:hover {
+            background: #fde68a;
+        }
+
+        /* ===== 用户信息栏 ===== */
+        .user-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+        .user-bar .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0b2b4a;
+        }
+        .user-bar .user-role {
+            font-size: 12px;
+            color: #94a3b8;
+            background: #eef2f6;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+
+        /* ===== 历史版本栏 ===== */
+        .history-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 24px;
+            background: #f8fafc;
+            border-bottom: 1px solid #eef2f6;
+            flex-shrink: 0;
+        }
+        .history-bar .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .history-bar select {
+            padding: 4px 10px;
+            border: 1.5px solid #d1d9e6;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            background: #fff;
+            outline: none;
+            min-width: 160px;
+        }
+        .history-bar select:focus {
+            border-color: #2acc8e;
+        }
+        .history-count {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* ===== 主体 ===== */
+        .main-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ===== 左侧侧边栏 ===== */
+        .sidebar {
+            width: 230px;
+            background: #fafcfe;
+            border-right: 1px solid #eef2f6;
+            padding: 12px 0;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+        .sidebar .abnormal-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            margin: 0 6px 8px 6px;
+            background: #fef3c7;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #8b5d0b;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: 1px solid #fde68a;
+        }
+        .sidebar .abnormal-entry:hover {
+            background: #fde68a;
+        }
+        .sidebar .abnormal-entry.active {
+            background: #f59e0b;
+            color: #fff;
+            border-color: #f59e0b;
+        }
+        .sidebar .abnormal-entry .badge {
+            background: #ef4444;
+            color: #fff;
+            border-radius: 12px;
+            padding: 0 10px;
+            font-size: 12px;
+            line-height: 20px;
+        }
+
+        .sidebar .team-group {
+            margin-bottom: 4px;
+        }
+        .sidebar .team-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #0b2b4a;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-radius: 4px;
+            margin: 0 6px;
+        }
+        .sidebar .team-header:hover {
+            background: #eef2f6;
+        }
+        .sidebar .team-header .team-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .sidebar .team-header .team-actions .btn {
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+        .sidebar .member-list {
+            padding-left: 12px;
+            margin: 4px 0 8px 0;
+        }
+        .sidebar .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 16px 6px 24px;
+            font-size: 13px;
+            color: #475569;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 0 6px 2px 6px;
+            transition: background 0.15s;
+        }
+        .sidebar .member-item:hover {
+            background: #eef2f6;
+        }
+        .sidebar .member-item.active {
+            background: #d1fae5;
+            color: #0b6e4f;
+            font-weight: 600;
+        }
+        .sidebar .member-item .member-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .sidebar .member-item .member-actions .btn {
+            padding: 0 6px;
+            font-size: 12px;
+            background: transparent;
+            color: #94a3b8;
+        }
+        .sidebar .member-item .member-actions .btn:hover {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+        .sidebar .add-member-btn {
+            display: block;
+            margin: 4px 12px 8px 24px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: #2acc8e;
+            background: transparent;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .sidebar .add-member-btn:hover {
+            border-color: #2acc8e;
+            background: #f6fdfa;
+        }
+
+        /* ===== 右侧内容 ===== */
+        .content {
+            flex: 1;
+            padding: 16px 24px 24px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+        .content .member-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0b2b4a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .content .member-title .count {
+            font-size: 14px;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+        .content .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0b2b4a;
+            margin: 20px 0 10px 0;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #e9edf4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content .section-title .add-btn {
+            font-size: 13px;
+            font-weight: 500;
+            padding: 2px 14px;
+            border-radius: 6px;
+            border: 1px dashed #cbd5e1;
+            background: transparent;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .content .section-title .add-btn:hover {
+            border-color: #2acc8e;
+            color: #2acc8e;
+            background: #f6fdfa;
+        }
+        .content .table-wrap {
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 900px;
+        }
+        table th {
+            background: #2acc8e;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 8px 10px;
+            text-align: left;
+            white-space: nowrap;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+        table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eef2f6;
+            vertical-align: middle;
+            word-break: break-word;
+        }
+        table tbody tr:hover {
+            background: #f8fafc;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            min-width: 60px;
+            text-align: center;
+        }
+        .status-tag.done {
+            background: #22c55e;
+        }
+        .status-tag.ongoing {
+            background: #3b82f6;
+        }
+        .status-tag.risk {
+            background: #eab308;
+            color: #1e293b;
+        }
+        .status-tag.delayed {
+            background: #ef4444;
+        }
+        .status-tag.default {
+            background: #94a3b8;
+        }
+        .achieve-tag {
+            display: inline-block;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .achieve-tag.pass {
+            background: #22c55e;
+        }
+        .achieve-tag.fail {
+            background: #ef4444;
+        }
+        .empty-row td {
+            text-align: center;
+            color: #94a3b8;
+            padding: 20px 12px;
+            font-style: italic;
+        }
+        .no-permission td {
+            text-align: center;
+            color: #ef4444;
+            padding: 20px 12px;
+            font-weight: 600;
+        }
+
+        /* ===== 模态框 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 680px;
+            width: 100%;
+            padding: 28px 32px 32px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0b2b4a;
+            margin-bottom: 20px;
+        }
+        .modal-box .form-group {
+            margin-bottom: 16px;
+        }
+        .modal-box .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+        .modal-box .form-group input,
+        .modal-box .form-group select,
+        .modal-box .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #d1d9e6;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #ffffff;
+            color: #1e293b;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .modal-box .form-group input:focus,
+        .modal-box .form-group select:focus,
+        .modal-box .form-group textarea:focus {
+            border-color: #2acc8e;
+            box-shadow: 0 0 0 3px rgba(42, 204, 142, 0.12);
+        }
+        .modal-box .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid #eef2f6;
+        }
+        .modal-actions .btn {
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            max-width: 90vw;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .toast.success {
+            background: #0b6e4f;
+        }
+        .toast.error {
+            background: #b91c1c;
+        }
+        .toast.info {
+            background: #1e4b8a;
+        }
+
+        /* ===== 滚动条 ===== */
+        .content::-webkit-scrollbar,
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .content::-webkit-scrollbar-thumb,
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .content::-webkit-scrollbar-track,
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 170px;
+            }
+            .content {
+                padding: 12px;
+            }
+            .header {
+                padding: 12px;
+            }
+            .header-title {
+                font-size: 18px;
+            }
+            .history-bar {
+                padding: 4px 12px;
+            }
+            .modal-box {
+                padding: 20px;
+            }
+            table {
+                font-size: 13px;
+                min-width: 700px;
+            }
+        }
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 130px;
+            }
+            .sidebar .team-header {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            .sidebar .member-item {
+                font-size: 12px;
+                padding: 4px 10px 4px 16px;
+            }
+            .content .member-title {
+                font-size: 16px;
+            }
+            .btn {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            .header-controls select {
+                min-width: 120px;
+                font-size: 12px;
+            }
+        }
+
+        .file-input-hidden {
+            display: none;
+        }
+        .login-modal .modal-box {
+            max-width: 420px;
+        }
+        .login-modal .modal-box .form-group {
+            margin-bottom: 18px;
+        }
+        .login-modal .modal-box .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 表头 -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="header-title">📋 质量团队目标及重点工作管理<span>周报</span></h1>
+                <span class="archive-indicator" id="archiveIndicator"></span>
+            </div>
+            <div class="header-controls">
+                <label for="weekSelect">📅 周次</label>
+                <select id="weekSelect"></select>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="exportBtn">📥 导出 Excel</button>
+                    <button class="btn btn-outline" id="importBtn">📤 导入 Excel</button>
+                    <input type="file" id="fileInput" class="file-input-hidden" accept=".xlsx,.xls" />
+                </div>
+                <div class="user-bar" id="userBar">
+                    <!-- 动态渲染 -->
+                </div>
+            </div>
+        </header>
+
+        <!-- 历史版本 -->
+        <div class="history-bar">
+            <span class="label">🕐 历史版本</span>
+            <select id="historySelect">
+                <option value="">— 当前版本 —</option>
+            </select>
+            <span class="history-count" id="historyCount">共 0 个版本</span>
+            <button class="btn btn-sm btn-outline" id="restoreHistoryBtn">↩ 恢复</button>
+            <button class="btn btn-sm btn-danger" id="clearHistoryBtn">🗑 清空</button>
+        </div>
+
+        <!-- 主体 -->
+        <div class="main-body">
+            <!-- 左侧侧边栏 -->
+            <nav class="sidebar" id="sidebar"></nav>
+
+            <!-- 右侧内容 -->
+            <div class="content" id="contentArea">
+                <!-- 普通成员视图 -->
+                <div id="normalView">
+                    <div class="member-title" id="memberTitle">
+                        <span id="currentMemberName">请选择成员</span>
+                        <span class="count" id="itemCount">0 项</span>
+                    </div>
+
+                    <!-- ===== 核心指标 ===== -->
+                    <div id="coreSection" style="display:none;">
+                        <div class="section-title">
+                            <span>📊 核心指标</span>
+                            <button class="add-btn" id="addCoreBtn">＋ 添加</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table id="coreTable">
+                                <thead>
+                                    <tr>
+                                        <th>指标分类</th>
+                                        <th>指标名称</th>
+                                        <th>目标值</th>
+                                        <th>达成值</th>
+                                        <th>达成状态</th>
+                                        <th>责任人</th>
+                                        <th>偏差分析</th>
+                                        <th>后续行动计划</th>
+                                        <th style="text-align:center;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="coreBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ===== 重点工作 ===== -->
+                    <div id="keySection" style="display:none;">
+                        <div class="section-title">
+                            <span>📌 重点工作</span>
+                            <button class="add-btn" id="addKeyBtn">＋ 添加</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table id="keyTable">
+                                <thead>
+                                    <tr>
+                                        <th>维度（自定义）</th>
+                                        <th>目标 / 任务描述</th>
+                                        <th>责任人</th>
+                                        <th>完成时间</th>
+                                        <th>完成进展</th>
+                                        <th>状态</th>
+                                        <th>偏差分析</th>
+                                        <th style="text-align:center;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="keyBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ===== 重大批量质量问题改进 ===== -->
+                    <div id="majorSection" style="display:none;">
+                        <div class="section-title">
+                            <span>⚙️ 重大批量质量问题改进</span>
+                            <button class="add-btn" id="addMajorBtn">＋ 添加</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table id="majorTable">
+                                <thead>
+                                    <tr>
+                                        <th>问题描述</th>
+                                        <th>原因分析</th>
+                                        <th>临时措施</th>
+                                        <th>长期措施</th>
+                                        <th>责任人</th>
+                                        <th>完成时间</th>
+                                        <th>状态</th>
+                                        <th>延期后下一步计划</th>
+                                        <th style="text-align:center;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="majorBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="emptyMember" style="display:none; text-align:center; padding:60px 0; color:#94a3b8;">
+                        <p style="font-size:18px;">👤 请从左侧选择一个成员</p>
+                    </div>
+                </div>
+
+                <!-- 异常分析视图 -->
+                <div id="abnormalView" style="display:none;">
+                    <div class="member-title">
+                        <span>🚨 异常分析汇总</span>
+                        <span class="count" id="abnormalCount">0 项异常</span>
+                    </div>
+                    <!-- 核心指标异常 -->
+                    <div id="abnormalCoreSection">
+                        <div class="section-title">📊 核心指标异常（不达标）</div>
+                        <div class="table-wrap">
+                            <table id="abnormalCoreTable">
+                                <thead>
+                                    <tr>
+                                        <th>团队</th>
+                                        <th>成员</th>
+                                        <th>指标分类</th>
+                                        <th>指标名称</th>
+                                        <th>目标值</th>
+                                        <th>达成值</th>
+                                        <th>达成状态</th>
+                                        <th>责任人</th>
+                                        <th>偏差分析</th>
+                                        <th>后续行动计划</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="abnormalCoreBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- 其他工作异常（重点+重大） -->
+                    <div id="abnormalOtherSection">
+                        <div class="section-title">📌 重点工作 / 重大改进异常（延期风险 / 已延期）</div>
+                        <div class="table-wrap">
+                            <table id="abnormalOtherTable">
+                                <thead>
+                                    <tr>
+                                        <th>团队</th>
+                                        <th>成员</th>
+                                        <th>类型</th>
+                                        <th>描述</th>
+                                        <th>责任人</th>
+                                        <th>完成时间</th>
+                                        <th>状态</th>
+                                        <th>偏差/计划</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="abnormalOtherBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 登录模态框 ===== -->
+    <div class="modal-overlay login-modal" id="loginModal">
+        <div class="modal-box">
+            <h3>🔐 用户登录</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">用户名</label>
+                    <input type="text" id="loginUsername" placeholder="请输入用户名" required />
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码" required />
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="loginCancelBtn">取消</button>
+                    <button type="submit" class="btn btn-primary">登录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== 修改密码模态框 ===== -->
+    <div class="modal-overlay" id="changePwdModal">
+        <div class="modal-box">
+            <h3>🔑 修改密码</h3>
+            <form id="changePwdForm">
+                <div class="form-group">
+                    <label for="oldPwd">当前密码</label>
+                    <input type="password" id="oldPwd" placeholder="请输入当前密码" required />
+                </div>
+                <div class="form-group">
+                    <label for="newPwd">新密码</label>
+                    <input type="password" id="newPwd" placeholder="请输入新密码" required />
+                </div>
+                <div class="form-group">
+                    <label for="confirmPwd">确认新密码</label>
+                    <input type="password" id="confirmPwd" placeholder="请再次输入新密码" required />
+                </div>
+                <div class="form-actions" style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                    <button type="button" class="btn btn-outline" id="changePwdCancelBtn">取消</button>
+                    <button type="submit" class="btn btn-primary">确认修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 任务编辑模态框（原有） -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <h3 id="modalTitle">添加任务项</h3>
+            <form id="modalForm" autocomplete="off">
+                <input type="hidden" id="editItemId" />
+                <input type="hidden" id="editTeamName" />
+                <input type="hidden" id="editMemberName" />
+                <input type="hidden" id="editDimension" />
+                <div id="modalFields"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="modalCancelBtn">取消</button>
+                    <button type="submit" class="btn btn-primary">💾 保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  配置 & 用户数据
+        // ============================================================
+        const TEAMS_CONFIG = {
+            '研发质量': ['杨思睿', '吴金鹏', '张桂群'],
+            '供应商质量-智慧能源': ['张春来', '张敏', '刘一宁', '施佳伟'],
+            '供应商质量-电池': ['邓超', '张强', '严鑫', '张若愚'],
+            '过程质量': ['崔得峰', '相茂岩', '徐朝兴', '张义', '葛晨云', '周海娜', '张端奇'],
+            '客户质量及质量改进': ['曹改芳', '谢星炯', '杨起翔', '邹家祥'],
+            '质量体系': ['杨思睿', '葛晨云']
+        };
+
+        const PINYIN_MAP = {
+            '杨思睿': 'yangsirui',
+            '吴金鹏': 'wujinpeng',
+            '张桂群': 'zhangguiqu',
+            '张春来': 'zhangchunlai',
+            '张敏': 'zhangmin',
+            '刘一宁': 'liuyining',
+            '施佳伟': 'shijiawei',
+            '邓超': 'dengchao',
+            '张强': 'zhangqiang',
+            '严鑫': 'yanxin',
+            '张若愚': 'zhangruoyu',
+            '崔得峰': 'cuidefeng',
+            '相茂岩': 'xiangmaoyan',
+            '徐朝兴': 'xuzhaoxing',
+            '张义': 'zhangyi',
+            '葛晨云': 'gechenyun',
+            '周海娜': 'zhouhaina',
+            '张端奇': 'zhangduanqi',
+            '曹改芳': 'caogaifang',
+            '谢星炯': 'xiexingjiong',
+            '杨起翔': 'yangqixiang',
+            '邹家祥': 'zoujiaxiang'
+        };
+
+        // 管理员账号列表（可扩展）
+        const ADMIN_ACCOUNTS = {
+            '路清召': 'rhzl@2026lqz',
+            '陈礼丽': 'chenlili'
+        };
+
+        const STORAGE_KEY = 'quality_team_data_v6';
+        const HISTORY_KEY = 'quality_team_history_v6';
+        const USERS_KEY = 'quality_users_v1';
+
+        const DIMENSION_TYPES = ['核心指标', '重点工作', '重大批量质量问题改进'];
+        const STATUS_LIST = ['已完成', '开展中', '延期风险', '已延期'];
+        const STATUS_CLASS = {
+            '已完成': 'done',
+            '开展中': 'ongoing',
+            '延期风险': 'risk',
+            '已延期': 'delayed'
+        };
+        const ACHIEVE_LIST = ['达标', '不达标'];
+
+        // ============================================================
+        //  用户管理
+        // ============================================================
+        function getUsers() {
+            try {
+                const raw = localStorage.getItem(USERS_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch { return {}; }
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        // 初始化用户（若不存在则创建）
+        function initUsers() {
+            let users = getUsers();
+            let changed = false;
+
+            // 添加所有管理员
+            for (const [username, password] of Object.entries(ADMIN_ACCOUNTS)) {
+                if (!users[username]) {
+                    users[username] = { password: password, role: 'admin' };
+                    changed = true;
+                }
+            }
+
+            // 普通成员
+            const allMembers = new Set();
+            for (const members of Object.values(TEAMS_CONFIG)) {
+                for (const m of members) {
+                    allMembers.add(m);
+                }
+            }
+            for (const name of allMembers) {
+                if (!users[name]) {
+                    const pinyin = PINYIN_MAP[name] || name.toLowerCase();
+                    users[name] = { password: pinyin, role: 'member' };
+                    changed = true;
+                }
+            }
+            if (changed) saveUsers(users);
+            return users;
+        }
+
+        function authenticate(username, password) {
+            const users = getUsers();
+            const user = users[username];
+            if (!user) return null;
+            if (user.password === password) {
+                return { username, role: user.role };
+            }
+            return null;
+        }
+
+        function changePassword(username, oldPwd, newPwd) {
+            const users = getUsers();
+            const user = users[username];
+            if (!user) return false;
+            if (user.password !== oldPwd) return false;
+            user.password = newPwd;
+            saveUsers(users);
+            return true;
+        }
+
+        // 获取某个成员所在的团队列表
+        function getTeamsOfMember(memberName) {
+            const teams = [];
+            for (const [team, members] of Object.entries(TEAMS_CONFIG)) {
+                if (members.includes(memberName)) teams.push(team);
+            }
+            return teams;
+        }
+
+        // 当前登录用户
+        let currentUser = null;
+
+        // ============================================================
+        //  数据管理
+        // ============================================================
+        function loadAllData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch { return {}; }
+        }
+
+        function saveAllData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadHistory() {
+            try {
+                const raw = localStorage.getItem(HISTORY_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch { return {}; }
+        }
+
+        function saveHistory(history) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        }
+
+        function getWeekData(weekKey) {
+            const all = loadAllData();
+            return all[weekKey] || {};
+        }
+
+        function setWeekData(weekKey, teamData) {
+            const all = loadAllData();
+            all[weekKey] = teamData;
+            saveAllData(all);
+        }
+
+        function getTeamMembers(weekKey, teamName) {
+            const weekData = getWeekData(weekKey);
+            return weekData[teamName] || {};
+        }
+
+        function setTeamMembers(weekKey, teamName, members) {
+            const weekData = getWeekData(weekKey);
+            weekData[teamName] = members;
+            setWeekData(weekKey, weekData);
+        }
+
+        function getMemberItems(weekKey, teamName, memberName) {
+            const members = getTeamMembers(weekKey, teamName);
+            return members[memberName] || [];
+        }
+
+        function setMemberItems(weekKey, teamName, memberName, items) {
+            const members = getTeamMembers(weekKey, teamName);
+            members[memberName] = items;
+            setTeamMembers(weekKey, teamName, members);
+        }
+
+        function ensureDefaultMembers(weekKey) {
+            const weekData = getWeekData(weekKey);
+            let changed = false;
+            for (const [team, members] of Object.entries(TEAMS_CONFIG)) {
+                if (!weekData[team]) {
+                    weekData[team] = {};
+                    changed = true;
+                }
+                for (const member of members) {
+                    if (!weekData[team][member]) {
+                        weekData[team][member] = [];
+                        changed = true;
+                    }
+                }
+            }
+            if (changed) {
+                setWeekData(weekKey, weekData);
+            }
+        }
+
+        function getAllMembers(weekKey) {
+            const weekData = getWeekData(weekKey);
+            const result = {};
+            for (const team of Object.keys(TEAMS_CONFIG)) {
+                result[team] = Object.keys(weekData[team] || {});
+            }
+            return result;
+        }
+
+        function addMember(weekKey, teamName, memberName) {
+            const members = getTeamMembers(weekKey, teamName);
+            if (members[memberName]) return false;
+            members[memberName] = [];
+            setTeamMembers(weekKey, teamName, members);
+            pushHistory(weekKey);
+            // 同时创建用户
+            const users = getUsers();
+            if (!users[memberName]) {
+                const pinyin = PINYIN_MAP[memberName] || memberName.toLowerCase();
+                users[memberName] = { password: pinyin, role: 'member' };
+                saveUsers(users);
+            }
+            return true;
+        }
+
+        function deleteMember(weekKey, teamName, memberName) {
+            const members = getTeamMembers(weekKey, teamName);
+            if (!members[memberName]) return false;
+            delete members[memberName];
+            setTeamMembers(weekKey, teamName, members);
+            pushHistory(weekKey);
+            // 删除用户（但管理员不删）
+            if (!ADMIN_ACCOUNTS[memberName]) {
+                const users = getUsers();
+                if (users[memberName]) {
+                    delete users[memberName];
+                    saveUsers(users);
+                }
+            }
+            return true;
+        }
+
+        function addItem(weekKey, teamName, memberName, item) {
+            const items = getMemberItems(weekKey, teamName, memberName);
+            const newItem = {
+                id: generateId(),
+                dimension: item.dimension || '重点工作',
+                category: item.category || '',
+                name: item.name || '',
+                target: item.target || '',
+                actual: item.actual || '',
+                achieveStatus: item.achieveStatus || '达标',
+                workType: item.workType || '',
+                problemDesc: item.problemDesc || '',
+                causeAnalysis: item.causeAnalysis || '',
+                tempMeasure: item.tempMeasure || '',
+                longTermMeasure: item.longTermMeasure || '',
+                nextPlan: item.nextPlan || '',
+                description: item.description || '',
+                responsible: item.responsible || '',
+                deadline: item.deadline || '',
+                progress: item.progress || '',
+                status: item.status || '开展中',
+                deviation: item.deviation || '',
+                action: item.action || ''
+            };
+            items.push(newItem);
+            setMemberItems(weekKey, teamName, memberName, items);
+            pushHistory(weekKey);
+            return newItem;
+        }
+
+        function editItem(weekKey, teamName, memberName, itemId, updates) {
+            const items = getMemberItems(weekKey, teamName, memberName);
+            const idx = items.findIndex(it => it.id === itemId);
+            if (idx === -1) return false;
+            items[idx] = { ...items[idx], ...updates };
+            setMemberItems(weekKey, teamName, memberName, items);
+            pushHistory(weekKey);
+            return true;
+        }
+
+        function deleteItem(weekKey, teamName, memberName, itemId) {
+            const items = getMemberItems(weekKey, teamName, memberName);
+            const filtered = items.filter(it => it.id !== itemId);
+            if (filtered.length === items.length) return false;
+            setMemberItems(weekKey, teamName, memberName, filtered);
+            pushHistory(weekKey);
+            return true;
+        }
+
+        function pushHistory(weekKey) {
+            const weekData = getWeekData(weekKey);
+            const history = loadHistory();
+            if (!history[weekKey]) history[weekKey] = [];
+            const snapshot = {
+                timestamp: new Date().toISOString(),
+                data: JSON.parse(JSON.stringify(weekData))
+            };
+            history[weekKey].push(snapshot);
+            if (history[weekKey].length > 50) history[weekKey] = history[weekKey].slice(-50);
+            saveHistory(history);
+        }
+
+        function getHistoryVersions(weekKey) {
+            const history = loadHistory();
+            return history[weekKey] || [];
+        }
+
+        function restoreHistoryVersion(weekKey, index) {
+            const versions = getHistoryVersions(weekKey);
+            if (index < 0 || index >= versions.length) return false;
+            setWeekData(weekKey, versions[index].data);
+            return true;
+        }
+
+        function clearHistory(weekKey) {
+            const history = loadHistory();
+            if (history[weekKey]) {
+                delete history[weekKey];
+                saveHistory(history);
+                return true;
+            }
+            return false;
+        }
+
+        // ============================================================
+        //  工具函数
+        // ============================================================
+        function generateId() {
+            return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            d.setDate(diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function formatDateKey(date) {
+            const d = new Date(date);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function formatDateDisplay(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}/${m}/${day}`;
+        }
+
+        function getWeekLabel(dateStr) {
+            const d = new Date(dateStr + 'T00:00:00');
+            const weekEnd = new Date(d);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            const year = d.getFullYear();
+            const weekNum = getWeekNumber(d);
+            return `${year}年第${weekNum}周 (${formatDateDisplay(d)} - ${formatDateDisplay(weekEnd)})`;
+        }
+
+        function getWeekNumber(d) {
+            const startOfYear = new Date(d.getFullYear(), 0, 1);
+            const diff = (d - startOfYear + (startOfYear.getTimezoneOffset() - d.getTimezoneOffset()) * 60000) / 86400000;
+            return Math.ceil((diff + startOfYear.getDay() + 1) / 7);
+        }
+
+        function generateWeekOptions(weeksAhead = 78, weeksBehind = 26) {
+            const now = new Date();
+            const currentMonday = getWeekStart(now);
+            const options = [];
+            for (let i = -weeksBehind; i <= weeksAhead; i++) {
+                const d = new Date(currentMonday);
+                d.setDate(d.getDate() + i * 7);
+                const key = formatDateKey(d);
+                const label = getWeekLabel(key);
+                options.push({ key, label });
+            }
+            return options;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        //  UI 状态
+        // ============================================================
+        let currentWeekKey = '';
+        let currentTeam = '';
+        let currentMember = '';
+        let currentView = 'normal';
+
+        // 是否允许编辑（根据权限）
+        function canEdit() {
+            if (!currentUser) return false;
+            if (currentUser.role === 'admin') return true;
+            // 普通成员：只能编辑自己的数据，且当前选中的成员必须是当前用户
+            if (currentUser.role === 'member') {
+                const teams = getTeamsOfMember(currentUser.username);
+                if (teams.includes(currentTeam) && currentMember === currentUser.username) {
+                    return true;
+                }
+                if (currentView === 'abnormal') return false;
+                return false;
+            }
+            return false;
+        }
+
+        // 判断当前用户是否可以查看该成员数据
+        function canViewMember(team, member) {
+            if (!currentUser) return false;
+            if (currentUser.role === 'admin') return true;
+            if (currentUser.role === 'member') {
+                if (member === currentUser.username && getTeamsOfMember(member).includes(team)) {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        // ============================================================
+        //  渲染侧边栏（根据权限）
+        // ============================================================
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.innerHTML = '';
+
+            // 异常分析入口
+            const abnormalEntry = document.createElement('div');
+            abnormalEntry.className = 'abnormal-entry' + (currentView === 'abnormal' ? ' active' : '');
+            abnormalEntry.innerHTML = `
+                <span>🚨 异常分析</span>
+                <span class="badge" id="abnormalBadge">0</span>
+            `;
+            abnormalEntry.addEventListener('click', function() {
+                if (currentView !== 'abnormal') {
+                    currentView = 'abnormal';
+                    currentTeam = '';
+                    currentMember = '';
+                    renderAll();
+                }
+            });
+            sidebar.appendChild(abnormalEntry);
+
+            const allMembers = getAllMembers(currentWeekKey);
+            let totalAbnormal = 0;
+
+            if (!currentUser) {
+                const msg = document.createElement('div');
+                msg.style.cssText =
+                    'padding:20px;text-align:center;color:#94a3b8;font-size:14px;';
+                msg.textContent = '👆 请先登录以查看数据';
+                sidebar.appendChild(msg);
+                return;
+            }
+
+            let visibleTeams = [];
+            if (currentUser.role === 'admin') {
+                visibleTeams = Object.keys(TEAMS_CONFIG);
+            } else {
+                const teams = getTeamsOfMember(currentUser.username);
+                visibleTeams = teams;
+            }
+
+            for (const team of visibleTeams) {
+                const members = allMembers[team] || [];
+                let displayMembers = members;
+                if (currentUser.role === 'member') {
+                    displayMembers = members.filter(m => m === currentUser.username);
+                }
+                if (displayMembers.length === 0) continue;
+
+                const group = document.createElement('div');
+                group.className = 'team-group';
+
+                const header = document.createElement('div');
+                header.className = 'team-header';
+                header.innerHTML = `
+                    <span>${team}</span>
+                    ${currentUser.role === 'admin' ? `<div class="team-actions"><button class="btn btn-xs btn-outline add-member-btn-team" data-team="${team}" title="添加成员">＋</button></div>` : ''}
+                `;
+                group.appendChild(header);
+
+                const list = document.createElement('div');
+                list.className = 'member-list';
+                for (const member of displayMembers) {
+                    const items = getMemberItems(currentWeekKey, team, member);
+                    const abnormalCount = items.filter(it => {
+                        if (it.dimension === '核心指标') return it.achieveStatus === '不达标';
+                        else return it.status === '延期风险' || it.status === '已延期';
+                    }).length;
+                    totalAbnormal += abnormalCount;
+
+                    const item = document.createElement('div');
+                    item.className = 'member-item' +
+                        (currentView === 'normal' && team === currentTeam && member === currentMember ? ' active' : '');
+                    item.dataset.team = team;
+                    item.dataset.member = member;
+                    const canDel = currentUser.role === 'admin';
+                    item.innerHTML = `
+                        <span>${member} ${abnormalCount > 0 ? '🔴' : ''}</span>
+                        ${canDel ? `<div class="member-actions"><button class="btn btn-xs delete-member-btn" data-team="${team}" data-member="${member}" title="删除成员">✕</button></div>` : ''}
+                    `;
+                    item.addEventListener('click', function() {
+                        const t = this.dataset.team;
+                        const m = this.dataset.member;
+                        if (currentView !== 'normal' || t !== currentTeam || m !== currentMember) {
+                            currentView = 'normal';
+                            currentTeam = t;
+                            currentMember = m;
+                            renderAll();
+                        }
+                    });
+                    list.appendChild(item);
+                }
+
+                if (currentUser.role === 'admin') {
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'add-member-btn';
+                    addBtn.textContent = '＋ 添加成员';
+                    addBtn.dataset.team = team;
+                    addBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const teamName = this.dataset.team;
+                        const newName = prompt(`请输入要添加到 "${teamName}" 的成员姓名：`);
+                        if (newName && newName.trim()) {
+                            const name = newName.trim();
+                            if (addMember(currentWeekKey, teamName, name)) {
+                                renderAll();
+                                showToast(`✅ 已添加成员 ${name}，初始密码为拼音全拼`, 'success');
+                            } else {
+                                showToast('⚠️ 成员已存在', 'error');
+                            }
+                        }
+                    });
+                    list.appendChild(addBtn);
+                }
+
+                group.appendChild(list);
+                sidebar.appendChild(group);
+
+                header.addEventListener('click', function(e) {
+                    if (e.target.closest('.team-actions')) return;
+                    const list = this.nextElementSibling;
+                    if (list.style.display === 'none') {
+                        list.style.display = 'block';
+                    } else {
+                        list.style.display = 'none';
+                    }
+                });
+            }
+
+            document.getElementById('abnormalBadge').textContent = totalAbnormal;
+
+            sidebar.querySelectorAll('.delete-member-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (currentUser.role !== 'admin') {
+                        showToast('仅管理员可删除成员', 'error');
+                        return;
+                    }
+                    const team = this.dataset.team;
+                    const member = this.dataset.member;
+                    if (confirm(`确定要删除成员 "${member}" 吗？其所有任务数据将被清除！`)) {
+                        if (deleteMember(currentWeekKey, team, member)) {
+                            if (currentTeam === team && currentMember === member) {
+                                currentTeam = '';
+                                currentMember = '';
+                            }
+                            renderAll();
+                            showToast(`已删除成员 ${member}`, 'info');
+                        } else {
+                            showToast('删除失败', 'error');
+                        }
+                    }
+                });
+            });
+
+            sidebar.querySelectorAll('.add-member-btn-team').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (currentUser.role !== 'admin') return;
+                    const teamName = this.dataset.team;
+                    const newName = prompt(`请输入要添加到 "${teamName}" 的成员姓名：`);
+                    if (newName && newName.trim()) {
+                        const name = newName.trim();
+                        if (addMember(currentWeekKey, teamName, name)) {
+                            renderAll();
+                            showToast(`✅ 已添加成员 ${name}，初始密码为拼音全拼`, 'success');
+                        } else {
+                            showToast('⚠️ 成员已存在', 'error');
+                        }
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        //  渲染普通视图（根据权限控制操作按钮）
+        // ============================================================
+        function renderNormalView() {
+            const emptyMember = document.getElementById('emptyMember');
+            const memberTitle = document.getElementById('currentMemberName');
+            const itemCount = document.getElementById('itemCount');
+
+            if (!currentUser) {
+                emptyMember.style.display = 'block';
+                emptyMember.innerHTML =
+                `<p style="font-size:18px;">🔐 请登录后查看</p>`;
+                document.getElementById('coreSection').style.display = 'none';
+                document.getElementById('keySection').style.display = 'none';
+                document.getElementById('majorSection').style.display = 'none';
+                memberTitle.textContent = '未登录';
+                itemCount.textContent = '0 项';
+                return;
+            }
+
+            if (!currentMember || !currentTeam) {
+                document.getElementById('coreSection').style.display = 'none';
+                document.getElementById('keySection').style.display = 'none';
+                document.getElementById('majorSection').style.display = 'none';
+                emptyMember.style.display = 'block';
+                emptyMember.innerHTML = `<p style="font-size:18px;">👤 请从左侧选择一个成员</p>`;
+                memberTitle.textContent = '请选择成员';
+                itemCount.textContent = '0 项';
+                return;
+            }
+
+            if (!canViewMember(currentTeam, currentMember)) {
+                document.getElementById('coreSection').style.display = 'none';
+                document.getElementById('keySection').style.display = 'none';
+                document.getElementById('majorSection').style.display = 'none';
+                emptyMember.style.display = 'block';
+                emptyMember.innerHTML = `<p style="font-size:18px;color:#ef4444;">⛔ 您没有权限查看该成员的数据</p>`;
+                memberTitle.textContent = '无权限';
+                itemCount.textContent = '0 项';
+                return;
+            }
+
+            emptyMember.style.display = 'none';
+            memberTitle.textContent = `${currentTeam} · ${currentMember}`;
+            const items = getMemberItems(currentWeekKey, currentTeam, currentMember);
+            itemCount.textContent = items.length + ' 项';
+
+            const coreItems = items.filter(it => it.dimension === '核心指标');
+            const keyItems = items.filter(it => it.dimension === '重点工作');
+            const majorItems = items.filter(it => it.dimension === '重大批量质量问题改进');
+
+            const canEditCurrent = canEdit();
+
+            // ---- 核心指标 ----
+            const coreBody = document.getElementById('coreBody');
+            if (coreItems.length === 0) {
+                coreBody.innerHTML = `<tr class="empty-row"><td colspan="9">暂无核心指标</td></tr>`;
+            } else {
+                coreBody.innerHTML = '';
+                for (const item of coreItems) {
+                    const achieveClass = item.achieveStatus === '达标' ? 'pass' : 'fail';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${escapeHtml(item.category)}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td>${escapeHtml(item.target)}</td>
+                        <td>${escapeHtml(item.actual)}</td>
+                        <td><span class="achieve-tag ${achieveClass}">${item.achieveStatus || '达标'}</span></td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${escapeHtml(item.deviation)}</td>
+                        <td>${escapeHtml(item.action)}</td>
+                        <td style="text-align:center;white-space:nowrap;">
+                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-core-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-core-btn" data-id="${item.id}">✕</button>` : '<span style="color:#94a3b8;">—</span>'}
+                        </td>
+                    `;
+                    coreBody.appendChild(tr);
+                }
+                if (canEditCurrent) {
+                    coreBody.querySelectorAll('.edit-core-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            const item = coreItems.find(it => it.id === id);
+                            if (item) openModal('edit', item);
+                        });
+                    });
+                    coreBody.querySelectorAll('.delete-core-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            if (confirm('确定删除该核心指标吗？')) {
+                                deleteItem(currentWeekKey, currentTeam, currentMember, id);
+                                renderAll();
+                                showToast('已删除', 'info');
+                            }
+                        });
+                    });
+                }
+            }
+            document.getElementById('coreSection').style.display = 'block';
+            document.getElementById('addCoreBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
+
+            // ---- 重点工作 ----
+            const keyBody = document.getElementById('keyBody');
+            if (keyItems.length === 0) {
+                keyBody.innerHTML = `<tr class="empty-row"><td colspan="8">暂无重点工作</td></tr>`;
+            } else {
+                keyBody.innerHTML = '';
+                for (const item of keyItems) {
+                    const statusClass = STATUS_CLASS[item.status] || 'default';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${escapeHtml(item.workType || '')}</td>
+                        <td>${escapeHtml(item.description)}</td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
+                        <td>${escapeHtml(item.progress)}</td>
+                        <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
+                        <td>${escapeHtml(item.deviation)}</td>
+                        <td style="text-align:center;white-space:nowrap;">
+                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-key-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-key-btn" data-id="${item.id}">✕</button>` : '<span style="color:#94a3b8;">—</span>'}
+                        </td>
+                    `;
+                    keyBody.appendChild(tr);
+                }
+                if (canEditCurrent) {
+                    keyBody.querySelectorAll('.edit-key-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            const item = keyItems.find(it => it.id === id);
+                            if (item) openModal('edit', item);
+                        });
+                    });
+                    keyBody.querySelectorAll('.delete-key-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            if (confirm('确定删除该重点工作吗？')) {
+                                deleteItem(currentWeekKey, currentTeam, currentMember, id);
+                                renderAll();
+                                showToast('已删除', 'info');
+                            }
+                        });
+                    });
+                }
+            }
+            document.getElementById('keySection').style.display = 'block';
+            document.getElementById('addKeyBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
+
+            // ---- 重大批量质量问题改进 ----
+            const majorBody = document.getElementById('majorBody');
+            if (majorItems.length === 0) {
+                majorBody.innerHTML = `<tr class="empty-row"><td colspan="9">暂无重大改进</td></tr>`;
+            } else {
+                majorBody.innerHTML = '';
+                for (const item of majorItems) {
+                    const statusClass = STATUS_CLASS[item.status] || 'default';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${escapeHtml(item.problemDesc)}</td>
+                        <td>${escapeHtml(item.causeAnalysis)}</td>
+                        <td>${escapeHtml(item.tempMeasure)}</td>
+                        <td>${escapeHtml(item.longTermMeasure)}</td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
+                        <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
+                        <td>${escapeHtml(item.nextPlan)}</td>
+                        <td style="text-align:center;white-space:nowrap;">
+                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-major-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-major-btn" data-id="${item.id}">✕</button>` : '<span style="color:#94a3b8;">—</span>'}
+                        </td>
+                    `;
+                    majorBody.appendChild(tr);
+                }
+                if (canEditCurrent) {
+                    majorBody.querySelectorAll('.edit-major-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            const item = majorItems.find(it => it.id === id);
+                            if (item) openModal('edit', item);
+                        });
+                    });
+                    majorBody.querySelectorAll('.delete-major-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            if (confirm('确定删除该重大改进吗？')) {
+                                deleteItem(currentWeekKey, currentTeam, currentMember, id);
+                                renderAll();
+                                showToast('已删除', 'info');
+                            }
+                        });
+                    });
+                }
+            }
+            document.getElementById('majorSection').style.display = 'block';
+            document.getElementById('addMajorBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
+        }
+
+        // ============================================================
+        //  渲染异常视图（根据权限过滤）
+        // ============================================================
+        function renderAbnormalView() {
+            const weekData = getWeekData(currentWeekKey);
+            const coreAbnormal = [];
+            const otherAbnormal = [];
+
+            const filterFn = (team, member) => {
+                if (!currentUser) return false;
+                if (currentUser.role === 'admin') return true;
+                if (currentUser.role === 'member') {
+                    return member === currentUser.username && getTeamsOfMember(member).includes(team);
+                }
+                return false;
+            };
+
+            for (const team of Object.keys(weekData)) {
+                const members = weekData[team] || {};
+                for (const member of Object.keys(members)) {
+                    if (!filterFn(team, member)) continue;
+                    const items = members[member] || [];
+                    for (const item of items) {
+                        if (item.dimension === '核心指标') {
+                            if (item.achieveStatus === '不达标') {
+                                coreAbnormal.push({ team, member, item });
+                            }
+                        } else {
+                            if (item.status === '延期风险' || item.status === '已延期') {
+                                otherAbnormal.push({ team, member, item });
+                            }
+                        }
+                    }
+                }
+            }
+
+            const coreBody = document.getElementById('abnormalCoreBody');
+            if (coreAbnormal.length === 0) {
+                coreBody.innerHTML = `<tr class="empty-row"><td colspan="10">🎉 暂无核心指标不达标</td></tr>`;
+            } else {
+                coreBody.innerHTML = '';
+                for (const entry of coreAbnormal) {
+                    const { team, member, item } = entry;
+                    const achieveClass = item.achieveStatus === '达标' ? 'pass' : 'fail';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${escapeHtml(team)}</td>
+                        <td>${escapeHtml(member)}</td>
+                        <td>${escapeHtml(item.category)}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td>${escapeHtml(item.target)}</td>
+                        <td>${escapeHtml(item.actual)}</td>
+                        <td><span class="achieve-tag ${achieveClass}">${item.achieveStatus || '达标'}</span></td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${escapeHtml(item.deviation)}</td>
+                        <td>${escapeHtml(item.action)}</td>
+                    `;
+                    coreBody.appendChild(tr);
+                }
+            }
+
+            const otherBody = document.getElementById('abnormalOtherBody');
+            if (otherAbnormal.length === 0) {
+                otherBody.innerHTML = `<tr class="empty-row"><td colspan="8">🎉 暂无延期风险或已延期任务</td></tr>`;
+            } else {
+                otherBody.innerHTML = '';
+                for (const entry of otherAbnormal) {
+                    const { team, member, item } = entry;
+                    const type = item.dimension;
+                    const desc = item.dimension === '重点工作' ? item.description : item.problemDesc;
+                    const statusClass = STATUS_CLASS[item.status] || 'default';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${escapeHtml(team)}</td>
+                        <td>${escapeHtml(member)}</td>
+                        <td>${escapeHtml(type)}</td>
+                        <td>${escapeHtml(desc)}</td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
+                        <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
+                        <td>${escapeHtml(item.deviation || item.nextPlan || '')}</td>
+                    `;
+                    otherBody.appendChild(tr);
+                }
+            }
+
+            document.getElementById('abnormalCount').textContent =
+                (coreAbnormal.length + otherAbnormal.length) + ' 项异常';
+
+            document.getElementById('normalView').style.display = 'none';
+            document.getElementById('abnormalView').style.display = 'block';
+        }
+
+        // ============================================================
+        //  主渲染
+        // ============================================================
+        function renderAll() {
+            ensureDefaultMembers(currentWeekKey);
+
+            if (currentView === 'normal') {
+                if (!currentUser) {
+                    // 显示登录提示
+                } else {
+                    if (!currentMember || !currentTeam) {
+                        const all = getAllMembers(currentWeekKey);
+                        let found = false;
+                        for (const team of Object.keys(all)) {
+                            const members = all[team];
+                            for (const m of members) {
+                                if (canViewMember(team, m)) {
+                                    currentTeam = team;
+                                    currentMember = m;
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (found) break;
+                        }
+                        if (!found) {
+                            currentTeam = '';
+                            currentMember = '';
+                        }
+                    }
+                }
+                document.getElementById('normalView').style.display = 'block';
+                document.getElementById('abnormalView').style.display = 'none';
+                renderNormalView();
+            } else {
+                document.getElementById('normalView').style.display = 'none';
+                document.getElementById('abnormalView').style.display = 'block';
+                renderAbnormalView();
+            }
+
+            renderSidebar();
+            renderHistorySelect();
+            updateArchiveIndicator();
+            renderUserBar();
+            const select = document.getElementById('weekSelect');
+            if (select.value !== currentWeekKey) select.value = currentWeekKey;
+            if (getHistoryVersions(currentWeekKey).length === 0) {
+                pushHistory(currentWeekKey);
+            }
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            document.getElementById('restoreHistoryBtn').style.display = isAdmin ? 'inline-flex' : 'none';
+            document.getElementById('clearHistoryBtn').style.display = isAdmin ? 'inline-flex' : 'none';
+        }
+
+        // ============================================================
+        //  用户栏渲染
+        // ============================================================
+        function renderUserBar() {
+            const bar = document.getElementById('userBar');
+            if (currentUser) {
+                const roleText = currentUser.role === 'admin' ? '管理员' : '成员';
+                bar.innerHTML = `
+                    <span class="user-name">👤 ${currentUser.username}</span>
+                    <span class="user-role">${roleText}</span>
+                    <button class="btn btn-sm btn-outline" id="changePwdBtn">🔑 修改密码</button>
+                    <button class="btn btn-sm btn-danger" id="logoutBtn">注销</button>
+                `;
+                document.getElementById('changePwdBtn').addEventListener('click', function() {
+                    document.getElementById('changePwdModal').classList.add('active');
+                });
+                document.getElementById('logoutBtn').addEventListener('click', function() {
+                    if (confirm('确定要注销登录吗？')) {
+                        currentUser = null;
+                        sessionStorage.removeItem('quality_user');
+                        currentTeam = '';
+                        currentMember = '';
+                        currentView = 'normal';
+                        renderAll();
+                        showToast('已注销', 'info');
+                    }
+                });
+            } else {
+                bar.innerHTML = `
+                    <button class="btn btn-primary" id="loginBtn">🔐 登录</button>
+                `;
+                document.getElementById('loginBtn').addEventListener('click', function() {
+                    document.getElementById('loginModal').classList.add('active');
+                    document.getElementById('loginUsername').value = '';
+                    document.getElementById('loginPassword').value = '';
+                });
+            }
+        }
+
+        // ============================================================
+        //  周选择器、历史版本
+        // ============================================================
+        function renderWeekSelector() {
+            const select = document.getElementById('weekSelect');
+            const options = generateWeekOptions(78, 26);
+            select.innerHTML = '';
+            const defaultKey = getDefaultWeek();
+            let found = false;
+            for (const opt of options) {
+                const el = document.createElement('option');
+                el.value = opt.key;
+                el.textContent = opt.label;
+                select.appendChild(el);
+                if (opt.key === defaultKey) {
+                    el.selected = true;
+                    found = true;
+                }
+            }
+            if (!found && options.length > 0) {
+                options[options.length - 1].selected = true;
+                currentWeekKey = options[options.length - 1].key;
+            } else {
+                currentWeekKey = defaultKey;
+            }
+            select.addEventListener('change', function() {
+                const newKey = this.value;
+                if (newKey !== currentWeekKey) {
+                    currentWeekKey = newKey;
+                    currentView = 'normal';
+                    currentTeam = '';
+                    currentMember = '';
+                    renderAll();
+                }
+            });
+        }
+
+        function getDefaultWeek() {
+            const now = new Date();
+            const monday = getWeekStart(now);
+            return formatDateKey(monday);
+        }
+
+        function renderHistorySelect() {
+            const select = document.getElementById('historySelect');
+            const versions = getHistoryVersions(currentWeekKey);
+            select.innerHTML = '<option value="">— 当前版本 —</option>';
+            for (let i = 0; i < versions.length; i++) {
+                const v = versions[i];
+                const ts = new Date(v.timestamp);
+                const label = ts.toLocaleString('zh-CN', { hour12: false });
+                const el = document.createElement('option');
+                el.value = i;
+                el.textContent = `📄 ${label}`;
+                select.appendChild(el);
+            }
+            document.getElementById('historyCount').textContent = `共 ${versions.length} 个版本`;
+        }
+
+        function updateArchiveIndicator() {
+            const weekData = getWeekData(currentWeekKey);
+            let total = 0;
+            for (const team of Object.keys(weekData)) {
+                for (const member of Object.keys(weekData[team] || {})) {
+                    total += (weekData[team][member] || []).length;
+                }
+            }
+            document.getElementById('archiveIndicator').textContent = `📌 ${getWeekLabel(currentWeekKey)} · 共 ${total} 项`;
+        }
+
+        // ============================================================
+        //  历史操作（仅管理员）
+        // ============================================================
+        document.getElementById('restoreHistoryBtn').addEventListener('click', function() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showToast('仅管理员可恢复历史版本', 'error');
+                return;
+            }
+            const select = document.getElementById('historySelect');
+            const val = select.value;
+            if (val === '' || isNaN(parseInt(val))) {
+                showToast('请先选择一个历史版本', 'error');
+                return;
+            }
+            const idx = parseInt(val);
+            const versions = getHistoryVersions(currentWeekKey);
+            if (idx < 0 || idx >= versions.length) {
+                showToast('版本不存在', 'error');
+                return;
+            }
+            if (confirm(`确定恢复到 ${versions[idx].timestamp} 的版本吗？`)) {
+                restoreHistoryVersion(currentWeekKey, idx);
+                currentView = 'normal';
+                currentTeam = '';
+                currentMember = '';
+                renderAll();
+                showToast('✅ 已恢复所选版本', 'success');
+            }
+        });
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showToast('仅管理员可清空历史版本', 'error');
+                return;
+            }
+            if (confirm('确定清空当前周所有历史版本？不可撤销！')) {
+                clearHistory(currentWeekKey);
+                renderHistorySelect();
+                showToast('已清空历史版本', 'info');
+            }
+        });
+
+        // ============================================================
+        //  导出 Excel（根据权限）
+        // ============================================================
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            if (!currentUser) {
+                showToast('请先登录', 'error');
+                return;
+            }
+            exportExcelStyled();
+        });
+
+        function exportExcelStyled() {
+            const weekData = getWeekData(currentWeekKey);
+            let filteredData = {};
+            if (currentUser.role === 'admin') {
+                filteredData = weekData;
+            } else {
+                const username = currentUser.username;
+                const teams = getTeamsOfMember(username);
+                for (const team of teams) {
+                    if (weekData[team] && weekData[team][username]) {
+                        if (!filteredData[team]) filteredData[team] = {};
+                        filteredData[team][username] = weekData[team][username];
+                    }
+                }
+            }
+
+            let html = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                      xmlns:x="urn:schemas-microsoft-com:office:excel"
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="UTF-8">
+                <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+                <x:Name>周报</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+                </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                <style>
+                    * { font-family: '微软雅黑', 'Segoe UI', sans-serif; }
+                    table { border-collapse: collapse; font-size: 12pt; width: 100%; }
+                    th { background-color: #2acc8e; color: #ffffff; font-weight: 700; padding: 8px 10px; border: 1px solid #b0b0b0; text-align: left; white-space: nowrap; }
+                    td { padding: 6px 10px; border: 1px solid #d0d0d0; word-wrap: break-word; white-space: pre-wrap; vertical-align: middle; }
+                    .status-tag { padding: 2px 12px; border-radius: 12px; color: #fff; font-weight: 600; display: inline-block; }
+                    .status-done { background: #22c55e; }
+                    .status-ongoing { background: #3b82f6; }
+                    .status-risk { background: #eab308; color: #1e293b; }
+                    .status-delayed { background: #ef4444; }
+                    .status-default { background: #94a3b8; }
+                    .achieve-tag { padding: 2px 12px; border-radius: 12px; color: #fff; font-weight: 600; display: inline-block; }
+                    .achieve-pass { background: #22c55e; }
+                    .achieve-fail { background: #ef4444; }
+                    .section-title { font-size: 16px; font-weight: 700; margin-top: 20px; color: #0b2b4a; }
+                    .member-title { font-size: 14px; font-weight: 600; margin: 12px 0 6px 0; }
+                </style>
+                </head><body>
+                <h3 style="font-family:'微软雅黑';color:#0b2b4a;">质量团队目标及重点工作管理周报</h3>
+                <p style="font-family:'微软雅黑';color:#475569;">周次：${getWeekLabel(currentWeekKey)}</p>
+                <p style="font-family:'微软雅黑';color:#475569;">导出人：${currentUser.username} (${currentUser.role === 'admin' ? '管理员' : '成员'})</p>
+            `;
+
+            for (const team of Object.keys(filteredData)) {
+                const members = filteredData[team] || {};
+                const memberNames = Object.keys(members);
+                if (memberNames.length === 0) continue;
+
+                html += `<h4 style="font-family:'微软雅黑';margin-top:24px;color:#0b2b4a;">${team}</h4>`;
+
+                for (const member of memberNames) {
+                    const items = members[member] || [];
+                    const coreItems = items.filter(it => it.dimension === '核心指标');
+                    const keyItems = items.filter(it => it.dimension === '重点工作');
+                    const majorItems = items.filter(it => it.dimension === '重大批量质量问题改进');
+
+                    html += `<div class="member-title">👤 ${member}</div>`;
+
+                    if (coreItems.length > 0) {
+                        html += `<p style="font-weight:600;margin:8px 0 4px 0;">📊 核心指标</p>`;
+                        html += `<table>
+                            <tr><th>指标分类</th><th>指标名称</th><th>目标值</th><th>达成值</th><th>达成状态</th><th>责任人</th><th>偏差分析</th><th>后续行动计划</th></tr>`;
+                        for (const item of coreItems) {
+                            const achieveClass = item.achieveStatus === '达标' ? 'achieve-pass' : 'achieve-fail';
+                            html += `<tr>
+                                <td>${escapeHtml(item.category)}</td>
+                                <td>${escapeHtml(item.name)}</td>
+                                <td>${escapeHtml(item.target)}</td>
+                                <td>${escapeHtml(item.actual)}</td>
+                                <td><span class="achieve-tag ${achieveClass}">${item.achieveStatus || '达标'}</span></td>
+                                <td>${escapeHtml(item.responsible)}</td>
+                                <td>${escapeHtml(item.deviation)}</td>
+                                <td>${escapeHtml(item.action)}</td>
+                            </tr>`;
+                        }
+                        html += `</table>`;
+                    }
+
+                    if (keyItems.length > 0) {
+                        html += `<p style="font-weight:600;margin:12px 0 4px 0;">📌 重点工作</p>`;
+                        html += `<table>
+                            <tr><th>维度（自定义）</th><th>目标/任务描述</th><th>责任人</th><th>完成时间</th><th>完成进展</th><th>状态</th><th>偏差分析</th></tr>`;
+                        for (const item of keyItems) {
+                            const statusClass = {
+                                '已完成': 'status-done',
+                                '开展中': 'status-ongoing',
+                                '延期风险': 'status-risk',
+                                '已延期': 'status-delayed'
+                            } [item.status] || 'status-default';
+                            html += `<tr>
+                                <td>${escapeHtml(item.workType || '')}</td>
+                                <td>${escapeHtml(item.description)}</td>
+                                <td>${escapeHtml(item.responsible)}</td>
+                                <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
+                                <td>${escapeHtml(item.progress)}</td>
+                                <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
+                                <td>${escapeHtml(item.deviation)}</td>
+                            </tr>`;
+                        }
+                        html += `</table>`;
+                    }
+
+                    if (majorItems.length > 0) {
+                        html += `<p style="font-weight:600;margin:12px 0 4px 0;">⚙️ 重大批量质量问题改进</p>`;
+                        html += `<table>
+                            <tr><th>问题描述</th><th>原因分析</th><th>临时措施</th><th>长期措施</th><th>责任人</th><th>完成时间</th><th>状态</th><th>延期后下一步计划</th></tr>`;
+                        for (const item of majorItems) {
+                            const statusClass = {
+                                '已完成': 'status-done',
+                                '开展中': 'status-ongoing',
+                                '延期风险': 'status-risk',
+                                '已延期': 'status-delayed'
+                            } [item.status] || 'status-default';
+                            html += `<tr>
+                                <td>${escapeHtml(item.problemDesc)}</td>
+                                <td>${escapeHtml(item.causeAnalysis)}</td>
+                                <td>${escapeHtml(item.tempMeasure)}</td>
+                                <td>${escapeHtml(item.longTermMeasure)}</td>
+                                <td>${escapeHtml(item.responsible)}</td>
+                                <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
+                                <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
+                                <td>${escapeHtml(item.nextPlan)}</td>
+                            </tr>`;
+                        }
+                        html += `</table>`;
+                    }
+
+                    if (coreItems.length === 0 && keyItems.length === 0 && majorItems.length === 0) {
+                        html += `<p style="color:#94a3b8;font-style:italic;">暂无任务</p>`;
+                    }
+                }
+            }
+
+            html += `</body></html>`;
+
+            const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            const label = getWeekLabel(currentWeekKey).replace(/[\/:]/g, '-');
+            link.download = `质量团队周报_${label}.xls`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showToast('📥 Excel 导出成功', 'success');
+        }
+
+        // ============================================================
+        //  导入 Excel（仅管理员）
+        // ============================================================
+        document.getElementById('importBtn').addEventListener('click', function() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showToast('仅管理员可导入数据', 'error');
+                return;
+            }
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(loadEvent) {
+                try {
+                    const data = new Uint8Array(loadEvent.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    importExcel(workbook);
+                } catch (err) {
+                    showToast('❌ 导入失败: ' + err.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            this.value = '';
+        });
+
+        function importExcel(workbook) {
+            let importedCount = 0;
+            const weekData = getWeekData(currentWeekKey);
+
+            for (const sheetName of workbook.SheetNames) {
+                const ws = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                if (json.length < 3) continue;
+
+                let teamName = null;
+                for (const t of Object.keys(TEAMS_CONFIG)) {
+                    if (sheetName.includes(t) || t.includes(sheetName)) {
+                        teamName = t;
+                        break;
+                    }
+                }
+                if (!teamName) {
+                    const header = json[0];
+                    const teamColIdx = header.findIndex(h => h && h.includes('团队'));
+                    if (teamColIdx !== -1) {
+                        for (let i = 1; i < json.length; i++) {
+                            const row = json[i];
+                            if (!row || row.length <= teamColIdx) continue;
+                            const tName = String(row[teamColIdx] || '').trim();
+                            if (!tName) continue;
+                            const matchedTeam = Object.keys(TEAMS_CONFIG).find(t => t.includes(tName) || tName.includes(t));
+                            if (!matchedTeam) continue;
+                            const memberIdx = header.findIndex(h => h && h.includes('成员'));
+                            let memberName = '未命名';
+                            if (memberIdx !== -1 && row.length > memberIdx) {
+                                memberName = String(row[memberIdx] || '').trim() || '未命名';
+                            }
+                            if (!weekData[matchedTeam]) weekData[matchedTeam] = {};
+                            if (!weekData[matchedTeam][memberName]) weekData[matchedTeam][memberName] = [];
+
+                            if (header.some(h => h && h.includes('指标分类'))) {
+                                const catIdx = header.findIndex(h => h && h.includes('指标分类'));
+                                const nameIdx = header.findIndex(h => h && h.includes('指标名称'));
+                                const targetIdx = header.findIndex(h => h && h.includes('目标值'));
+                                const actualIdx = header.findIndex(h => h && h.includes('达成值'));
+                                const achieveIdx = header.findIndex(h => h && h.includes('达成状态'));
+                                const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                                const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
+                                const actionIdx = header.findIndex(h => h && h.includes('后续行动计划'));
+                                const item = {
+                                    dimension: '核心指标',
+                                    category: catIdx !== -1 ? String(row[catIdx] || '').trim() : '',
+                                    name: nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '',
+                                    target: targetIdx !== -1 ? String(row[targetIdx] || '').trim() : '',
+                                    actual: actualIdx !== -1 ? String(row[actualIdx] || '').trim() : '',
+                                    achieveStatus: achieveIdx !== -1 ? String(row[achieveIdx] || '').trim() : '达标',
+                                    responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                    deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
+                                    action: actionIdx !== -1 ? String(row[actionIdx] || '').trim() : '',
+                                    workType: '',
+                                    problemDesc: '',
+                                    causeAnalysis: '',
+                                    tempMeasure: '',
+                                    longTermMeasure: '',
+                                    nextPlan: '',
+                                    description: '',
+                                    deadline: '',
+                                    progress: '',
+                                    status: ''
+                                };
+                                if (item.category && item.name) {
+                                    weekData[matchedTeam][memberName].push({ id: generateId(), ...item });
+                                    importedCount++;
+                                }
+                            } else if (header.some(h => h && h.includes('问题描述'))) {
+                                const probIdx = header.findIndex(h => h && h.includes('问题描述'));
+                                const causeIdx = header.findIndex(h => h && h.includes('原因分析'));
+                                const tempIdx = header.findIndex(h => h && h.includes('临时措施'));
+                                const longIdx = header.findIndex(h => h && h.includes('长期措施'));
+                                const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                                const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
+                                const statIdx = header.findIndex(h => h && h.includes('状态'));
+                                const nextIdx = header.findIndex(h => h && (h.includes('下一步计划') || h.includes('延期后')));
+                                const item = {
+                                    dimension: '重大批量质量问题改进',
+                                    problemDesc: probIdx !== -1 ? String(row[probIdx] || '').trim() : '',
+                                    causeAnalysis: causeIdx !== -1 ? String(row[causeIdx] || '').trim() : '',
+                                    tempMeasure: tempIdx !== -1 ? String(row[tempIdx] || '').trim() : '',
+                                    longTermMeasure: longIdx !== -1 ? String(row[longIdx] || '').trim() : '',
+                                    responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                    deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
+                                    status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
+                                    nextPlan: nextIdx !== -1 ? String(row[nextIdx] || '').trim() : '',
+                                    category: '',
+                                    name: '',
+                                    target: '',
+                                    actual: '',
+                                    achieveStatus: '',
+                                    deviation: '',
+                                    action: '',
+                                    workType: '',
+                                    description: '',
+                                    progress: ''
+                                };
+                                if (item.problemDesc) {
+                                    weekData[matchedTeam][memberName].push({ id: generateId(), ...item });
+                                    importedCount++;
+                                }
+                            } else {
+                                const workTypeIdx = header.findIndex(h => h && h.includes('维度') && !h.includes('状态'));
+                                const descIdx = header.findIndex(h => h && (h.includes('目标') || h.includes('描述')));
+                                const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                                const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
+                                const progIdx = header.findIndex(h => h && h.includes('进展'));
+                                const statIdx = header.findIndex(h => h && h.includes('状态'));
+                                const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
+                                const item = {
+                                    dimension: '重点工作',
+                                    workType: workTypeIdx !== -1 ? String(row[workTypeIdx] || '').trim() : '',
+                                    description: descIdx !== -1 ? String(row[descIdx] || '').trim() : '',
+                                    responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                    deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
+                                    progress: progIdx !== -1 ? String(row[progIdx] || '').trim() : '',
+                                    status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
+                                    deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
+                                    category: '',
+                                    name: '',
+                                    target: '',
+                                    actual: '',
+                                    achieveStatus: '',
+                                    action: '',
+                                    problemDesc: '',
+                                    causeAnalysis: '',
+                                    tempMeasure: '',
+                                    longTermMeasure: '',
+                                    nextPlan: ''
+                                };
+                                if (item.description) {
+                                    weekData[matchedTeam][memberName].push({ id: generateId(), ...item });
+                                    importedCount++;
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                    continue;
+                }
+
+                const header = json[0];
+                const memberIdx = header.findIndex(h => h && h.includes('成员'));
+                if (memberIdx === -1) {
+                    let memberName = sheetName.replace(teamName, '').trim() || '未命名';
+                    if (!weekData[teamName]) weekData[teamName] = {};
+                    if (!weekData[teamName][memberName]) weekData[teamName][memberName] = [];
+
+                    for (let i = 1; i < json.length; i++) {
+                        const row = json[i];
+                        if (!row || row.length === 0) continue;
+                        if (header.some(h => h && h.includes('指标分类'))) {
+                            const catIdx = header.findIndex(h => h && h.includes('指标分类'));
+                            const nameIdx = header.findIndex(h => h && h.includes('指标名称'));
+                            const targetIdx = header.findIndex(h => h && h.includes('目标值'));
+                            const actualIdx = header.findIndex(h => h && h.includes('达成值'));
+                            const achieveIdx = header.findIndex(h => h && h.includes('达成状态'));
+                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
+                            const actionIdx = header.findIndex(h => h && h.includes('后续行动计划'));
+                            const item = {
+                                dimension: '核心指标',
+                                category: catIdx !== -1 ? String(row[catIdx] || '').trim() : '',
+                                name: nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '',
+                                target: targetIdx !== -1 ? String(row[targetIdx] || '').trim() : '',
+                                actual: actualIdx !== -1 ? String(row[actualIdx] || '').trim() : '',
+                                achieveStatus: achieveIdx !== -1 ? String(row[achieveIdx] || '').trim() : '达标',
+                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
+                                action: actionIdx !== -1 ? String(row[actionIdx] || '').trim() : '',
+                                workType: '',
+                                problemDesc: '',
+                                causeAnalysis: '',
+                                tempMeasure: '',
+                                longTermMeasure: '',
+                                nextPlan: '',
+                                description: '',
+                                deadline: '',
+                                progress: '',
+                                status: ''
+                            };
+                            if (item.category && item.name) {
+                                weekData[teamName][memberName].push({ id: generateId(), ...item });
+                                importedCount++;
+                            }
+                        } else if (header.some(h => h && h.includes('问题描述'))) {
+                            const probIdx = header.findIndex(h => h && h.includes('问题描述'));
+                            const causeIdx = header.findIndex(h => h && h.includes('原因分析'));
+                            const tempIdx = header.findIndex(h => h && h.includes('临时措施'));
+                            const longIdx = header.findIndex(h => h && h.includes('长期措施'));
+                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
+                            const statIdx = header.findIndex(h => h && h.includes('状态'));
+                            const nextIdx = header.findIndex(h => h && (h.includes('下一步计划') || h.includes('延期后')));
+                            const item = {
+                                dimension: '重大批量质量问题改进',
+                                problemDesc: probIdx !== -1 ? String(row[probIdx] || '').trim() : '',
+                                causeAnalysis: causeIdx !== -1 ? String(row[causeIdx] || '').trim() : '',
+                                tempMeasure: tempIdx !== -1 ? String(row[tempIdx] || '').trim() : '',
+                                longTermMeasure: longIdx !== -1 ? String(row[longIdx] || '').trim() : '',
+                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
+                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
+                                nextPlan: nextIdx !== -1 ? String(row[nextIdx] || '').trim() : '',
+                                category: '',
+                                name: '',
+                                target: '',
+                                actual: '',
+                                achieveStatus: '',
+                                deviation: '',
+                                action: '',
+                                workType: '',
+                                description: '',
+                                progress: ''
+                            };
+                            if (item.problemDesc) {
+                                weekData[teamName][memberName].push({ id: generateId(), ...item });
+                                importedCount++;
+                            }
+                        } else {
+                            const workTypeIdx = header.findIndex(h => h && h.includes('维度') && !h.includes('状态'));
+                            const descIdx = header.findIndex(h => h && (h.includes('目标') || h.includes('描述')));
+                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
+                            const progIdx = header.findIndex(h => h && h.includes('进展'));
+                            const statIdx = header.findIndex(h => h && h.includes('状态'));
+                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
+                            const item = {
+                                dimension: '重点工作',
+                                workType: workTypeIdx !== -1 ? String(row[workTypeIdx] || '').trim() : '',
+                                description: descIdx !== -1 ? String(row[descIdx] || '').trim() : '',
+                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
+                                progress: progIdx !== -1 ? String(row[progIdx] || '').trim() : '',
+                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
+                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
+                                category: '',
+                                name: '',
+                                target: '',
+                                actual: '',
+                                achieveStatus: '',
+                                action: '',
+                                problemDesc: '',
+                                causeAnalysis: '',
+                                tempMeasure: '',
+                                longTermMeasure: '',
+                                nextPlan: ''
+                            };
+                            if (item.description) {
+                                weekData[teamName][memberName].push({ id: generateId(), ...item });
+                                importedCount++;
+                            }
+                        }
+                    }
+                } else {
+                    for (let i = 1; i < json.length; i++) {
+                        const row = json[i];
+                        if (!row || row.length <= memberIdx) continue;
+                        const memberName = String(row[memberIdx] || '').trim() || '未命名';
+                        if (!weekData[teamName]) weekData[teamName] = {};
+                        if (!weekData[teamName][memberName]) weekData[teamName][memberName] = [];
+
+                        if (header.some(h => h && h.includes('指标分类'))) {
+                            const catIdx = header.findIndex(h => h && h.includes('指标分类'));
+                            const nameIdx = header.findIndex(h => h && h.includes('指标名称'));
+                            const targetIdx = header.findIndex(h => h && h.includes('目标值'));
+                            const actualIdx = header.findIndex(h => h && h.includes('达成值'));
+                            const achieveIdx = header.findIndex(h => h && h.includes('达成状态'));
+                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
+                            const actionIdx = header.findIndex(h => h && h.includes('后续行动计划'));
+                            const item = {
+                                dimension: '核心指标',
+                                category: catIdx !== -1 ? String(row[catIdx] || '').trim() : '',
+                                name: nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '',
+                                target: targetIdx !== -1 ? String(row[targetIdx] || '').trim() : '',
+                                actual: actualIdx !== -1 ? String(row[actualIdx] || '').trim() : '',
+                                achieveStatus: achieveIdx !== -1 ? String(row[achieveIdx] || '').trim() : '达标',
+                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
+                                action: actionIdx !== -1 ? String(row[actionIdx] || '').trim() : '',
+                                workType: '',
+                                problemDesc: '',
+                                causeAnalysis: '',
+                                tempMeasure: '',
+                                longTermMeasure: '',
+                                nextPlan: '',
+                                description: '',
+                                deadline: '',
+                                progress: '',
+                                status: ''
+                            };
+                            if (item.category && item.name) {
+                                weekData[teamName][memberName].push({ id: generateId(), ...item });
+                                importedCount++;
+                            }
+                        } else if (header.some(h => h && h.includes('问题描述'))) {
+                            const probIdx = header.findIndex(h => h && h.includes('问题描述'));
+                            const causeIdx = header.findIndex(h => h && h.includes('原因分析'));
+                            const tempIdx = header.findIndex(h => h && h.includes('临时措施'));
+                            const longIdx = header.findIndex(h => h && h.includes('长期措施'));
+                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
+                            const statIdx = header.findIndex(h => h && h.includes('状态'));
+                            const nextIdx = header.findIndex(h => h && (h.includes('下一步计划') || h.includes('延期后')));
+                            const item = {
+                                dimension: '重大批量质量问题改进',
+                                problemDesc: probIdx !== -1 ? String(row[probIdx] || '').trim() : '',
+                                causeAnalysis: causeIdx !== -1 ? String(row[causeIdx] || '').trim() : '',
+                                tempMeasure: tempIdx !== -1 ? String(row[tempIdx] || '').trim() : '',
+                                longTermMeasure: longIdx !== -1 ? String(row[longIdx] || '').trim() : '',
+                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
+                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
+                                nextPlan: nextIdx !== -1 ? String(row[nextIdx] || '').trim() : '',
+                                category: '',
+                                name: '',
+                                target: '',
+                                actual: '',
+                                achieveStatus: '',
+                                deviation: '',
+                                action: '',
+                                workType: '',
+                                description: '',
+                                progress: ''
+                            };
+                            if (item.problemDesc) {
+                                weekData[teamName][memberName].push({ id: generateId(), ...item });
+                                importedCount++;
+                            }
+                        } else {
+                            const workTypeIdx = header.findIndex(h => h && h.includes('维度') && !h.includes('状态'));
+                            const descIdx = header.findIndex(h => h && (h.includes('目标') || h.includes('描述')));
+                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
+                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
+                            const progIdx = header.findIndex(h => h && h.includes('进展'));
+                            const statIdx = header.findIndex(h => h && h.includes('状态'));
+                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
+                            const item = {
+                                dimension: '重点工作',
+                                workType: workTypeIdx !== -1 ? String(row[workTypeIdx] || '').trim() : '',
+                                description: descIdx !== -1 ? String(row[descIdx] || '').trim() : '',
+                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
+                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
+                                progress: progIdx !== -1 ? String(row[progIdx] || '').trim() : '',
+                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
+                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
+                                category: '',
+                                name: '',
+                                target: '',
+                                actual: '',
+                                achieveStatus: '',
+                                action: '',
+                                problemDesc: '',
+                                causeAnalysis: '',
+                                tempMeasure: '',
+                                longTermMeasure: '',
+                                nextPlan: ''
+                            };
+                            if (item.description) {
+                                weekData[teamName][memberName].push({ id: generateId(), ...item });
+                                importedCount++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (importedCount > 0) {
+                setWeekData(currentWeekKey, weekData);
+                pushHistory(currentWeekKey);
+                renderAll();
+                showToast(`✅ 成功导入 ${importedCount} 条数据`, 'success');
+            } else {
+                showToast('⚠️ 未导入任何数据，请检查Excel格式', 'error');
+            }
+        }
+
+        // ============================================================
+        //  模态框（任务编辑）
+        // ============================================================
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalForm = document.getElementById('modalForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalFields = document.getElementById('modalFields');
+        const editItemId = document.getElementById('editItemId');
+        const editTeamName = document.getElementById('editTeamName');
+        const editMemberName = document.getElementById('editMemberName');
+        const editDimension = document.getElementById('editDimension');
+
+        function buildFormFields(dimension, data = {}) {
+            let html = '';
+            if (dimension === '核心指标') {
+                html = `
+                    <div class="form-group">
+                        <label for="f_category">指标分类 *</label>
+                        <input type="text" id="f_category" value="${escapeHtml(data.category || '')}" placeholder="如：质量、效率" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_name">指标名称 *</label>
+                        <input type="text" id="f_name" value="${escapeHtml(data.name || '')}" placeholder="如：一次通过率" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_target">目标值</label>
+                        <input type="text" id="f_target" value="${escapeHtml(data.target || '')}" placeholder="如：98%" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_actual">达成值</label>
+                        <input type="text" id="f_actual" value="${escapeHtml(data.actual || '')}" placeholder="如：96.5%" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_achieveStatus">达成状态 *</label>
+                        <select id="f_achieveStatus">
+                            <option value="达标" ${data.achieveStatus === '达标' ? 'selected' : ''}>达标</option>
+                            <option value="不达标" ${data.achieveStatus === '不达标' ? 'selected' : ''}>不达标</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_responsible">责任人</label>
+                        <input type="text" id="f_responsible" value="${escapeHtml(data.responsible || '')}" placeholder="姓名" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_deviation">偏差分析</label>
+                        <textarea id="f_deviation" rows="2" placeholder="偏差原因及说明">${escapeHtml(data.deviation || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_action">后续行动计划</label>
+                        <textarea id="f_action" rows="2" placeholder="后续改进措施">${escapeHtml(data.action || '')}</textarea>
+                    </div>
+                `;
+            } else if (dimension === '重点工作') {
+                html = `
+                    <div class="form-group">
+                        <label for="f_workType">维度（自定义） *</label>
+                        <input type="text" id="f_workType" value="${escapeHtml(data.workType || '')}" placeholder="如：研发、生产" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_description">目标 / 任务描述 *</label>
+                        <textarea id="f_description" rows="2" placeholder="请输入描述" required>${escapeHtml(data.description || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_responsible">责任人</label>
+                        <input type="text" id="f_responsible" value="${escapeHtml(data.responsible || '')}" placeholder="姓名" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_deadline">完成时间</label>
+                        <input type="date" id="f_deadline" value="${data.deadline || ''}" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_progress">完成进展</label>
+                        <input type="text" id="f_progress" value="${escapeHtml(data.progress || '')}" placeholder="如：50%、进行中" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_status">状态 *</label>
+                        <select id="f_status">
+                            ${STATUS_LIST.map(s => `<option value="${s}" ${s === data.status ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_deviation">偏差分析</label>
+                        <textarea id="f_deviation" rows="2" placeholder="偏差原因及措施">${escapeHtml(data.deviation || '')}</textarea>
+                    </div>
+                `;
+            } else if (dimension === '重大批量质量问题改进') {
+                html = `
+                    <div class="form-group">
+                        <label for="f_problemDesc">问题描述 *</label>
+                        <textarea id="f_problemDesc" rows="2" placeholder="请描述问题" required>${escapeHtml(data.problemDesc || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_causeAnalysis">原因分析</label>
+                        <textarea id="f_causeAnalysis" rows="2" placeholder="原因分析">${escapeHtml(data.causeAnalysis || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_tempMeasure">临时措施</label>
+                        <textarea id="f_tempMeasure" rows="2" placeholder="临时措施">${escapeHtml(data.tempMeasure || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_longTermMeasure">长期措施</label>
+                        <textarea id="f_longTermMeasure" rows="2" placeholder="长期措施">${escapeHtml(data.longTermMeasure || '')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_responsible">责任人</label>
+                        <input type="text" id="f_responsible" value="${escapeHtml(data.responsible || '')}" placeholder="姓名" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_deadline">完成时间</label>
+                        <input type="date" id="f_deadline" value="${data.deadline || ''}" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_status">状态 *</label>
+                        <select id="f_status">
+                            ${STATUS_LIST.map(s => `<option value="${s}" ${s === data.status ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_nextPlan">延期后下一步计划</label>
+                        <textarea id="f_nextPlan" rows="2" placeholder="如延期，请填写后续计划">${escapeHtml(data.nextPlan || '')}</textarea>
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        function openModal(mode, item = null) {
+            if (!canEdit()) {
+                showToast('您没有权限编辑此内容', 'error');
+                return;
+            }
+            const team = currentTeam;
+            const member = currentMember;
+            if (!team || !member) {
+                showToast('请先选择成员', 'error');
+                return;
+            }
+
+            let dimension = '重点工作';
+            if (mode === 'edit' && item) {
+                dimension = item.dimension || '重点工作';
+                editItemId.value = item.id;
+            } else {
+                editItemId.value = '';
+                dimension = window._addDimension || '重点工作';
+            }
+
+            editTeamName.value = team;
+            editMemberName.value = member;
+            editDimension.value = dimension;
+
+            const data = item || {};
+            modalFields.innerHTML = buildFormFields(dimension, data);
+
+            if (mode === 'add') {
+                modalTitle.textContent = `➕ 添加 (${dimension}) · ${member}`;
+            } else {
+                modalTitle.textContent = `✎ 编辑 (${dimension}) · ${member}`;
+            }
+
+            modalOverlay.classList.add('active');
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        modalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const team = editTeamName.value;
+            const member = editMemberName.value;
+            const id = editItemId.value;
+            const dimension = editDimension.value;
+
+            let updates = {};
+            if (dimension === '核心指标') {
+                const category = document.getElementById('f_category').value.trim();
+                const name = document.getElementById('f_name').value.trim();
+                const target = document.getElementById('f_target').value.trim();
+                const actual = document.getElementById('f_actual').value.trim();
+                const achieveStatus = document.getElementById('f_achieveStatus').value;
+                const responsible = document.getElementById('f_responsible').value.trim();
+                const deviation = document.getElementById('f_deviation').value.trim();
+                const action = document.getElementById('f_action').value.trim();
+                if (!category || !name) {
+                    showToast('请填写指标分类和名称', 'error');
+                    return;
+                }
+                updates = {
+                    dimension: '核心指标',
+                    category,
+                    name,
+                    target,
+                    actual,
+                    achieveStatus,
+                    responsible,
+                    deviation,
+                    action,
+                    workType: '',
+                    problemDesc: '',
+                    causeAnalysis: '',
+                    tempMeasure: '',
+                    longTermMeasure: '',
+                    nextPlan: '',
+                    description: '',
+                    deadline: '',
+                    progress: '',
+                    status: ''
+                };
+            } else if (dimension === '重点工作') {
+                const workType = document.getElementById('f_workType').value.trim();
+                const description = document.getElementById('f_description').value.trim();
+                const responsible = document.getElementById('f_responsible').value.trim();
+                const deadline = document.getElementById('f_deadline').value;
+                const progress = document.getElementById('f_progress').value.trim();
+                const status = document.getElementById('f_status').value;
+                const deviation = document.getElementById('f_deviation').value.trim();
+                if (!workType || !description) {
+                    showToast('请填写维度和任务描述', 'error');
+                    return;
+                }
+                updates = {
+                    dimension: '重点工作',
+                    workType,
+                    description,
+                    responsible,
+                    deadline,
+                    progress,
+                    status,
+                    deviation,
+                    category: '',
+                    name: '',
+                    target: '',
+                    actual: '',
+                    achieveStatus: '',
+                    action: '',
+                    problemDesc: '',
+                    causeAnalysis: '',
+                    tempMeasure: '',
+                    longTermMeasure: '',
+                    nextPlan: ''
+                };
+            } else if (dimension === '重大批量质量问题改进') {
+                const problemDesc = document.getElementById('f_problemDesc').value.trim();
+                const causeAnalysis = document.getElementById('f_causeAnalysis').value.trim();
+                const tempMeasure = document.getElementById('f_tempMeasure').value.trim();
+                const longTermMeasure = document.getElementById('f_longTermMeasure').value.trim();
+                const responsible = document.getElementById('f_responsible').value.trim();
+                const deadline = document.getElementById('f_deadline').value;
+                const status = document.getElementById('f_status').value;
+                const nextPlan = document.getElementById('f_nextPlan').value.trim();
+                if (!problemDesc) {
+                    showToast('请填写问题描述', 'error');
+                    return;
+                }
+                updates = {
+                    dimension: '重大批量质量问题改进',
+                    problemDesc,
+                    causeAnalysis,
+                    tempMeasure,
+                    longTermMeasure,
+                    responsible,
+                    deadline,
+                    status,
+                    nextPlan,
+                    category: '',
+                    name: '',
+                    target: '',
+                    actual: '',
+                    achieveStatus: '',
+                    deviation: '',
+                    action: '',
+                    workType: '',
+                    description: '',
+                    progress: ''
+                };
+            }
+
+            if (id) {
+                if (editItem(currentWeekKey, team, member, id, updates)) {
+                    showToast('✅ 已更新', 'success');
+                } else {
+                    showToast('更新失败', 'error');
+                }
+            } else {
+                addItem(currentWeekKey, team, member, updates);
+                showToast('✅ 已添加', 'success');
+            }
+            closeModal();
+            renderAll();
+        });
+
+        document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.getElementById('addCoreBtn').addEventListener('click', function() {
+            window._addDimension = '核心指标';
+            openModal('add');
+        });
+        document.getElementById('addKeyBtn').addEventListener('click', function() {
+            window._addDimension = '重点工作';
+            openModal('add');
+        });
+        document.getElementById('addMajorBtn').addEventListener('click', function() {
+            window._addDimension = '重大批量质量问题改进';
+            openModal('add');
+        });
+
+        // ============================================================
+        //  登录 / 修改密码
+        // ============================================================
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            if (!username || !password) {
+                showToast('请输入用户名和密码', 'error');
+                return;
+            }
+            const user = authenticate(username, password);
+            if (user) {
+                currentUser = user;
+                sessionStorage.setItem('quality_user', JSON.stringify(user));
+                document.getElementById('loginModal').classList.remove('active');
+                currentView = 'normal';
+                currentTeam = '';
+                currentMember = '';
+                renderAll();
+                showToast(`✅ 登录成功，欢迎 ${user.username}`, 'success');
+            } else {
+                showToast('❌ 用户名或密码错误', 'error');
+            }
+        });
+
+        document.getElementById('loginCancelBtn').addEventListener('click', function() {
+            document.getElementById('loginModal').classList.remove('active');
+        });
+
+        document.getElementById('changePwdForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showToast('请先登录', 'error');
+                return;
+            }
+            const oldPwd = document.getElementById('oldPwd').value.trim();
+            const newPwd = document.getElementById('newPwd').value.trim();
+            const confirmPwd = document.getElementById('confirmPwd').value.trim();
+            if (!oldPwd || !newPwd || !confirmPwd) {
+                showToast('请填写完整', 'error');
+                return;
+            }
+            if (newPwd !== confirmPwd) {
+                showToast('两次输入的新密码不一致', 'error');
+                return;
+            }
+            if (changePassword(currentUser.username, oldPwd, newPwd)) {
+                document.getElementById('changePwdModal').classList.remove('active');
+                showToast('✅ 密码修改成功，请重新登录', 'success');
+                currentUser = null;
+                sessionStorage.removeItem('quality_user');
+                currentTeam = '';
+                currentMember = '';
+                renderAll();
+            } else {
+                showToast('❌ 当前密码错误', 'error');
+            }
+        });
+
+        document.getElementById('changePwdCancelBtn').addEventListener('click', function() {
+            document.getElementById('changePwdModal').classList.remove('active');
+        });
+
+        // ============================================================
+        //  Toast
+        // ============================================================
+        let toastTimer = null;
+
+        function showToast(message, type = 'info', duration = 2500) {
+            const el = document.getElementById('toast');
+            el.textContent = message;
+            el.className = 'toast ' + type;
+            void el.offsetWidth;
+            el.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+        }
+
+        // ============================================================
+        //  初始化
+        // ============================================================
+        function init() {
+            // 初始化用户（包含新增管理员陈礼丽）
+            initUsers();
+
+            const saved = sessionStorage.getItem('quality_user');
+            if (saved) {
+                try {
+                    const user = JSON.parse(saved);
+                    const users = getUsers();
+                    if (users[user.username] && users[user.username].role === user.role) {
+                        currentUser = user;
+                    } else {
+                        sessionStorage.removeItem('quality_user');
+                    }
+                } catch { sessionStorage.removeItem('quality_user'); }
+            }
+
+            renderWeekSelector();
+            ensureDefaultMembers(currentWeekKey);
+            if (currentUser && currentUser.role === 'member') {
+                const teams = getTeamsOfMember(currentUser.username);
+                if (teams.length > 0) {
+                    currentTeam = teams[0];
+                    currentMember = currentUser.username;
+                }
+            } else if (currentUser && currentUser.role === 'admin') {
+                const all = getAllMembers(currentWeekKey);
+                for (const team of Object.keys(all)) {
+                    if (all[team].length > 0) {
+                        currentTeam = team;
+                        currentMember = all[team][0];
+                        break;
+                    }
+                }
+            }
+            currentView = 'normal';
+            renderAll();
+            showToast('📋 已加载，数据自动保存', 'info', 1500);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.getElementById('loginModal').classList.remove('active');
+                    document.getElementById('changePwdModal').classList.remove('active');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
