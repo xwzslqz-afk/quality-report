@@ -996,6 +996,47 @@
             return new TextDecoder().decode(bytes);
         }
 
+        // 合并云端数据到本地（不覆盖本地已有的条目）
+        function _mergeCloudIntoLocal(cloud) {
+            const localWeeks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            const localUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+            const localHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
+
+            // 合并 weeks：云端有而本地没有的合并进来
+            for (const wk of Object.keys(cloud.weeks || {})) {
+                if (!localWeeks[wk]) { localWeeks[wk] = cloud.weeks[wk]; continue; }
+                for (const team of Object.keys(cloud.weeks[wk])) {
+                    if (!localWeeks[wk][team]) { localWeeks[wk][team] = cloud.weeks[wk][team]; continue; }
+                    for (const member of Object.keys(cloud.weeks[wk][team])) {
+                        if (!localWeeks[wk][team][member]) { localWeeks[wk][team][member] = cloud.weeks[wk][team][member]; continue; }
+                        // 按 ID 合并：本地有的保留，云端新增的添加
+                        const localIds = new Set(localWeeks[wk][team][member].map(it => it.id));
+                        for (const ci of cloud.weeks[wk][team][member]) {
+                            if (!localIds.has(ci.id)) localWeeks[wk][team][member].push(ci);
+                        }
+                    }
+                }
+            }
+
+            // 合并 users：云端有而本地没有的合并进来
+            for (const u of Object.keys(cloud.users || {})) {
+                if (!localUsers[u]) localUsers[u] = cloud.users[u];
+            }
+
+            // 合并 history：追加云端快照
+            for (const hk of Object.keys(cloud.history || {})) {
+                if (!localHistory[hk]) { localHistory[hk] = cloud.history[hk]; continue; }
+                const localTs = new Set(localHistory[hk].map(h => h.timestamp));
+                for (const snap of cloud.history[hk]) {
+                    if (!localTs.has(snap.timestamp)) localHistory[hk].push(snap);
+                }
+            }
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(localWeeks));
+            localStorage.setItem(USERS_KEY, JSON.stringify(localUsers));
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(localHistory));
+        }
+
         // 从云端拉取数据（API 优先 → raw URL → Pages 同域兜底）
         async function syncPull(silent) {
             const t = ghToken();
@@ -1009,9 +1050,7 @@
                         _ghSha = info.sha;
                         const json = JSON.parse(_b64dec(info.content));
                         console.log('syncPull OK via API: weeks=' + Object.keys(json.weeks||{}).length + ' history=' + Object.keys(json.history||{}).length);
-                        if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
-                        if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
-                        if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
+                        _mergeCloudIntoLocal(json);
                         updateSyncBadge('✅', '已同步');
                         if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
                         return json;
@@ -1025,9 +1064,7 @@
                 if (r.ok) {
                     const json = await r.json();
                     console.log('syncPull OK via raw: weeks=' + Object.keys(json.weeks||{}).length);
-                    if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
-                    if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
-                    if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
+                    _mergeCloudIntoLocal(json);
                     updateSyncBadge('✅', '已同步');
                     if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
                     return json;
@@ -1040,9 +1077,7 @@
                 if (r.ok) {
                     const json = await r.json();
                     console.log('syncPull OK via Pages: weeks=' + Object.keys(json.weeks||{}).length);
-                    if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
-                    if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
-                    if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
+                    _mergeCloudIntoLocal(json);
                     updateSyncBadge('✅', '已同步');
                     if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
                     return json;
@@ -3272,21 +3307,8 @@
             // 尝试从云端拉取数据
             const cloudData = await syncPull(false);
             _initDone = true;
-            if (cloudData) {
-                if (cloudData.weeks && Object.keys(cloudData.weeks).length > 0) {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData.weeks));
-                }
-                if (cloudData.users && Object.keys(cloudData.users).length > 0) {
-                    localStorage.setItem(USERS_KEY, JSON.stringify(cloudData.users));
-                }
-                if (cloudData.history) {
-                    localStorage.setItem(HISTORY_KEY, JSON.stringify(cloudData.history));
-                }
-                updateSyncBadge('✅', '已同步');
-            } else if (ghToken()) {
+            if (!cloudData && ghToken()) {
                 updateSyncBadge('⚠️', '离线');
-            } else {
-                updateSyncBadge('💻', '本地');
             }
 
             const saved = sessionStorage.getItem('quality_user');
