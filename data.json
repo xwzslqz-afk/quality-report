@@ -28,13 +28,13 @@
         ],
         "吴金鹏": [
           {
-            "id": "mrkp6z7d_wjack",
+            "id": "mrkp7byr_8svvt",
             "dimension": "核心指标",
             "category": "2",
             "name": "2",
             "target": "2",
             "actual": "2",
-            "achieveStatus": "不达标",
+            "achieveStatus": "达标",
             "workType": "",
             "problemDesc": "",
             "causeAnalysis": "",
@@ -291,7 +291,7 @@
         }
       },
       {
-        "timestamp": "2026-07-14T13:39:32.665Z",
+        "timestamp": "2026-07-14T13:39:49.203Z",
         "data": {
           "研发质量": {
             "杨思睿": [
@@ -320,13 +320,13 @@
             ],
             "吴金鹏": [
               {
-                "id": "mrkp6z7d_wjack",
+                "id": "mrkp7byr_8svvt",
                 "dimension": "核心指标",
                 "category": "2",
                 "name": "2",
                 "target": "2",
                 "actual": "2",
-                "achieveStatus": "不达标",
+                "achieveStatus": "达标",
                 "workType": "",
                 "problemDesc": "",
                 "causeAnalysis": "",
