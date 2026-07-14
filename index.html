@@ -974,7 +974,8 @@
                 // ===== GitHub 云端同步配置 =====
         const GH_REPO = 'xwzslqz-afk/quality-report';
         const GH_API = 'https://api.github.com/repos/' + GH_REPO + '/contents/data.json';
-        const PAGES_DATA = 'data.json';  // 同域读取，无需认证，永不断连
+        const PAGES_DATA = 'data.json';  // 同域 fallback
+        const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';  // 即时更新，无 Pages 延迟
         let _ghSha = null;
         let _ghSyncing = false;
 
@@ -995,25 +996,28 @@
             return new TextDecoder().decode(bytes);
         }
 
-        // 从云端拉取数据（Pages 同域 URL，永不断连）
+        // 从云端拉取数据（raw URL 即时更新 → Pages 同域兜底）
         async function syncPull(silent) {
-            try {
-                const r = await fetch(PAGES_DATA + '?t=' + Date.now());
-                if (!r.ok) throw new Error('HTTP ' + r.status);
-                const json = await r.json();
-                console.log('syncPull OK: weeks=' + Object.keys(json.weeks||{}).length + ' users=' + Object.keys(json.users||{}).length + ' history=' + Object.keys(json.history||{}).length);
-                if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
-                if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
-                if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
-                updateSyncBadge('✅', '已同步');
-                if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
-                return json;
-            } catch(e) {
-                console.error('syncPull failed:', e.message);
-                updateSyncBadge('❌', '读取失败');
-                if (!silent) showToast('❌ 读取云端失败: ' + e.message, 'error', 3000);
-                return null;
+            // 优先 raw.githubusercontent.com（即时更新，无 Pages 构建延迟）
+            const urls = [RAW_DATA, PAGES_DATA];
+            for (const url of urls) {
+                try {
+                    const r = await fetch(url + '?t=' + Date.now());
+                    if (!r.ok) continue;
+                    const json = await r.json();
+                    console.log('syncPull OK via ' + url.split('/')[2] + ': weeks=' + Object.keys(json.weeks||{}).length + ' users=' + Object.keys(json.users||{}).length + ' history=' + Object.keys(json.history||{}).length);
+                    if (json.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(json.weeks));
+                    if (json.users) localStorage.setItem(USERS_KEY, JSON.stringify(json.users));
+                    if (json.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(json.history));
+                    updateSyncBadge('✅', '已同步');
+                    if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
+                    return json;
+                } catch(e) { console.log('syncPull ' + url.split('/')[2] + ':', e.message); }
             }
+            console.error('syncPull: all URLs failed');
+            updateSyncBadge('❌', '读取失败');
+            if (!silent) showToast('❌ 读取云端失败', 'error', 3000);
+            return null;
         }
 
         // 推送本地数据到云端
