@@ -1,9 +1,272 @@
 {
-  "weeks": {},
-  "users": {
-    "路清召": { "password": "rhzl@2026lqz", "role": "admin" },
-    "陈礼丽": { "password": "chenlili", "role": "admin" }
+  "weeks": {
+    "2026-07-13": {
+      "研发质量": {
+        "杨思睿": [
+          {
+            "id": "mrkl6y48_zt1jf",
+            "dimension": "核心指标",
+            "category": "1",
+            "name": "1",
+            "target": "1",
+            "actual": "1",
+            "achieveStatus": "不达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "1",
+            "deadline": "",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "1",
+            "action": "1"
+          }
+        ],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    }
   },
-  "history": {},
-  "_token": ""
+  "users": {
+    "路清召": {
+      "password": "123456789.0",
+      "role": "admin"
+    },
+    "陈礼丽": {
+      "password": "chenlili",
+      "role": "admin"
+    },
+    "杨思睿": {
+      "password": "yangsirui",
+      "role": "member"
+    },
+    "吴金鹏": {
+      "password": "wujinpeng",
+      "role": "member"
+    },
+    "张桂群": {
+      "password": "zhangguiqu",
+      "role": "member"
+    },
+    "张春来": {
+      "password": "zhangchunlai",
+      "role": "member"
+    },
+    "张敏": {
+      "password": "zhangmin",
+      "role": "member"
+    },
+    "刘一宁": {
+      "password": "liuyining",
+      "role": "member"
+    },
+    "施佳伟": {
+      "password": "shijiawei",
+      "role": "member"
+    },
+    "邓超": {
+      "password": "dengchao",
+      "role": "member"
+    },
+    "张强": {
+      "password": "zhangqiang",
+      "role": "member"
+    },
+    "严鑫": {
+      "password": "yanxin",
+      "role": "member"
+    },
+    "张若愚": {
+      "password": "zhangruoyu",
+      "role": "member"
+    },
+    "崔得峰": {
+      "password": "cuidefeng",
+      "role": "member"
+    },
+    "相茂岩": {
+      "password": "xiangmaoyan",
+      "role": "member"
+    },
+    "徐朝兴": {
+      "password": "xuzhaoxing",
+      "role": "member"
+    },
+    "张义": {
+      "password": "zhangyi",
+      "role": "member"
+    },
+    "葛晨云": {
+      "password": "gechenyun",
+      "role": "member"
+    },
+    "周海娜": {
+      "password": "zhouhaina",
+      "role": "member"
+    },
+    "张端奇": {
+      "password": "zhangduanqi",
+      "role": "member"
+    },
+    "曹改芳": {
+      "password": "caogaifang",
+      "role": "member"
+    },
+    "谢星炯": {
+      "password": "xiexingjiong",
+      "role": "member"
+    },
+    "杨起翔": {
+      "password": "yangqixiang",
+      "role": "member"
+    },
+    "邹家祥": {
+      "password": "zoujiaxiang",
+      "role": "member"
+    }
+  },
+  "history": {
+    "2026-07-13": [
+      {
+        "timestamp": "2026-07-14T11:42:54.153Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-14T11:47:32.792Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [
+              {
+                "id": "mrkl6y48_zt1jf",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "1"
+              }
+            ],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ]
+  }
 }
