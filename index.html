@@ -983,6 +983,10 @@
             return localStorage.getItem('gh_token') || '';
         }
 
+        function setGitHubToken(token) {
+            localStorage.setItem('gh_token', token);
+        }
+
         // Base64 编码（正确处理中文）
         function _toBase64(str) {
             const bytes = new TextEncoder().encode(str);
