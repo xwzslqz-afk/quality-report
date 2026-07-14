@@ -3102,10 +3102,7 @@
             const weeks = loadAllData();
             const users = getUsers();
             const hasLocal = Object.keys(weeks).length > 0 || Object.keys(users).length > 2;
-            if (hasLocal && confirm('是否先将本地数据推送到云端？
-
-点「确定」推送本地 → 云端
-点「取消」从云端拉取覆盖本地')) {
+            if (hasLocal && confirm('是否先将本地数据推送到云端？\n\n点「确定」推送本地 → 云端\n点「取消」从云端拉取覆盖本地')) {
                 // Push local to cloud
                 _ghSha = null;
                 await _cloudPush();
