@@ -971,6 +971,9 @@
         const HISTORY_KEY = 'quality_team_history_v6';
         const USERS_KEY = 'quality_users_v1';
 
+        // 内存数据（云端直连模式，localStorage 仅作容错缓存）
+        let _memData = { weeks: {}, users: {}, history: {} };
+
                 // ===== GitHub 云端同步配置 =====
         const GH_REPO = 'xwzslqz-afk/quality-report';
         const GH_API = 'https://api.github.com/repos/' + GH_REPO + '/contents/data.json';
@@ -1116,9 +1119,9 @@
 
                 // 3. 深度合并：本地数据合并到云端数据（云端数据为基底，不删除）
                 const local = {
-                    weeks: JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'),
-                    users: JSON.parse(localStorage.getItem(USERS_KEY) || '{}'),
-                    history: JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}')
+                    weeks: _memData.weeks || {},
+                    users: _memData.users || {},
+                    history: _memData.history || {}
                 };
 
                 // 合并 weeks（保留云端所有条目，本地新增/更新）
@@ -1269,14 +1272,11 @@
         //  用户管理
         // ============================================================
         function getUsers() {
-            try {
-                const raw = localStorage.getItem(USERS_KEY);
-                return raw ? JSON.parse(raw) : {};
-            } catch { return {}; }
+            return _memData.users || {};
         }
 
         function saveUsers(users) {
-            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            _memData.users = users;
             schedulePush();
         }
 
@@ -1347,26 +1347,20 @@
         //  数据管理
         // ============================================================
         function loadAllData() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                return raw ? JSON.parse(raw) : {};
-            } catch { return {}; }
+            return _memData.weeks || {};
         }
 
-        function saveAllData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        function saveAllData(weeks) {
+            _memData.weeks = weeks;
             schedulePush();
         }
 
         function loadHistory() {
-            try {
-                const raw = localStorage.getItem(HISTORY_KEY);
-                return raw ? JSON.parse(raw) : {};
-            } catch { return {}; }
+            return _memData.history || {};
         }
 
         function saveHistory(history) {
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            _memData.history = history;
             schedulePush();
         }
 
@@ -3359,7 +3353,7 @@
             // 尝试从云端拉取数据
             const cloudData = await syncPull(false);
             _initDone = true;
-            if (!cloudData && ghToken()) {
+            if (!cloudData) {
                 updateSyncBadge('⚠️', '离线');
             }
 
