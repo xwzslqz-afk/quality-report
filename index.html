@@ -1184,9 +1184,10 @@
                 if (r.ok) {
                     const result = await r.json();
                     _ghSha = result.content.sha;
-                    sessionStorage.removeItem('_deletedIds');  // 清除已同步的删除记录
+                    sessionStorage.removeItem('_deletedIds');
+                    localStorage.removeItem('_syncFailed');
                     updateSyncBadge('✅', '已同步');
-                    console.log('syncPush OK: SHA=' + _ghSha.substring(0,12));
+                    console.log('syncPush OK');
                     if (!silent) showToast('📤 已推送到云端', 'success', 1500);
                     return true;
                 }
@@ -1244,9 +1245,12 @@
                     updateSyncBadge('❌', '推送失败');
                     if (!silent) showToast('❌ 推送失败 HTTP ' + r.status, 'error');
                 }
+                // 推送失败，标记本地有未同步数据
+                localStorage.setItem('_syncFailed', '1');
                 return false;
             } catch(e) {
                 console.error('syncPush:', e);
+                localStorage.setItem('_syncFailed', '1');
                 updateSyncBadge('❌', '网络错误');
                 if (!silent) showToast('❌ 推送异常: ' + e.message, 'error');
                 return false;
@@ -1288,6 +1292,7 @@
 
         function saveUsers(users) {
             _memData.users = users;
+            try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch(e) {}
             schedulePush();
         }
 
@@ -1363,6 +1368,7 @@
 
         function saveAllData(weeks) {
             _memData.weeks = weeks;
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(weeks)); } catch(e) {}
             schedulePush();
         }
 
@@ -1372,6 +1378,7 @@
 
         function saveHistory(history) {
             _memData.history = history;
+            try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch(e) {}
             schedulePush();
         }
 
@@ -3357,6 +3364,17 @@
             _initDone = true;
             if (!cloudData) {
                 updateSyncBadge('⚠️', '离线');
+                // 离线时从 localStorage 恢复（上次操作可能未同步成功）
+                const localWeeks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                const localUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+                const localHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
+                if (Object.keys(localWeeks).length > 0) _memData.weeks = localWeeks;
+                if (Object.keys(localUsers).length > 0) _memData.users = localUsers;
+                if (Object.keys(localHistory).length > 0) _memData.history = localHistory;
+            }
+            // 如果上次推送失败，警告用户
+            if (localStorage.getItem('_syncFailed') === '1') {
+                showToast('⚠️ 上次数据未同步成功，请检查网络后点击 🔄 同步', 'error', 5000);
             }
 
             const saved = sessionStorage.getItem('quality_user');
