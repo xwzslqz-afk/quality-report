@@ -981,6 +981,7 @@
         const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';  // 即时更新，无 Pages 延迟
         let _ghSha = null;
         let _ghSyncing = false;
+        let _dirty = false;  // 仅当用户主动编辑后才推送
 
         function ghToken() { return localStorage.getItem('gh_token') || ''; }
         function ghSetToken(t) { localStorage.setItem('gh_token', t); }
@@ -1195,6 +1196,7 @@
                     _ghSha = result.content.sha;
                     sessionStorage.removeItem('_deletedIds');
                     localStorage.removeItem('_syncFailed');
+                    _dirty = false;
                     updateSyncBadge('✅', '已同步');
                     console.log('syncPush OK');
                     if (!silent) showToast('📤 已推送到云端', 'success', 1500);
@@ -1248,6 +1250,8 @@
                                 body: JSON.stringify(body2) });
                             if (r2.ok) {
                                 _ghSha = (await r2.json()).content.sha;
+                                _dirty = false;
+                                sessionStorage.removeItem('_deletedIds');
                                 updateSyncBadge('✅', '已同步');
                                 if (!silent) showToast('📤 已推送到云端', 'success', 1500);
                                 return true;
@@ -1277,6 +1281,7 @@
         // 本地修改后自动调度推送（500ms 防抖）
         function schedulePush() {
             if (!ghToken()) { updateSyncBadge('💻', '本地'); return; }
+            if (!_dirty) return;  // 没有编辑，不推送
             updateSyncBadge('⏳', '待同步');
             clearTimeout(window._pushTimer);
             window._pushTimer = setTimeout(() => syncPush(false), 500);
@@ -1353,6 +1358,7 @@
         }
 
         function changePassword(username, oldPwd, newPwd) {
+            _dirty = true;
             const users = getUsers();
             const user = users[username];
             if (!user) return false;
@@ -1461,6 +1467,7 @@
         }
 
         function addMember(weekKey, teamName, memberName) {
+            _dirty = true;
             const members = getTeamMembers(weekKey, teamName);
             if (members[memberName]) return false;
             members[memberName] = [];
@@ -1477,6 +1484,7 @@
         }
 
         function deleteMember(weekKey, teamName, memberName) {
+            _dirty = true;
             const members = getTeamMembers(weekKey, teamName);
             if (!members[memberName]) return false;
             delete members[memberName];
@@ -1494,6 +1502,7 @@
         }
 
         function addItem(weekKey, teamName, memberName, item) {
+            _dirty = true;
             const items = getMemberItems(weekKey, teamName, memberName);
             const newItem = {
                 id: generateId(),
@@ -1524,6 +1533,7 @@
         }
 
         function editItem(weekKey, teamName, memberName, itemId, updates) {
+            _dirty = true;
             const items = getMemberItems(weekKey, teamName, memberName);
             const idx = items.findIndex(it => it.id === itemId);
             if (idx === -1) return false;
@@ -1534,6 +1544,7 @@
         }
 
         function deleteItem(weekKey, teamName, memberName, itemId) {
+            _dirty = true;
             const items = getMemberItems(weekKey, teamName, memberName);
             const filtered = items.filter(it => it.id !== itemId);
             if (filtered.length === items.length) return false;
