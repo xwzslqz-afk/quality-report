@@ -981,7 +981,8 @@
         const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';  // 即时更新，无 Pages 延迟
         let _ghSha = null;
         let _ghSyncing = false;
-        let _dirty = false;  // 仅当用户主动编辑后才推送
+        let _dirty = false;
+        let _lastSyncTime = 0;  // 上次成功同步时间，用于判断本地独有条目是否过期
 
         function ghToken() { return localStorage.getItem('gh_token') || ''; }
         function ghSetToken(t) { localStorage.setItem('gh_token', t); }
@@ -1002,8 +1003,11 @@
 
         // 合并云端数据到本地（不覆盖本地已有的条目）
         
-        // OT 合并：云端数据合并到 _memData（时间戳比较 + 删除传播）
+        // OT 合并：云端权威 + 本地新增保护
         function _otMergePull(cloud) {
+            const now = Date.now();
+            // 本地独有条目仅在 _ts > _lastSyncTime 时保留（本次会话新增）
+            const keepThreshold = _lastSyncTime || (now - 60000);
             const cw = cloud.weeks || {};
             const lw = _memData.weeks || {};
             for (const wk of Object.keys(cw)) {
@@ -1024,8 +1028,11 @@
                                 const ci = lMap[li.id];
                                 if ((li._ts || 0) > (ci._ts || 0)) lMap[li.id] = li;
                             } else {
-                                // 云端没有 → 本地新增 → 保留
-                                lMap[li.id] = li;
+                                // 云端没有 → 仅保留本次会话新增的（_ts > _lastSyncTime）
+                                if ((li._ts || 0) > keepThreshold) {
+                                    lMap[li.id] = li;
+                                }
+                                // else: 云端已删除的旧条目 → 丢弃
                             }
                         }
                         lw[wk][team][member] = Object.values(lMap);
@@ -1206,6 +1213,7 @@
                     sessionStorage.removeItem('_deletedIds');
                     localStorage.removeItem('_syncFailed');
                     _dirty = false;
+                    _lastSyncTime = Date.now();
                     updateSyncBadge('✅', '已同步');
                     console.log('syncPush OK');
                     if (!silent) showToast('📤 已推送到云端', 'success', 1500);
@@ -1260,6 +1268,7 @@
                             if (r2.ok) {
                                 _ghSha = (await r2.json()).content.sha;
                                 _dirty = false;
+                                _lastSyncTime = Date.now();
                                 sessionStorage.removeItem('_deletedIds');
                                 updateSyncBadge('✅', '已同步');
                                 if (!silent) showToast('📤 已推送到云端', 'success', 1500);
