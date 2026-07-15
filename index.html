@@ -1129,6 +1129,7 @@
                     if (!cloud.weeks[wk]) cloud.weeks[wk] = {};
                     for (const team of Object.keys(local.weeks[wk])) {
                         if (!cloud.weeks[wk][team]) cloud.weeks[wk][team] = {};
+                        // 1. 遍历本地 members，覆盖云端
                         for (const member of Object.keys(local.weeks[wk][team])) {
                             const lItems = local.weeks[wk][team][member];
                             const cItems = cloud.weeks[wk][team][member] || [];
@@ -1136,10 +1137,17 @@
                             const delIds = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
                             const merged = [...lItems];
                             for (const ci of cItems) {
-                                // 云端独有且未被本次会话删除 → 保留
                                 if (!lIds.has(ci.id) && !delIds.has(ci.id)) merged.push(ci);
                             }
                             cloud.weeks[wk][team][member] = merged;
+                        }
+                        // 2. 删除云端有但本地没有的 members（用户删除了成员）
+                        if (cloud.weeks[wk]) {
+                            for (const cm of Object.keys(cloud.weeks[wk][team] || {})) {
+                                if (!local.weeks[wk][team][cm]) {
+                                    delete cloud.weeks[wk][team][cm];
+                                }
+                            }
                         }
                     }
                 }
@@ -1205,6 +1213,9 @@
                                         const mg = [...lIt];
                                         for (const ci of cIt) { if (!lId2.has(ci.id) && !del2.has(ci.id)) mg.push(ci); }
                                         cloud2.weeks[wk][team][member] = mg;
+                                    }
+                                    for (const cm2 of Object.keys(cloud2.weeks[wk][team] || {})) {
+                                        if (!local.weeks[wk][team][cm2]) delete cloud2.weeks[wk][team][cm2];
                                     }
                                 }
                             }
@@ -3242,17 +3253,8 @@
                     .then(r => {
                         if (r.ok) {
                             updateSyncBadge('✅', '已连接');
-                            showToast('✅ Token 有效，已启用云端同步！正在拉取数据…', 'success');
-                            // Re-init data from cloud
-                            syncPull(true).then(data => {
-                                if (data) {
-                                    if (data.weeks) localStorage.setItem(STORAGE_KEY, JSON.stringify(data.weeks));
-                                    if (data.users) localStorage.setItem(USERS_KEY, JSON.stringify(data.users));
-                                    if (data.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(data.history));
-                                    renderAll();
-                                    showToast('🔄 云端数据已加载', 'success');
-                                }
-                            });
+                            showToast('✅ Token 有效！正在同步…', 'success');
+                            syncPull(false).then(d => { if (d) renderAll(); });
                         } else {
                             updateSyncBadge('❌', '无效');
                             showToast('❌ Token 无效，请检查', 'error');
@@ -3371,7 +3373,6 @@
             }
 
             renderWeekSelector();
-            ensureDefaultMembers(currentWeekKey);
             if (currentUser && currentUser.role === 'member') {
                 const teams = getTeamsOfMember(currentUser.username);
                 if (teams.length > 0) {
@@ -3415,7 +3416,6 @@
                     const fresh = await syncPull(true);
                     if (fresh) {
                         renderAll();
-                        updateSyncBadge('✅', '已同步');
                     }
                 }
             }, 30000);
@@ -3424,10 +3424,7 @@
             document.addEventListener('visibilitychange', async () => {
                 if (!document.hidden && ghToken() && !_ghSyncing) {
                     const fresh = await syncPull(true);
-                    if (fresh) {
-                        renderAll();
-                        updateSyncBadge('✅', '已同步');
-                    }
+                    if (fresh) { renderAll(); }
                 }
             });
         }
