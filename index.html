@@ -1002,7 +1002,7 @@
 
         // 合并云端数据到本地（不覆盖本地已有的条目）
         
-        // OT 合并：云端数据合并到 _memData（时间戳比较）
+        // OT 合并：云端数据合并到 _memData（时间戳比较 + 删除传播）
         function _otMergePull(cloud) {
             const cw = cloud.weeks || {};
             const lw = _memData.weeks || {};
@@ -1014,12 +1014,27 @@
                         if (!lw[wk][team][member]) { lw[wk][team][member] = cw[wk][team][member]; continue; }
                         const cItems = cw[wk][team][member];
                         const lItems = lw[wk][team][member] || [];
-                        const lMap = {}; for (const li of lItems) lMap[li.id] = li;
-                        for (const ci of cItems) {
-                            const li = lMap[ci.id];
-                            if (!li || (ci._ts || 0) > (li._ts || 0)) lMap[ci.id] = ci;
+                        // 以云端 ID 集合为基准（云端权威），本地独有 ID 按 _ts 判断
+                        const cIds = new Set(cItems.map(it => it.id));
+                        const lMap = {};
+                        for (const ci of cItems) lMap[ci.id] = ci;  // 云端条目为底
+                        for (const li of lItems) {
+                            if (cIds.has(li.id)) {
+                                // 两端都有：比较 _ts
+                                const ci = lMap[li.id];
+                                if ((li._ts || 0) > (ci._ts || 0)) lMap[li.id] = li;
+                            } else {
+                                // 云端没有 → 本地新增 → 保留
+                                lMap[li.id] = li;
+                            }
                         }
                         lw[wk][team][member] = Object.values(lMap);
+                    }
+                    // 删除本地有但云端没有的空 members（云端已删且本地无数据）
+                    for (const cm of Object.keys(lw[wk][team] || {})) {
+                        if (!cw[wk][team][cm] && (!lw[wk][team][cm] || lw[wk][team][cm].length === 0)) {
+                            delete lw[wk][team][cm];
+                        }
                     }
                 }
             }
@@ -1118,23 +1133,21 @@
                     for (const team of Object.keys(local.weeks[wk])) {
                         if (!cloud.weeks[wk][team]) cloud.weeks[wk][team] = {};
                         // 1. 遍历本地 members，覆盖云端
-                        // OT 合并：基于时间戳，最新版本胜出
+                        // OT 合并：以本地 ID 为基准，排除已删 ID，云端独有保留
                         for (const member of Object.keys(local.weeks[wk][team])) {
                             const lItems = local.weeks[wk][team][member];
                             const cItems = cloud.weeks[wk][team][member] || [];
                             const delIds = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
-                            const merged = {};  // 用 map 去重
-                            // 云端条目（保留未被本地删除的）
+                            const lIds = new Set(lItems.map(it => it.id));
+                            const merged = {};
+                            // 云端条目为底（排除已删）
                             for (const ci of cItems) {
                                 if (!delIds.has(ci.id)) merged[ci.id] = ci;
                             }
-                            // 本地条目（覆盖同 ID，添加新 ID）
+                            // 本地条目覆盖/新增
                             for (const li of lItems) {
                                 const ci = merged[li.id];
-                                if (!ci || (li._ts || 0) >= (ci._ts || 0)) {
-                                    merged[li.id] = li;  // 本地版本更新或相同 → 本地胜出
-                                }
-                                // else: 云端版本更新 → 保留云端
+                                if (!ci || (li._ts || 0) >= (ci._ts || 0)) merged[li.id] = li;
                             }
                             cloud.weeks[wk][team][member] = Object.values(merged);
                         }
@@ -1219,10 +1232,7 @@
                                         const del2 = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
                                         const mg2 = {};
                                         for (const ci of cIt) { if (!del2.has(ci.id)) mg2[ci.id] = ci; }
-                                        for (const li of lIt) {
-                                            const ci = mg2[li.id];
-                                            if (!ci || (li._ts || 0) >= (ci._ts || 0)) mg2[li.id] = li;
-                                        }
+                                        for (const li of lIt) { const ci = mg2[li.id]; if (!ci || (li._ts||0) >= (ci._ts||0)) mg2[li.id] = li; }
                                         cloud2.weeks[wk][team][member] = Object.values(mg2);
                                     }
                                     for (const cm2 of Object.keys(cloud2.weeks[wk][team] || {})) {
