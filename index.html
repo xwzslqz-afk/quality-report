@@ -1152,9 +1152,18 @@
                     }
                 }
 
-                // 合并 users（保留云端所有用户，本地新增/更新）
+                // 合并 users：只新增云端缺失的用户；已在云端的保留云端密码
                 for (const u of Object.keys(local.users)) {
-                    cloud.users[u] = local.users[u]; // 本地覆盖（含密码修改等）
+                    if (!cloud.users[u]) {
+                        cloud.users[u] = local.users[u];
+                    } else {
+                        // 保留云端 role + password，仅当本地显式修改密码时才更新
+                        if (sessionStorage.getItem('_pwdChanged_' + u) === '1') {
+                            cloud.users[u].password = local.users[u].password;
+                            sessionStorage.removeItem('_pwdChanged_' + u);
+                        }
+                        // role 以云端为准（管理员可能在云端被变更）
+                    }
                 }
 
                 // 合并 history（保留云端所有快照，本地追加）
@@ -1220,7 +1229,13 @@
                                     }
                                 }
                             }
-                            for (const u of Object.keys(local.users)) cloud2.users[u] = local.users[u];
+                            for (const u of Object.keys(local.users)) {
+                                if (!cloud2.users[u]) { cloud2.users[u] = local.users[u]; }
+                                else if (sessionStorage.getItem('_pwdChanged_' + u) === '1') {
+                                    cloud2.users[u].password = local.users[u].password;
+                                    sessionStorage.removeItem('_pwdChanged_' + u);
+                                }
+                            }
                             for (const hk of Object.keys(local.history)) {
                                 if (!cloud2.history[hk]) cloud2.history[hk] = [];
                                 const ts2 = new Set(cloud2.history[hk].map(h => h.timestamp));
@@ -1343,6 +1358,7 @@
             if (!user) return false;
             if (user.password !== oldPwd) return false;
             user.password = newPwd;
+            sessionStorage.setItem('_pwdChanged_' + username, '1');
             saveUsers(users);
             return true;
         }
