@@ -1127,13 +1127,14 @@
                     for (const team of Object.keys(local.weeks[wk])) {
                         if (!cloud.weeks[wk][team]) cloud.weeks[wk][team] = {};
                         for (const member of Object.keys(local.weeks[wk][team])) {
-                            // 本地为主 + 云端独有项保留（删除有效，新增不丢）
                             const lItems = local.weeks[wk][team][member];
                             const cItems = cloud.weeks[wk][team][member] || [];
                             const lIds = new Set(lItems.map(it => it.id));
+                            const delIds = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
                             const merged = [...lItems];
                             for (const ci of cItems) {
-                                if (!lIds.has(ci.id)) merged.push(ci);
+                                // 云端独有且未被本次会话删除 → 保留
+                                if (!lIds.has(ci.id) && !delIds.has(ci.id)) merged.push(ci);
                             }
                             cloud.weeks[wk][team][member] = merged;
                         }
@@ -1172,6 +1173,7 @@
                 if (r.ok) {
                     const result = await r.json();
                     _ghSha = result.content.sha;
+                    sessionStorage.removeItem('_deletedIds');  // 清除已同步的删除记录
                     updateSyncBadge('✅', '已同步');
                     console.log('syncPush OK: SHA=' + _ghSha.substring(0,12));
                     if (!silent) showToast('📤 已推送到云端', 'success', 1500);
@@ -1195,9 +1197,10 @@
                                     for (const member of Object.keys(local.weeks[wk][team])) {
                                         const lIt = local.weeks[wk][team][member];
                                         const cIt = cloud2.weeks[wk][team][member] || [];
-                                        const lId = new Set(lIt.map(it => it.id));
+                                        const lId2 = new Set(lIt.map(it => it.id));
+                                        const del2 = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
                                         const mg = [...lIt];
-                                        for (const ci of cIt) { if (!lId.has(ci.id)) mg.push(ci); }
+                                        for (const ci of cIt) { if (!lId2.has(ci.id) && !del2.has(ci.id)) mg.push(ci); }
                                         cloud2.weeks[wk][team][member] = mg;
                                     }
                                 }
@@ -1506,6 +1509,10 @@
             const items = getMemberItems(weekKey, teamName, memberName);
             const filtered = items.filter(it => it.id !== itemId);
             if (filtered.length === items.length) return false;
+            // 记录已删除 ID（同步时从云端移除）
+            const delIds = JSON.parse(sessionStorage.getItem('_deletedIds') || '[]');
+            delIds.push(itemId);
+            sessionStorage.setItem('_deletedIds', JSON.stringify(delIds));
             setMemberItems(weekKey, teamName, memberName, filtered);
             pushHistory(weekKey);
             return true;
