@@ -450,136 +450,6 @@
   "history": {
     "2026-07-13": [
       {
-        "timestamp": "2026-07-15T11:04:15.280Z",
-        "data": {
-          "研发质量": {
-            "杨思睿": [],
-            "吴金鹏": [
-              {
-                "id": "mrkqdu4o_y5nam",
-                "dimension": "核心指标",
-                "category": "1",
-                "name": "1",
-                "target": "1",
-                "actual": "1",
-                "achieveStatus": "达标",
-                "workType": "",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "",
-                "responsible": "1",
-                "deadline": "",
-                "progress": "",
-                "status": "开展中",
-                "deviation": "1",
-                "action": "1"
-              },
-              {
-                "id": "mrkqh8zm_5en0s",
-                "dimension": "核心指标",
-                "category": "1",
-                "name": "1",
-                "target": "1",
-                "actual": "1",
-                "achieveStatus": "达标",
-                "workType": "",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "",
-                "responsible": "1",
-                "deadline": "",
-                "progress": "",
-                "status": "开展中",
-                "deviation": "1",
-                "action": "1"
-              },
-              {
-                "id": "mrkqj404_x6li3",
-                "dimension": "核心指标",
-                "category": "1",
-                "name": "1",
-                "target": "1",
-                "actual": "1",
-                "achieveStatus": "达标",
-                "workType": "",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "",
-                "responsible": "1",
-                "deadline": "",
-                "progress": "",
-                "status": "开展中",
-                "deviation": "1",
-                "action": "1"
-              },
-              {
-                "id": "mrkqjunn_f91g5",
-                "dimension": "核心指标",
-                "category": "2",
-                "name": "2",
-                "target": "2",
-                "actual": "2",
-                "achieveStatus": "达标",
-                "workType": "",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "",
-                "responsible": "2",
-                "deadline": "",
-                "progress": "",
-                "status": "开展中",
-                "deviation": "2",
-                "action": "2"
-              }
-            ],
-            "张桂群": []
-          },
-          "供应商质量-智慧能源": {
-            "张春来": [],
-            "张敏": [],
-            "刘一宁": [],
-            "施佳伟": []
-          },
-          "供应商质量-电池": {
-            "邓超": [],
-            "张强": [],
-            "严鑫": [],
-            "张若愚": []
-          },
-          "过程质量": {
-            "崔得峰": [],
-            "相茂岩": [],
-            "徐朝兴": [],
-            "张义": [],
-            "葛晨云": [],
-            "周海娜": [],
-            "张端奇": []
-          },
-          "客户质量及质量改进": {
-            "曹改芳": [],
-            "谢星炯": [],
-            "杨起翔": [],
-            "邹家祥": []
-          },
-          "质量体系": {
-            "杨思睿": [],
-            "葛晨云": []
-          }
-        }
-      },
-      {
         "timestamp": "2026-07-14T14:28:18.241Z",
         "data": {
           "研发质量": {
@@ -11903,6 +11773,47 @@
       },
       {
         "timestamp": "2026-07-15T11:08:42.442Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-15T11:08:45.842Z",
         "data": {
           "研发质量": {
             "杨思睿": [],
