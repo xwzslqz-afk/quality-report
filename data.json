@@ -222,6 +222,12 @@
             "status": "开展中",
             "deviation": "7",
             "action": "7"
+          },
+          {
+            "id": "diag_1784113792",
+            "dimension": "重点工作",
+            "description": "诊断",
+            "status": "开展中"
           }
         ],
         "吴金鹏": [
