@@ -1127,17 +1127,15 @@
                     for (const team of Object.keys(local.weeks[wk])) {
                         if (!cloud.weeks[wk][team]) cloud.weeks[wk][team] = {};
                         for (const member of Object.keys(local.weeks[wk][team])) {
-                            if (!cloud.weeks[wk][team][member]) {
-                                cloud.weeks[wk][team][member] = local.weeks[wk][team][member];
-                            } else {
-                                // 按 ID 合并：本地有的更新，云端独有的保留
-                                const cloudItems = cloud.weeks[wk][team][member];
-                                const localItems = local.weeks[wk][team][member];
-                                const cloudMap = {};
-                                for (const ci of cloudItems) cloudMap[ci.id] = ci;
-                                for (const li of localItems) cloudMap[li.id] = li; // 本地覆盖云端同 ID
-                                cloud.weeks[wk][team][member] = Object.values(cloudMap);
+                            // 本地为主 + 云端独有项保留（删除有效，新增不丢）
+                            const lItems = local.weeks[wk][team][member];
+                            const cItems = cloud.weeks[wk][team][member] || [];
+                            const lIds = new Set(lItems.map(it => it.id));
+                            const merged = [...lItems];
+                            for (const ci of cItems) {
+                                if (!lIds.has(ci.id)) merged.push(ci);
                             }
+                            cloud.weeks[wk][team][member] = merged;
                         }
                     }
                 }
@@ -1195,13 +1193,12 @@
                                 for (const team of Object.keys(local.weeks[wk])) {
                                     if (!cloud2.weeks[wk][team]) cloud2.weeks[wk][team] = {};
                                     for (const member of Object.keys(local.weeks[wk][team])) {
-                                        if (!cloud2.weeks[wk][team][member]) {
-                                            cloud2.weeks[wk][team][member] = local.weeks[wk][team][member];
-                                        } else {
-                                            const cm = {}; for (const ci of cloud2.weeks[wk][team][member]) cm[ci.id] = ci;
-                                            for (const li of local.weeks[wk][team][member]) cm[li.id] = li;
-                                            cloud2.weeks[wk][team][member] = Object.values(cm);
-                                        }
+                                        const lIt = local.weeks[wk][team][member];
+                                        const cIt = cloud2.weeks[wk][team][member] || [];
+                                        const lId = new Set(lIt.map(it => it.id));
+                                        const mg = [...lIt];
+                                        for (const ci of cIt) { if (!lId.has(ci.id)) mg.push(ci); }
+                                        cloud2.weeks[wk][team][member] = mg;
                                     }
                                 }
                             }
