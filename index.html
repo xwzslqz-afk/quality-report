@@ -1001,44 +1001,31 @@
         }
 
         // 合并云端数据到本地（不覆盖本地已有的条目）
-        function _mergeCloudIntoLocal(cloud) {
-            const localWeeks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            const localUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-            const localHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
-
-            // 合并 weeks：云端有而本地没有的合并进来
-            for (const wk of Object.keys(cloud.weeks || {})) {
-                if (!localWeeks[wk]) { localWeeks[wk] = cloud.weeks[wk]; continue; }
-                for (const team of Object.keys(cloud.weeks[wk])) {
-                    if (!localWeeks[wk][team]) { localWeeks[wk][team] = cloud.weeks[wk][team]; continue; }
-                    for (const member of Object.keys(cloud.weeks[wk][team])) {
-                        if (!localWeeks[wk][team][member]) { localWeeks[wk][team][member] = cloud.weeks[wk][team][member]; continue; }
-                        // 按 ID 合并：本地有的保留，云端新增的添加
-                        const localIds = new Set(localWeeks[wk][team][member].map(it => it.id));
-                        for (const ci of cloud.weeks[wk][team][member]) {
-                            if (!localIds.has(ci.id)) localWeeks[wk][team][member].push(ci);
+        
+        // OT 合并：云端数据合并到 _memData（时间戳比较）
+        function _otMergePull(cloud) {
+            const cw = cloud.weeks || {};
+            const lw = _memData.weeks || {};
+            for (const wk of Object.keys(cw)) {
+                if (!lw[wk]) { lw[wk] = cw[wk]; continue; }
+                for (const team of Object.keys(cw[wk])) {
+                    if (!lw[wk][team]) { lw[wk][team] = cw[wk][team]; continue; }
+                    for (const member of Object.keys(cw[wk][team])) {
+                        if (!lw[wk][team][member]) { lw[wk][team][member] = cw[wk][team][member]; continue; }
+                        const cItems = cw[wk][team][member];
+                        const lItems = lw[wk][team][member] || [];
+                        const lMap = {}; for (const li of lItems) lMap[li.id] = li;
+                        for (const ci of cItems) {
+                            const li = lMap[ci.id];
+                            if (!li || (ci._ts || 0) > (li._ts || 0)) lMap[ci.id] = ci;
                         }
+                        lw[wk][team][member] = Object.values(lMap);
                     }
                 }
             }
-
-            // 合并 users：云端有而本地没有的合并进来
-            for (const u of Object.keys(cloud.users || {})) {
-                if (!localUsers[u]) localUsers[u] = cloud.users[u];
-            }
-
-            // 合并 history：追加云端快照
-            for (const hk of Object.keys(cloud.history || {})) {
-                if (!localHistory[hk]) { localHistory[hk] = cloud.history[hk]; continue; }
-                const localTs = new Set(localHistory[hk].map(h => h.timestamp));
-                for (const snap of cloud.history[hk]) {
-                    if (!localTs.has(snap.timestamp)) localHistory[hk].push(snap);
-                }
-            }
-
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(localWeeks));
-            localStorage.setItem(USERS_KEY, JSON.stringify(localUsers));
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(localHistory));
+            _memData.weeks = lw;
+            _memData.users = cloud.users || _memData.users || {};
+            _memData.history = cloud.history || _memData.history || {};
         }
 
         // 从云端拉取数据（API 优先 → raw URL → Pages 同域兜底）
@@ -1053,11 +1040,11 @@
                         const info = await r.json();
                         _ghSha = info.sha;
                         const json = JSON.parse(_b64dec(info.content));
-                        console.log('syncPull OK via API: weeks=' + Object.keys(json.weeks||{}).length + ' history=' + Object.keys(json.history||{}).length);
-                        _mergeCloudIntoLocal(json);
+                        console.log('syncPull API OK');
+                        _otMergePull(json);
                         updateSyncBadge('✅', '已同步');
                         if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
-                        return json;
+                        return _memData;
                     }
                 } catch(e) { console.log('syncPull API:', e.message); }
             }
@@ -1067,11 +1054,11 @@
                 const r = await fetch(RAW_DATA + '?t=' + Date.now());
                 if (r.ok) {
                     const json = await r.json();
-                    console.log('syncPull OK via raw: weeks=' + Object.keys(json.weeks||{}).length);
-                    _mergeCloudIntoLocal(json);
+                    console.log('syncPull raw OK');
+                    _otMergePull(json);
                     updateSyncBadge('✅', '已同步');
                     if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
-                    return json;
+                    return _memData;
                 }
             } catch(e) { console.log('syncPull raw:', e.message); }
 
@@ -1080,11 +1067,11 @@
                 const r = await fetch(PAGES_DATA + '?t=' + Date.now());
                 if (r.ok) {
                     const json = await r.json();
-                    console.log('syncPull OK via Pages: weeks=' + Object.keys(json.weeks||{}).length);
-                    _mergeCloudIntoLocal(json);
+                    console.log('syncPull Pages OK');
+                    _otMergePull(json);
                     updateSyncBadge('✅', '已同步');
                     if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
-                    return json;
+                    return _memData;
                 }
             } catch(e) { console.log('syncPull Pages:', e.message); }
 
