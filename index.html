@@ -1131,16 +1131,25 @@
                     for (const team of Object.keys(local.weeks[wk])) {
                         if (!cloud.weeks[wk][team]) cloud.weeks[wk][team] = {};
                         // 1. 遍历本地 members，覆盖云端
+                        // OT 合并：基于时间戳，最新版本胜出
                         for (const member of Object.keys(local.weeks[wk][team])) {
                             const lItems = local.weeks[wk][team][member];
                             const cItems = cloud.weeks[wk][team][member] || [];
-                            const lIds = new Set(lItems.map(it => it.id));
                             const delIds = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
-                            const merged = [...lItems];
+                            const merged = {};  // 用 map 去重
+                            // 云端条目（保留未被本地删除的）
                             for (const ci of cItems) {
-                                if (!lIds.has(ci.id) && !delIds.has(ci.id)) merged.push(ci);
+                                if (!delIds.has(ci.id)) merged[ci.id] = ci;
                             }
-                            cloud.weeks[wk][team][member] = merged;
+                            // 本地条目（覆盖同 ID，添加新 ID）
+                            for (const li of lItems) {
+                                const ci = merged[li.id];
+                                if (!ci || (li._ts || 0) >= (ci._ts || 0)) {
+                                    merged[li.id] = li;  // 本地版本更新或相同 → 本地胜出
+                                }
+                                // else: 云端版本更新 → 保留云端
+                            }
+                            cloud.weeks[wk][team][member] = Object.values(merged);
                         }
                         // 2. 删除云端有但本地没有的 members（用户删除了成员）
                         if (cloud.weeks[wk]) {
@@ -1220,11 +1229,14 @@
                                     for (const member of Object.keys(local.weeks[wk][team])) {
                                         const lIt = local.weeks[wk][team][member];
                                         const cIt = cloud2.weeks[wk][team][member] || [];
-                                        const lId2 = new Set(lIt.map(it => it.id));
                                         const del2 = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
-                                        const mg = [...lIt];
-                                        for (const ci of cIt) { if (!lId2.has(ci.id) && !del2.has(ci.id)) mg.push(ci); }
-                                        cloud2.weeks[wk][team][member] = mg;
+                                        const mg2 = {};
+                                        for (const ci of cIt) { if (!del2.has(ci.id)) mg2[ci.id] = ci; }
+                                        for (const li of lIt) {
+                                            const ci = mg2[li.id];
+                                            if (!ci || (li._ts || 0) >= (ci._ts || 0)) mg2[li.id] = li;
+                                        }
+                                        cloud2.weeks[wk][team][member] = Object.values(mg2);
                                     }
                                     for (const cm2 of Object.keys(cloud2.weeks[wk][team] || {})) {
                                         if (!local.weeks[wk][team][cm2]) delete cloud2.weeks[wk][team][cm2];
@@ -1506,6 +1518,8 @@
             const items = getMemberItems(weekKey, teamName, memberName);
             const newItem = {
                 id: generateId(),
+                _ts: Date.now(),
+                _by: currentUser ? currentUser.username : '',  // OT: 时间戳+操作者
                 dimension: item.dimension || '重点工作',
                 category: item.category || '',
                 name: item.name || '',
@@ -1537,7 +1551,7 @@
             const items = getMemberItems(weekKey, teamName, memberName);
             const idx = items.findIndex(it => it.id === itemId);
             if (idx === -1) return false;
-            items[idx] = { ...items[idx], ...updates };
+            items[idx] = { ...items[idx], ...updates, _ts: Date.now(), _by: currentUser ? currentUser.username : '' };
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
             return true;
