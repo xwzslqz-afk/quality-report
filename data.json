@@ -62,6 +62,82 @@
         "杨思睿": [],
         "葛晨云": []
       }
+    },
+    "2026-07-27": {
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-07-06": {
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
     }
   },
   "users": {
@@ -2024,6 +2100,2410 @@
                 "action": "1"
               }
             ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T07:51:53.309Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:03:59.981Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:05:54.355Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn85mb7_gscht",
+                "_ts": 1784189154355,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "1",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:06:39.151Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:11:24.897Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8cpcx_fa3sx",
+                "_ts": 1784189484897,
+                "_by": "邓超",
+                "dimension": "重大批量质量问题改进",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "1",
+                "causeAnalysis": "1",
+                "tempMeasure": "1",
+                "longTermMeasure": "1",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "2026-07-16",
+                "progress": "",
+                "status": "已完成",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:11:37.849Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:22:15.130Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190135130,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:22:44.660Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190135130,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8r9v8_q8cwr",
+                "_ts": 1784190164660,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:23:06.783Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190135130,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8r9v8_q8cwr",
+                "_ts": 1784190164660,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8rqxr_165cm",
+                "_ts": 1784190186783,
+                "_by": "张强",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:24:57.777Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8r9v8_q8cwr",
+                "_ts": 1784190164660,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8rqxr_165cm",
+                "_ts": 1784190186783,
+                "_by": "张强",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:26:23.592Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8vyso_dfb5j",
+                "_ts": 1784190383592,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "3",
+                "name": "3",
+                "target": "3",
+                "actual": "3",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "33",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8r9v8_q8cwr",
+                "_ts": 1784190164660,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8rqxr_165cm",
+                "_ts": 1784190186783,
+                "_by": "张强",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:26:42.719Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8vyso_dfb5j",
+                "_ts": 1784190383592,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "3",
+                "name": "3",
+                "target": "3",
+                "actual": "3",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "33",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8r9v8_q8cwr",
+                "_ts": 1784190164660,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8rqxr_165cm",
+                "_ts": 1784190186783,
+                "_by": "张强",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrn8wdjz_tw4eb",
+                "_ts": 1784190402719,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "3",
+                "name": "3",
+                "target": "3",
+                "actual": "3",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "3",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "3",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:26:46.785Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8vyso_dfb5j",
+                "_ts": 1784190383592,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "3",
+                "name": "3",
+                "target": "3",
+                "actual": "3",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "33",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8r9v8_q8cwr",
+                "_ts": 1784190164660,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8rqxr_165cm",
+                "_ts": 1784190186783,
+                "_by": "张强",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:26:51.429Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8vyso_dfb5j",
+                "_ts": 1784190383592,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "3",
+                "name": "3",
+                "target": "3",
+                "actual": "3",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "33",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn8r9v8_q8cwr",
+                "_ts": 1784190164660,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:26:53.775Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              },
+              {
+                "id": "mrn8vyso_dfb5j",
+                "_ts": 1784190383592,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "3",
+                "name": "3",
+                "target": "3",
+                "actual": "3",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "33",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:33:01.739Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:33:08.716Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [
+              {
+                "id": "mrn94ne3_l9bmu",
+                "_ts": 1784190788715,
+                "_by": "张强",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "11",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              }
+            ],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:34:47.177Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn83625_9u0ct",
+                "_ts": 1784189039981,
+                "_by": "路清召",
+                "dimension": "核心指标",
+                "category": "9",
+                "name": "9",
+                "target": "9",
+                "actual": "9",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "9",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "9",
+                "action": "9",
+                "comments": [
+                  {
+                    "author": "路清召",
+                    "text": "请对指标差异进行分析",
+                    "time": "2026-07-16T08:05:37.399Z"
+                  }
+                ]
+              },
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:35:01.367Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn8qn2y_ea4p7",
+                "_ts": 1784190297777,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "pending"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-16T08:35:03.125Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-07-27": [
+      {
+        "timestamp": "2026-07-16T07:40:12.982Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-07-06": [
+      {
+        "timestamp": "2026-07-16T08:07:26.380Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
             "张强": [],
             "严鑫": [],
             "张若愚": []
