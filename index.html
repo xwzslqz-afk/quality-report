@@ -3243,36 +3243,34 @@
         //  初始化
         // ============================================================
         async function init() {
-            const cloudData = await syncPull(true);  // silent: cloud is supplement
-            // localStorage 是主数据源，云端数据补充
+            const cloudData = await syncPull(true);
             const lw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            // 如果本地为空，使用云端数据
-            if (Object.keys(lw).length === 0 && cloudData && Object.keys(cloudData.weeks||{}).length > 0) {
-                _memData.weeks = cloudData.weeks;
-                _memData.users = cloudData.users || {};
-                _memData.history = cloudData.history || {};
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData.weeks));
-                localStorage.setItem(USERS_KEY, JSON.stringify(cloudData.users||{}));
-                localStorage.setItem(HISTORY_KEY, JSON.stringify(cloudData.history||{}));
-                // 合并云端独有的条目到本地
-                if (cloudData) {
-                    const cw = cloudData.weeks || {};
-                    for (const wk of Object.keys(cw)) {
-                        if (!_memData.weeks[wk]) { _memData.weeks[wk] = cw[wk]; continue; }
-                        for (const team of Object.keys(cw[wk])) {
-                            if (!_memData.weeks[wk][team]) { _memData.weeks[wk][team] = cw[wk][team]; continue; }
-                            for (const member of Object.keys(cw[wk][team])) {
-                                if (!_memData.weeks[wk][team][member]) { _memData.weeks[wk][team][member] = cw[wk][team][member]; continue; }
-                                const lIds = new Set((_memData.weeks[wk][team][member]||[]).map(it => it.id));
-                                for (const ci of cw[wk][team][member]||[]) {
-                                    if (!lIds.has(ci.id)) _memData.weeks[wk][team][member].push(ci);
-                                }
+            const hasLocal = Object.keys(lw).length > 0;
+
+            if (hasLocal) {
+                // 以 localStorage 为基础，云端独有数据合并进来
+                _memData.weeks = JSON.parse(JSON.stringify(lw));  // 深拷贝
+                _memData.users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+                _memData.history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
+            }
+            // 合并云端独有的条目（不管本地是否有数据）
+            if (cloudData) {
+                const cw = cloudData.weeks || {};
+                for (const wk of Object.keys(cw)) {
+                    if (!_memData.weeks[wk]) { _memData.weeks[wk] = cw[wk]; continue; }
+                    for (const team of Object.keys(cw[wk])) {
+                        if (!_memData.weeks[wk][team]) { _memData.weeks[wk][team] = cw[wk][team]; continue; }
+                        for (const member of Object.keys(cw[wk][team])) {
+                            if (!_memData.weeks[wk][team][member]) { _memData.weeks[wk][team][member] = cw[wk][team][member]; continue; }
+                            const lIds = new Set((_memData.weeks[wk][team][member]||[]).map(it => it.id));
+                            for (const ci of cw[wk][team][member]||[]) {
+                                if (!lIds.has(ci.id)) _memData.weeks[wk][team][member].push(ci);
                             }
                         }
                     }
-                    for (const u of Object.keys(cloudData.users||{})) {
-                        if (!_memData.users[u]) _memData.users[u] = cloudData.users[u];
-                    }
+                }
+                for (const u of Object.keys(cloudData.users||{})) {
+                    if (!_memData.users[u]) _memData.users[u] = cloudData.users[u];
                 }
             }
             initUsers();
