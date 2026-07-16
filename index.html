@@ -1986,6 +1986,7 @@
             const filterFn = (team, member) => {
                 if (!currentUser) return false;
                 if (currentUser.role === 'admin') return true;
+                if (currentUser.role === 'sub-admin') return team === currentUser.managedTeam;
                 if (currentUser.role === 'member') {
                     return member === currentUser.username && getTeamsOfMember(member).includes(team);
                 }
@@ -2125,8 +2126,11 @@
                 pushHistory(currentWeekKey);
             }
             const isAdmin = currentUser && currentUser.role === 'admin';
-            document.getElementById('restoreHistoryBtn').style.display = isAdmin ? 'inline-flex' : 'none';
+            const canManageHistory = currentUser && (currentUser.role === 'admin' || currentUser.role === 'sub-admin');
+            document.getElementById('restoreHistoryBtn').style.display = canManageHistory ? 'inline-flex' : 'none';
             document.getElementById('clearHistoryBtn').style.display = isAdmin ? 'inline-flex' : 'none';
+            // 只有管理员可配置 Token
+            document.getElementById('tokenBtn').style.display = isAdmin ? 'inline-flex' : 'none';
         }
 
         // ============================================================
@@ -2242,11 +2246,11 @@
         }
 
         // ============================================================
-        //  历史操作（仅管理员）
+        //  历史操作（管理员及子管理员）
         // ============================================================
         document.getElementById('restoreHistoryBtn').addEventListener('click', function() {
-            if (!currentUser || currentUser.role !== 'admin') {
-                showToast('仅管理员可恢复历史版本', 'error');
+            if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'sub-admin')) {
+                showToast('仅管理员或子管理员可恢复历史版本', 'error');
                 return;
             }
             const select = document.getElementById('historySelect');
@@ -3205,6 +3209,10 @@
         });
 
         document.getElementById('tokenBtn').addEventListener('click', function() {
+            if (currentUser && currentUser.role !== 'admin') {
+                showToast('仅管理员可配置 Token', 'error');
+                return;
+            }
             const current = ghToken();
             const msg = current
                 ? `当前已配置 Token。\n\n• 点「确定」查看/更换\n• 点「取消」清除 Token（恢复纯本地模式）`
