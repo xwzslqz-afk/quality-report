@@ -414,6 +414,7 @@
             vertical-align: middle;
             word-break: break-word;
         }
+        tr.pending { background: #fef3c7 !important; }
         table tbody tr:hover {
             background: #f8fafc;
         }
@@ -726,6 +727,7 @@
                         <div class="section-title">
                             <span>📊 核心指标</span>
                             <button class="add-btn" id="addCoreBtn">＋ 添加</button>
+                            <button class="add-btn" id="taskCoreBtn" style="border-color:#f59e0b;color:#f59e0b;">📋 补充任务</button>
                         </div>
                         <div class="table-wrap">
                             <table id="coreTable">
@@ -752,6 +754,7 @@
                         <div class="section-title">
                             <span>📌 重点工作</span>
                             <button class="add-btn" id="addKeyBtn">＋ 添加</button>
+                            <button class="add-btn" id="taskKeyBtn" style="border-color:#f59e0b;color:#f59e0b;">📋 补充任务</button>
                         </div>
                         <div class="table-wrap">
                             <table id="keyTable">
@@ -777,6 +780,7 @@
                         <div class="section-title">
                             <span>⚙️ 重大批量质量问题改进</span>
                             <button class="add-btn" id="addMajorBtn">＋ 添加</button>
+                            <button class="add-btn" id="taskMajorBtn" style="border-color:#f59e0b;color:#f59e0b;">📋 补充任务</button>
                         </div>
                         <div class="table-wrap">
                             <table id="majorTable">
@@ -1383,7 +1387,8 @@
                 progress: item.progress || '',
                 status: item.status || '开展中',
                 deviation: item.deviation || '',
-                action: item.action || '', comments: [], notes: [], confirmed: false
+                action: item.action || '', comments: [], notes: [], confirmed: false,
+                _taskStatus: window._isTask ? 'pending' : ''
             };
             items.push(newItem);
             _newIds.push(newItem.id);
@@ -1854,6 +1859,7 @@
                 for (const item of coreItems) {
                     const achieveClass = item.achieveStatus === '达标' ? 'pass' : 'fail';
                     const tr = document.createElement('tr');
+                    if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
                         <td>${escapeHtml(item.category)}</td>
                         <td>${escapeHtml(item.name)}</td>
@@ -1866,7 +1872,7 @@
                         <td style="text-align:center;white-space:nowrap;">
                             ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-core-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-core-btn" data-id="${item.id}">✕</button>` : ''}
                     ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
-                    ${(currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
+                    ${(currentUser && item.responsible && item.responsible===currentUser.username && item._taskStatus==='pending') ? `<button class="btn btn-xs btn-warning confirm-btn" data-id="${item.id}">✅确认</button><button class="btn btn-xs btn-danger reject-btn" data-id="${item.id}">❌拒绝</button>` : (currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item._taskStatus==='rejected' ? 'btn-outline' : item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item._taskStatus==='rejected' ? '↩已拒绝' : item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
                         </td>
                     `;
                     coreBody.appendChild(tr);
@@ -1893,6 +1899,7 @@
             }
             document.getElementById('coreSection').style.display = 'block';
             document.getElementById('addCoreBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
+            document.getElementById('taskCoreBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
 
             // ---- 重点工作 ----
             const keyBody = document.getElementById('keyBody');
@@ -1903,6 +1910,7 @@
                 for (const item of keyItems) {
                     const statusClass = STATUS_CLASS[item.status] || 'default';
                     const tr = document.createElement('tr');
+                    if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
                         <td>${escapeHtml(item.workType || '')}</td>
                         <td>${escapeHtml(item.description)}</td>
@@ -1914,7 +1922,7 @@
                         <td style="text-align:center;white-space:nowrap;">
                             ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-key-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-key-btn" data-id="${item.id}">✕</button>` : ''}
                     ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
-                    ${(currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
+                    ${(currentUser && item.responsible && item.responsible===currentUser.username && item._taskStatus==='pending') ? `<button class="btn btn-xs btn-warning confirm-btn" data-id="${item.id}">✅确认</button><button class="btn btn-xs btn-danger reject-btn" data-id="${item.id}">❌拒绝</button>` : (currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item._taskStatus==='rejected' ? 'btn-outline' : item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item._taskStatus==='rejected' ? '↩已拒绝' : item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
                         </td>
                     `;
                     keyBody.appendChild(tr);
@@ -1940,6 +1948,7 @@
                 }
             }
             document.getElementById('keySection').style.display = 'block';
+            document.getElementById('taskKeyBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
             document.getElementById('addKeyBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
 
             // ---- 重大批量质量问题改进 ----
@@ -1951,6 +1960,7 @@
                 for (const item of majorItems) {
                     const statusClass = STATUS_CLASS[item.status] || 'default';
                     const tr = document.createElement('tr');
+                    if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
                         <td>${escapeHtml(item.problemDesc)}</td>
                         <td>${escapeHtml(item.causeAnalysis)}</td>
@@ -1963,7 +1973,7 @@
                         <td style="text-align:center;white-space:nowrap;">
                             ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-major-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-major-btn" data-id="${item.id}">✕</button>` : ''}
                     ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
-                    ${(currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
+                    ${(currentUser && item.responsible && item.responsible===currentUser.username && item._taskStatus==='pending') ? `<button class="btn btn-xs btn-warning confirm-btn" data-id="${item.id}">✅确认</button><button class="btn btn-xs btn-danger reject-btn" data-id="${item.id}">❌拒绝</button>` : (currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item._taskStatus==='rejected' ? 'btn-outline' : item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item._taskStatus==='rejected' ? '↩已拒绝' : item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
                         </td>
                     `;
                     majorBody.appendChild(tr);
@@ -1989,6 +1999,7 @@
                 }
             }
             document.getElementById('majorSection').style.display = 'block';
+            document.getElementById('taskMajorBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
             document.getElementById('addMajorBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
         }
 
@@ -2038,6 +2049,7 @@
                     const { team, member, item } = entry;
                     const achieveClass = item.achieveStatus === '达标' ? 'pass' : 'fail';
                     const tr = document.createElement('tr');
+                    if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
                         <td>${escapeHtml(team)}</td>
                         <td>${escapeHtml(member)}</td>
@@ -2065,6 +2077,7 @@
                     const desc = item.dimension === '重点工作' ? item.description : item.problemDesc;
                     const statusClass = STATUS_CLASS[item.status] || 'default';
                     const tr = document.createElement('tr');
+                    if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
                         <td>${escapeHtml(team)}</td>
                         <td>${escapeHtml(member)}</td>
@@ -3023,6 +3036,7 @@
 
             editTeamName.value = team;
             editMemberName.value = member;
+            if (window._isTask) { window._prefillResponsible = member; }
             editDimension.value = dimension;
 
             const data = item || {};
@@ -3173,14 +3187,33 @@
 
         document.getElementById('addCoreBtn').addEventListener('click', function() {
             window._addDimension = '核心指标';
+            window._isTask = false;
             openModal('add');
         });
         document.getElementById('addKeyBtn').addEventListener('click', function() {
             window._addDimension = '重点工作';
+            window._isTask = false;
             openModal('add');
         });
         document.getElementById('addMajorBtn').addEventListener('click', function() {
             window._addDimension = '重大批量质量问题改进';
+            window._isTask = false;
+            openModal('add');
+        });
+        // 补充任务按钮
+        document.getElementById('taskCoreBtn').addEventListener('click', function() {
+            window._addDimension = '核心指标';
+            window._isTask = true;
+            openModal('add');
+        });
+        document.getElementById('taskKeyBtn').addEventListener('click', function() {
+            window._addDimension = '重点工作';
+            window._isTask = true;
+            openModal('add');
+        });
+        document.getElementById('taskMajorBtn').addEventListener('click', function() {
+            window._addDimension = '重大批量质量问题改进';
+            window._isTask = true;
             openModal('add');
         });
 
@@ -3303,13 +3336,24 @@
                 const id = e.target.dataset.id;
                 const item = findItemById(id);
                 if (!item) return;
-                item.confirmed = !item.confirmed;
-                item.confirmedBy = currentUser.username;
-                item.confirmedAt = new Date().toISOString();
+                if (item._taskStatus === 'pending') {
+                    item._taskStatus = 'confirmed';
+                    item.confirmed = true;
+                    item.confirmedBy = currentUser.username;
+                    item.confirmedAt = new Date().toISOString();
+                    showToast('✅ 任务已确认接收', 'success');
+                } else if (e.target.classList.contains('reject-btn')) {
+                    item._taskStatus = 'rejected';
+                    showToast('↩ 已拒绝该补充任务', 'info');
+                } else {
+                    item.confirmed = !item.confirmed;
+                    item.confirmedBy = currentUser.username;
+                    item.confirmedAt = new Date().toISOString();
+                    showToast(item.confirmed ? '✅ 已确认接收' : '↩ 已取消确认', 'success');
+                }
                 _dirty = true;
                 saveAllData(_memData.weeks);
                 renderAll();
-                showToast(item.confirmed ? '✅ 已确认接收' : '↩ 已取消确认', 'success');
             }
         });
 
