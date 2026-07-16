@@ -1441,7 +1441,18 @@
         function restoreHistoryVersion(weekKey, index) {
             const versions = getHistoryVersions(weekKey);
             if (index < 0 || index >= versions.length) return false;
-            setWeekData(weekKey, versions[index].data);
+            const snapshotData = versions[index].data;
+            // 子管理员：只恢复所管团队数据，其他团队保持不变
+            if (currentUser && currentUser.role === 'sub-admin' && currentUser.managedTeam) {
+                const team = currentUser.managedTeam;
+                const currentWeek = getWeekData(weekKey);
+                // 只替换所管团队的数据
+                currentWeek[team] = snapshotData[team] || {};
+                setWeekData(weekKey, currentWeek);
+            } else {
+                // 管理员：全量恢复
+                setWeekData(weekKey, snapshotData);
+            }
             return true;
         }
 
