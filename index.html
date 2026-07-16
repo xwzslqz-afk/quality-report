@@ -1428,6 +1428,7 @@
                 data: JSON.parse(JSON.stringify(weekData))
             };
             history[weekKey].push(snapshot);
+            // 每个周最多保留 50 个快照，防止数据膨胀
             if (history[weekKey].length > 50) history[weekKey] = history[weekKey].slice(-50);
             saveHistory(history);
         }
