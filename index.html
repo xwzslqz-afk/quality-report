@@ -685,9 +685,11 @@
                     <button class="btn btn-outline" id="importBtn">📤 导入 Excel</button>
                     <input type="file" id="fileInput" class="file-input-hidden" accept=".xlsx,.xls" />
                 </div>
-                <span class="sync-badge" id="syncBadge" title="云端同步状态" style="font-size:12px;color:#64748b;margin:0 4px;white-space:nowrap;">💻 本地</span>
-                <button class="btn btn-xs btn-outline" id="syncBtn" title="手动同步云端数据" style="font-size:11px;">🔄 同步</button>
-                <button class="btn btn-xs btn-outline" id="tokenBtn" title="配置 GitHub Token" style="font-size:11px;">🔑 Token</button>
+                <span class="sync-badge" id="syncBadge" title="同步状态" style="font-size:12px;color:#64748b;margin:0 4px;white-space:nowrap;">💻 本地</span>
+                <button class="btn btn-xs btn-outline" id="saveLocalBtn" title="保存到本地" style="font-size:11px;">💾 保存</button>
+                <button class="btn btn-xs btn-outline" id="uploadBtn" title="上传到云端" style="font-size:11px;">📤 上传</button>
+                <button class="btn btn-xs btn-outline" id="downloadBtn" title="从云端下载" style="font-size:11px;">📥 下载</button>
+                <button class="btn btn-xs btn-outline" id="tokenBtn" title="配置 GitHub Token" style="font-size:11px;">🔑</button>
                 <div class="user-bar" id="userBar">
                     <!-- 动态渲染 -->
                 </div>
@@ -3113,14 +3115,42 @@
         // ============================================================
         //  手动同步 & Token 管理
         // ============================================================
-        document.getElementById('syncBtn').addEventListener('click', async function() {
+        //  保存 / 上传 / 下载
+        // ============================================================
+        document.getElementById('saveLocalBtn').addEventListener('click', function() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks));
+                localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users));
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(_memData.history));
+                updateSyncBadge('💻', '已保存');
+                showToast('💾 数据已保存到本地', 'success', 1500);
+            } catch(e) {
+                showToast('❌ 保存失败: ' + e.message, 'error');
+            }
+        });
+
+        document.getElementById('uploadBtn').addEventListener('click', async function() {
             if (!ghToken()) {
-                showToast('⚠️ 请先点击 🔑 Token 配置 GitHub Token', 'error');
+                showToast('⚠️ 请先点击 🔑 配置 GitHub Token', 'error');
                 return;
             }
-            updateSyncBadge('⏳','推送中…');
+            updateSyncBadge('⏳', '上传中…');
             _ghSha = null;
             await syncPush(true);
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', async function() {
+            updateSyncBadge('⏳', '下载中…');
+            const ok = await syncPull(false);
+            if (ok) {
+                renderAll();
+                // 同步到 localStorage
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks));
+                    localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users));
+                    localStorage.setItem(HISTORY_KEY, JSON.stringify(_memData.history));
+                } catch(e) {}
+            }
         });
 
         document.getElementById('tokenBtn').addEventListener('click', function() {
