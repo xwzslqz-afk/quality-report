@@ -974,342 +974,177 @@
         // 内存数据（云端直连模式，localStorage 仅作容错缓存）
         let _memData = { weeks: {}, users: {}, history: {} };
 
-                // ===== GitHub 云端同步配置 =====
+                // ===== 云端同步（OT 实现）=====
         const GH_REPO = 'xwzslqz-afk/quality-report';
         const GH_API = 'https://api.github.com/repos/' + GH_REPO + '/contents/data.json';
-        const PAGES_DATA = 'data.json';  // 同域 fallback
-        const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';  // 即时更新，无 Pages 延迟
+        const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';
+        const PAGES_DATA = 'data.json';
         let _ghSha = null;
-        let _ghSyncing = false;
+        let _pushing = false;
         let _dirty = false;
-        let _lastSyncTime = 0;  // 上次成功同步时间，用于判断本地独有条目是否过期
+        let _newIds = [];
+        let _delIds = [];
 
         function ghToken() { return localStorage.getItem('gh_token') || ''; }
         function ghSetToken(t) { localStorage.setItem('gh_token', t); }
 
-        // Base64（正确处理中文）
-        function _b64enc(str) {
-            const bytes = new TextEncoder().encode(str);
-            let bin = '';
-            for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-            return btoa(bin);
-        }
-        function _b64dec(b64) {
-            const bin = atob(b64.replace(/\s/g, ''));
-            const bytes = new Uint8Array(bin.length);
-            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-            return new TextDecoder().decode(bytes);
-        }
+        function _b64e(s) { const b=new TextEncoder().encode(s); let r=''; for(let i=0;i<b.length;i++)r+=String.fromCharCode(b[i]); return btoa(r); }
+        function _b64d(s) { const b=atob(s.replace(/\s/g,'')); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i); return new TextDecoder().decode(u); }
 
-        // 合并云端数据到本地（不覆盖本地已有的条目）
-        
-        // OT 合并：云端权威 + 本地新增保护
-        function _otMergePull(cloud) {
-            const now = Date.now();
-            // 本地独有条目仅在 _ts > _lastSyncTime 时保留（本次会话新增）
-            const keepThreshold = _lastSyncTime || (now - 60000);
-            const cw = cloud.weeks || {};
-            const lw = _memData.weeks || {};
-            for (const wk of Object.keys(cw)) {
-                if (!lw[wk]) { lw[wk] = cw[wk]; continue; }
-                for (const team of Object.keys(cw[wk])) {
-                    if (!lw[wk][team]) { lw[wk][team] = cw[wk][team]; continue; }
-                    for (const member of Object.keys(cw[wk][team])) {
-                        if (!lw[wk][team][member]) { lw[wk][team][member] = cw[wk][team][member]; continue; }
-                        const cItems = cw[wk][team][member];
-                        const lItems = lw[wk][team][member] || [];
-                        // 以云端 ID 集合为基准（云端权威），本地独有 ID 按 _ts 判断
-                        const cIds = new Set(cItems.map(it => it.id));
-                        const lMap = {};
-                        for (const ci of cItems) lMap[ci.id] = ci;  // 云端条目为底
-                        for (const li of lItems) {
-                            if (cIds.has(li.id)) {
-                                // 两端都有：比较 _ts
-                                const ci = lMap[li.id];
-                                if ((li._ts || 0) > (ci._ts || 0)) lMap[li.id] = li;
-                            } else {
-                                // 云端没有 → 仅保留本次会话新增的（_ts > _lastSyncTime）
-                                if ((li._ts || 0) > keepThreshold) {
-                                    lMap[li.id] = li;
-                                }
-                                // else: 云端已删除的旧条目 → 丢弃
-                            }
-                        }
-                        lw[wk][team][member] = Object.values(lMap);
-                    }
-                    // 删除本地有但云端没有的空 members（云端已删且本地无数据）
-                    for (const cm of Object.keys(lw[wk][team] || {})) {
-                        if (!cw[wk][team][cm] && (!lw[wk][team][cm] || lw[wk][team][cm].length === 0)) {
-                            delete lw[wk][team][cm];
-                        }
-                    }
-                }
-            }
-            _memData.weeks = lw;
-            _memData.users = cloud.users || _memData.users || {};
-            _memData.history = cloud.history || _memData.history || {};
-        }
-
-        // 从云端拉取数据（API 优先 → raw URL → Pages 同域兜底）
         async function syncPull(silent) {
             const t = ghToken();
-
-            // 方案1：GitHub API（实时，100% 准确）+ Token 认证
             if (t) {
                 try {
-                    const r = await fetch(GH_API, { headers: { 'Authorization': 'Bearer ' + t, 'Cache-Control': 'no-cache' } });
+                    const r = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t,'Cache-Control':'no-cache'}});
                     if (r.ok) {
                         const info = await r.json();
                         _ghSha = info.sha;
-                        const json = JSON.parse(_b64dec(info.content));
-                        console.log('syncPull API OK');
-                        _otMergePull(json);
-                        updateSyncBadge('✅', '已同步');
-                        if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
+                        const cloud = JSON.parse(_b64d(info.content));
+                        _memData.weeks = cloud.weeks || {};
+                        _memData.users = cloud.users || {};
+                        _memData.history = cloud.history || {};
+                        updateSyncBadge('✅','已同步');
+                        if (!silent) showToast('📥 云端数据已加载','success',1500);
                         return _memData;
                     }
-                } catch(e) { console.log('syncPull API:', e.message); }
+                } catch(e) { console.log('syncPull API:',e.message); }
             }
-
-            // 方案2：raw.githubusercontent.com（即时，无需认证）
-            try {
-                const r = await fetch(RAW_DATA + '?t=' + Date.now());
-                if (r.ok) {
-                    const json = await r.json();
-                    console.log('syncPull raw OK');
-                    _otMergePull(json);
-                    updateSyncBadge('✅', '已同步');
-                    if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
-                    return _memData;
-                }
-            } catch(e) { console.log('syncPull raw:', e.message); }
-
-            // 方案3：Pages 同域（最可靠但可能有延迟）
-            try {
-                const r = await fetch(PAGES_DATA + '?t=' + Date.now());
-                if (r.ok) {
-                    const json = await r.json();
-                    console.log('syncPull Pages OK');
-                    _otMergePull(json);
-                    updateSyncBadge('✅', '已同步');
-                    if (!silent) showToast('📥 云端数据已加载', 'success', 1500);
-                    return _memData;
-                }
-            } catch(e) { console.log('syncPull Pages:', e.message); }
-
-            console.error('syncPull: all 3 methods failed');
-            updateSyncBadge('❌', '读取失败');
-            if (!silent) showToast('❌ 读取云端失败', 'error', 3000);
+            for (const url of [RAW_DATA, PAGES_DATA]) {
+                try {
+                    const r = await fetch(url+'?t='+Date.now());
+                    if (r.ok) {
+                        const json = await r.json();
+                        _memData.weeks = json.weeks || {};
+                        _memData.users = json.users || {};
+                        _memData.history = json.history || {};
+                        updateSyncBadge('✅','已同步');
+                        return _memData;
+                    }
+                } catch(e) {}
+            }
+            updateSyncBadge('❌','离线');
+            if (!silent) showToast('❌ 无法连接云端','error',3000);
             return null;
         }
 
-        // 推送本地数据到云端（先拉取再合并，绝不删除云端数据）
-        async function syncPush(silent) {
+        async function syncPush() {
             const t = ghToken();
-            if (!t || _ghSyncing) return false;
-            _ghSyncing = true;
-            updateSyncBadge('⏳', '推送中…');
-            console.log('syncPush: pulling cloud first...');
+            if (!t || _pushing) return;
+            _pushing = true;
+            updateSyncBadge('⏳','推送中…');
             try {
-                // 1. 先拉取云端最新数据
                 let cloud = null;
                 try {
-                    const cr = await fetch(GH_API, { headers: { 'Authorization': 'Bearer ' + t } });
-                    if (cr.ok) {
-                        const ci = await cr.json();
-                        _ghSha = ci.sha;
-                        cloud = JSON.parse(_b64dec(ci.content));
-                    }
-                } catch(e) { console.log('syncPush: cloud fetch error:', e.message); }
+                    const r = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t}});
+                    if (r.ok) { const ci = await r.json(); _ghSha = ci.sha; cloud = JSON.parse(_b64d(ci.content)); }
+                } catch(e) {}
+                if (!cloud) cloud = { weeks:{}, users:{}, history:{} };
 
-                // 2. 如果没有云端数据或拉取失败，直接用本地覆盖（首次推送）
-                if (!cloud) {
-                    cloud = { weeks: {}, users: {}, history: {} };
-                }
+                const lw = _memData.weeks || {};
+                const lu = _memData.users || {};
+                const lh = _memData.history || {};
+                const delSet = new Set(_delIds);
 
-                // 3. 深度合并：本地数据合并到云端数据（云端数据为基底，不删除）
-                const local = {
-                    weeks: _memData.weeks || {},
-                    users: _memData.users || {},
-                    history: _memData.history || {}
-                };
-
-                // 合并 weeks（保留云端所有条目，本地新增/更新）
-                for (const wk of Object.keys(local.weeks)) {
+                // OT 合并 weeks
+                for (const wk of Object.keys(lw)) {
                     if (!cloud.weeks[wk]) cloud.weeks[wk] = {};
-                    for (const team of Object.keys(local.weeks[wk])) {
+                    for (const team of Object.keys(lw[wk])) {
                         if (!cloud.weeks[wk][team]) cloud.weeks[wk][team] = {};
-                        // 1. 遍历本地 members，覆盖云端
-                        // OT 合并：以本地 ID 为基准，排除已删 ID，云端独有保留
-                        for (const member of Object.keys(local.weeks[wk][team])) {
-                            const lItems = local.weeks[wk][team][member];
+                        for (const member of Object.keys(lw[wk][team])) {
+                            const lItems = lw[wk][team][member] || [];
                             const cItems = cloud.weeks[wk][team][member] || [];
-                            const delIds = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
-                            const lIds = new Set(lItems.map(it => it.id));
                             const merged = {};
-                            // 云端条目为底（排除已删）
-                            for (const ci of cItems) {
-                                if (!delIds.has(ci.id)) merged[ci.id] = ci;
-                            }
-                            // 本地条目覆盖/新增
+                            for (const ci of cItems) { if (!delSet.has(ci.id)) merged[ci.id] = ci; }
                             for (const li of lItems) {
                                 const ci = merged[li.id];
-                                if (!ci || (li._ts || 0) >= (ci._ts || 0)) merged[li.id] = li;
+                                if (!ci || (li._ts||0) >= (ci._ts||0)) merged[li.id] = li;
                             }
                             cloud.weeks[wk][team][member] = Object.values(merged);
                         }
-                        // 2. 删除云端有但本地没有的 members（用户删除了成员）
-                        if (cloud.weeks[wk]) {
-                            for (const cm of Object.keys(cloud.weeks[wk][team] || {})) {
-                                if (!local.weeks[wk][team][cm]) {
-                                    delete cloud.weeks[wk][team][cm];
-                                }
-                            }
+                        for (const cm of Object.keys(cloud.weeks[wk][team] || {})) {
+                            if (!lw[wk][team][cm]) delete cloud.weeks[wk][team][cm];
                         }
                     }
                 }
-
-                // 合并 users：只新增云端缺失的用户；已在云端的保留云端密码
-                for (const u of Object.keys(local.users)) {
-                    if (!cloud.users[u]) {
-                        cloud.users[u] = local.users[u];
-                    } else {
-                        // 保留云端 role + password，仅当本地显式修改密码时才更新
-                        if (sessionStorage.getItem('_pwdChanged_' + u) === '1') {
-                            cloud.users[u].password = local.users[u].password;
-                            sessionStorage.removeItem('_pwdChanged_' + u);
-                        }
-                        // role 以云端为准（管理员可能在云端被变更）
+                // users
+                for (const u of Object.keys(lu)) {
+                    if (!cloud.users[u]) cloud.users[u] = lu[u];
+                    else if (sessionStorage.getItem('_pwd_'+u) === '1') {
+                        cloud.users[u].password = lu[u].password;
+                        sessionStorage.removeItem('_pwd_'+u);
                     }
                 }
-
-                // 合并 history（保留云端所有快照，本地追加）
-                for (const hk of Object.keys(local.history)) {
+                // history
+                for (const hk of Object.keys(lh)) {
                     if (!cloud.history[hk]) cloud.history[hk] = [];
-                    const existTimestamps = new Set(cloud.history[hk].map(h => h.timestamp));
-                    for (const snap of local.history[hk]) {
-                        if (!existTimestamps.has(snap.timestamp)) {
-                            cloud.history[hk].push(snap);
-                        }
-                    }
+                    const cTs = new Set(cloud.history[hk].map(h=>h.timestamp));
+                    for (const s of lh[hk]) { if (!cTs.has(s.timestamp)) cloud.history[hk].push(s); }
                     if (cloud.history[hk].length > 50) cloud.history[hk] = cloud.history[hk].slice(-50);
                 }
 
-                // 4. 推送合并结果
-                const body = {
-                    message: 'Update ' + new Date().toLocaleString('zh-CN'),
-                    content: _b64enc(JSON.stringify(cloud, null, 2))
-                };
+                const body = { message:'Update '+new Date().toLocaleString('zh-CN'), content:_b64e(JSON.stringify(cloud,null,2)) };
                 if (_ghSha) body.sha = _ghSha;
+                const r = await fetch(GH_API, { method:'PUT',
+                    headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},
+                    body:JSON.stringify(body) });
 
-                const r = await fetch(GH_API, {
-                    method: 'PUT',
-                    headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
                 if (r.ok) {
-                    const result = await r.json();
-                    _ghSha = result.content.sha;
-                    sessionStorage.removeItem('_deletedIds');
+                    _ghSha = (await r.json()).content.sha;
+                    _dirty = false; _newIds = []; _delIds = [];
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(cloud.weeks));
+                    localStorage.setItem(USERS_KEY, JSON.stringify(cloud.users));
+                    localStorage.setItem(HISTORY_KEY, JSON.stringify(cloud.history));
                     localStorage.removeItem('_syncFailed');
-                    _dirty = false;
-                    _lastSyncTime = Date.now();
-                    updateSyncBadge('✅', '已同步');
-                    console.log('syncPush OK');
-                    if (!silent) showToast('📤 已推送到云端', 'success', 1500);
-                    return true;
+                    updateSyncBadge('✅','已同步');
+                    showToast('📤 已推送到云端','success',1500);
+                    return;
                 }
-                console.error('syncPush FAIL: HTTP ' + r.status);
                 if (r.status === 409) {
-                    // SHA 冲突：自动重新拉取 → 合并 → 重推（最多 1 次）
-                    console.log('syncPush: 409 conflict, retrying...');
                     try {
-                        const cr2 = await fetch(GH_API, { headers: { 'Authorization': 'Bearer ' + t } });
+                        const cr2 = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t}});
                         if (cr2.ok) {
-                            const ci2 = await cr2.json();
-                            _ghSha = ci2.sha;
-                            const cloud2 = JSON.parse(_b64dec(ci2.content));
-                            // 在最新的云端数据上重新合并本地
-                            for (const wk of Object.keys(local.weeks)) {
-                                if (!cloud2.weeks[wk]) cloud2.weeks[wk] = {};
-                                for (const team of Object.keys(local.weeks[wk])) {
-                                    if (!cloud2.weeks[wk][team]) cloud2.weeks[wk][team] = {};
-                                    for (const member of Object.keys(local.weeks[wk][team])) {
-                                        const lIt = local.weeks[wk][team][member];
-                                        const cIt = cloud2.weeks[wk][team][member] || [];
-                                        const del2 = new Set(JSON.parse(sessionStorage.getItem('_deletedIds') || '[]'));
-                                        const mg2 = {};
-                                        for (const ci of cIt) { if (!del2.has(ci.id)) mg2[ci.id] = ci; }
-                                        for (const li of lIt) { const ci = mg2[li.id]; if (!ci || (li._ts||0) >= (ci._ts||0)) mg2[li.id] = li; }
-                                        cloud2.weeks[wk][team][member] = Object.values(mg2);
-                                    }
-                                    for (const cm2 of Object.keys(cloud2.weeks[wk][team] || {})) {
-                                        if (!local.weeks[wk][team][cm2]) delete cloud2.weeks[wk][team][cm2];
-                                    }
-                                }
-                            }
-                            for (const u of Object.keys(local.users)) {
-                                if (!cloud2.users[u]) { cloud2.users[u] = local.users[u]; }
-                                else if (sessionStorage.getItem('_pwdChanged_' + u) === '1') {
-                                    cloud2.users[u].password = local.users[u].password;
-                                    sessionStorage.removeItem('_pwdChanged_' + u);
-                                }
-                            }
-                            for (const hk of Object.keys(local.history)) {
-                                if (!cloud2.history[hk]) cloud2.history[hk] = [];
-                                const ts2 = new Set(cloud2.history[hk].map(h => h.timestamp));
-                                for (const s of local.history[hk]) { if (!ts2.has(s.timestamp)) cloud2.history[hk].push(s); }
-                            }
-                            // 重推
-                            const body2 = { message: 'Retry merge', content: _b64enc(JSON.stringify(cloud2, null, 2)), sha: _ghSha };
-                            const r2 = await fetch(GH_API, { method: 'PUT',
-                                headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' },
-                                body: JSON.stringify(body2) });
+                            _ghSha = (await cr2.json()).sha;
+                            const body2 = { message:'Retry', content:body.content, sha:_ghSha };
+                            const r2 = await fetch(GH_API, { method:'PUT',
+                                headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},
+                                body:JSON.stringify(body2) });
                             if (r2.ok) {
                                 _ghSha = (await r2.json()).content.sha;
-                                _dirty = false;
-                                _lastSyncTime = Date.now();
-                                sessionStorage.removeItem('_deletedIds');
-                                updateSyncBadge('✅', '已同步');
-                                if (!silent) showToast('📤 已推送到云端', 'success', 1500);
-                                return true;
+                                _dirty = false; _newIds = []; _delIds = [];
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloud.weeks));
+                                localStorage.setItem(USERS_KEY, JSON.stringify(cloud.users));
+                                localStorage.removeItem('_syncFailed');
+                                updateSyncBadge('✅','已同步');
+                                showToast('📤 已推送到云端','success',1500);
+                                return;
                             }
                         }
-                    } catch(e2) { console.log('syncPush retry error:', e2.message); }
-                    updateSyncBadge('⚠️', '冲突');
-                    if (!silent) showToast('⚠️ 多人同时编辑导致冲突，请稍后重试', 'error', 2000);
-                } else {
-                    updateSyncBadge('❌', '推送失败');
-                    if (!silent) showToast('❌ 推送失败 HTTP ' + r.status, 'error');
+                    } catch(e2) {}
                 }
-                // 推送失败，标记本地有未同步数据
-                localStorage.setItem('_syncFailed', '1');
-                return false;
+                localStorage.setItem('_syncFailed','1');
+                updateSyncBadge('❌','未同步');
+                showToast('❌ 推送失败，数据仅保存在本地','error',4000);
             } catch(e) {
-                console.error('syncPush:', e);
-                localStorage.setItem('_syncFailed', '1');
-                updateSyncBadge('❌', '网络错误');
-                if (!silent) showToast('❌ 推送异常: ' + e.message, 'error');
-                return false;
+                console.error('syncPush:',e);
+                localStorage.setItem('_syncFailed','1');
+                updateSyncBadge('❌','未同步');
+                showToast('❌ 网络异常','error',4000);
             } finally {
-                _ghSyncing = false;
+                _pushing = false;
+                if (_dirty) setTimeout(syncPush, 300);
             }
         }
 
-        // 本地修改后自动调度推送（500ms 防抖）
         function schedulePush() {
-            if (!ghToken()) { updateSyncBadge('💻', '本地'); return; }
-            if (!_dirty) return;  // 没有编辑，不推送
-            updateSyncBadge('⏳', '待同步');
+            if (!ghToken() || !_dirty) return;
             clearTimeout(window._pushTimer);
-            window._pushTimer = setTimeout(() => syncPush(false), 500);
+            window._pushTimer = setTimeout(syncPush, 300);
         }
 
         function updateSyncBadge(icon, text) {
             const el = document.getElementById('syncBadge');
             if (el) { el.textContent = icon + ' ' + text; }
         }
-
 
         const DIMENSION_TYPES = ['核心指标', '重点工作', '重大批量质量问题改进'];
         const STATUS_LIST = ['已完成', '开展中', '延期风险', '已延期'];
@@ -1382,7 +1217,7 @@
             if (!user) return false;
             if (user.password !== oldPwd) return false;
             user.password = newPwd;
-            sessionStorage.setItem('_pwdChanged_' + username, '1');
+            sessionStorage.setItem('_pwd_' + username, '1');
             saveUsers(users);
             return true;
         }
@@ -1547,6 +1382,7 @@
                 action: item.action || ''
             };
             items.push(newItem);
+            _newIds.push(newItem.id);
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
             return newItem;
@@ -1569,9 +1405,9 @@
             const filtered = items.filter(it => it.id !== itemId);
             if (filtered.length === items.length) return false;
             // 记录已删除 ID（同步时从云端移除）
-            const delIds = JSON.parse(sessionStorage.getItem('_deletedIds') || '[]');
+            const delIds = JSON.parse(JSON.stringify(_delIds) || '[]');
             delIds.push(itemId);
-            sessionStorage.setItem('_deletedIds', JSON.stringify(delIds));
+            _delIds.push(itemId);
             setMemberItems(weekKey, teamName, memberName, filtered);
             pushHistory(weekKey);
             return true;
@@ -3404,25 +3240,15 @@
         //  初始化
         // ============================================================
         async function init() {
-            initUsers();
-
-            // 尝试从云端拉取数据
             const cloudData = await syncPull(false);
-            _initDone = true;
-            if (!cloudData) {
-                updateSyncBadge('⚠️', '离线');
-                // 离线时从 localStorage 恢复（上次操作可能未同步成功）
-                const localWeeks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-                const localUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-                const localHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}');
-                if (Object.keys(localWeeks).length > 0) _memData.weeks = localWeeks;
-                if (Object.keys(localUsers).length > 0) _memData.users = localUsers;
-                if (Object.keys(localHistory).length > 0) _memData.history = localHistory;
-            }
-            // 如果上次推送失败，警告用户
             if (localStorage.getItem('_syncFailed') === '1') {
-                showToast('⚠️ 上次数据未同步成功，请检查网络后点击 🔄 同步', 'error', 5000);
+                showToast('⚠️ 上次数据未同步，已从本地恢复', 'error', 5000);
+                const lw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                const lu = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+                if (Object.keys(lw).length > 0) _memData.weeks = lw;
+                if (Object.keys(lu).length > 0) _memData.users = lu;
             }
+            initUsers();
 
             const saved = sessionStorage.getItem('quality_user');
             if (saved) {
@@ -3477,7 +3303,7 @@
 
             // 自动刷新：每 30 秒拉取一次云端数据
             setInterval(async () => {
-                if (ghToken() && !_ghSyncing) {
+                if (ghToken() && !_pushing) {
                     const fresh = await syncPull(true);
                     if (fresh) {
                         renderAll();
@@ -3487,7 +3313,7 @@
 
             // 页面获得焦点时也刷新
             document.addEventListener('visibilitychange', async () => {
-                if (!document.hidden && ghToken() && !_ghSyncing) {
+                if (!document.hidden && ghToken() && !_pushing) {
                     const fresh = await syncPull(true);
                     if (fresh) { renderAll(); }
                 }
