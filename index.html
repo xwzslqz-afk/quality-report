@@ -3306,7 +3306,13 @@
                     }
                 }
                 for (const u of Object.keys(cloudData.users||{})) {
-                    if (!_memData.users[u]) _memData.users[u] = cloudData.users[u];
+                    if (!_memData.users[u]) {
+                        _memData.users[u] = cloudData.users[u];
+                    } else if (!sessionStorage.getItem('_pwd_'+u)) {
+                        // 云端密码覆盖本地（其他设备可能已修改密码）
+                        _memData.users[u].password = cloudData.users[u].password;
+                        _memData.users[u].role = cloudData.users[u].role;
+                    }
                 }
             }
             initUsers();
