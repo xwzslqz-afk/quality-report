@@ -1383,7 +1383,7 @@
                 progress: item.progress || '',
                 status: item.status || '开展中',
                 deviation: item.deviation || '',
-                action: item.action || ''
+                action: item.action || '', comments: [], notes: [], confirmed: false
             };
             items.push(newItem);
             _newIds.push(newItem.id);
@@ -1853,7 +1853,9 @@
                         <td>${escapeHtml(item.deviation)}</td>
                         <td>${escapeHtml(item.action)}</td>
                         <td style="text-align:center;white-space:nowrap;">
-                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-core-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-core-btn" data-id="${item.id}">✕</button>` : '<span style="color:#94a3b8;">—</span>'}
+                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-core-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-core-btn" data-id="${item.id}">✕</button>` : ''}
+                    ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
+                    ${(currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
                         </td>
                     `;
                     coreBody.appendChild(tr);
@@ -1899,7 +1901,9 @@
                         <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
                         <td>${escapeHtml(item.deviation)}</td>
                         <td style="text-align:center;white-space:nowrap;">
-                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-key-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-key-btn" data-id="${item.id}">✕</button>` : '<span style="color:#94a3b8;">—</span>'}
+                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-key-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-key-btn" data-id="${item.id}">✕</button>` : ''}
+                    ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
+                    ${(currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
                         </td>
                     `;
                     keyBody.appendChild(tr);
@@ -1946,7 +1950,9 @@
                         <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
                         <td>${escapeHtml(item.nextPlan)}</td>
                         <td style="text-align:center;white-space:nowrap;">
-                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-major-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-major-btn" data-id="${item.id}">✕</button>` : '<span style="color:#94a3b8;">—</span>'}
+                            ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-major-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-major-btn" data-id="${item.id}">✕</button>` : ''}
+                    ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
+                    ${(currentUser && item.responsible && item.responsible===currentUser.username) ? `<button class="btn btn-xs ${item.confirmed ? 'btn-outline' : 'btn-primary'} confirm-btn" data-id="${item.id}">${item.confirmed ? '✅已确认' : '📌确认接收'}</button>` : ''}
                         </td>
                     `;
                     majorBody.appendChild(tr);
@@ -3248,6 +3254,66 @@
                     });
             }
         });
+
+
+        // ============================================================
+        //  评论 / 备注 / 确认
+        // ============================================================
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('comment-btn')) {
+                const id = e.target.dataset.id;
+                const item = findItemById(id);
+                if (!item) return;
+                const text = prompt('💬 添加评论：\n\n已有评论：' + (item.comments||[]).map(c => c.author+': '+c.text).join('\n') + '\n\n请输入新评论：');
+                if (text && text.trim()) {
+                    if (!item.comments) item.comments = [];
+                    item.comments.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
+                    _dirty = true;
+                    saveAllData(_memData.weeks);
+                    renderAll();
+                    showToast('💬 评论已添加', 'success');
+                }
+            }
+            if (e.target.classList.contains('note-btn')) {
+                const id = e.target.dataset.id;
+                const item = findItemById(id);
+                if (!item) return;
+                const text = prompt('📝 添加任务备注：\n\n已有备注：' + (item.notes||[]).map(n => n.author+': '+n.text).join('\n') + '\n\n请输入新备注：');
+                if (text && text.trim()) {
+                    if (!item.notes) item.notes = [];
+                    item.notes.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
+                    _dirty = true;
+                    saveAllData(_memData.weeks);
+                    renderAll();
+                    showToast('📝 任务备注已添加', 'success');
+                }
+            }
+            if (e.target.classList.contains('confirm-btn')) {
+                const id = e.target.dataset.id;
+                const item = findItemById(id);
+                if (!item) return;
+                item.confirmed = !item.confirmed;
+                item.confirmedBy = currentUser.username;
+                item.confirmedAt = new Date().toISOString();
+                _dirty = true;
+                saveAllData(_memData.weeks);
+                renderAll();
+                showToast(item.confirmed ? '✅ 已确认接收' : '↩ 已取消确认', 'success');
+            }
+        });
+
+        function findItemById(id) {
+            for (const wk of Object.keys(_memData.weeks || {})) {
+                for (const team of Object.keys(_memData.weeks[wk] || {})) {
+                    for (const member of Object.keys(_memData.weeks[wk][team] || {})) {
+                        const items = _memData.weeks[wk][team][member] || [];
+                        const found = items.find(it => it.id === id);
+                        if (found) return found;
+                    }
+                }
+            }
+            return null;
+        }
 
         // ============================================================
         //  登录 / 修改密码
