@@ -1027,9 +1027,12 @@
             return null;
         }
 
-        async function syncPush() {
+        async function syncPush(manual) {
+            if (!manual && !ghToken()) return;  // auto push requires token
+            if (!manual) { /* auto push disabled - API unreliable */ return; }
             const t = ghToken();
-            if (!t || _pushing) return;
+            if (!t) return;
+            if (_pushing) { showToast('⏳ 正在推送中，请稍候','info'); return; }
             _pushing = true;
             updateSyncBadge('⏳','推送中…');
             try {
@@ -1136,9 +1139,8 @@
         }
 
         function schedulePush() {
-            if (!ghToken() || !_dirty) return;
-            clearTimeout(window._pushTimer);
-            window._pushTimer = setTimeout(syncPush, 300);
+            // 自动推送已禁用（API 不可达），数据保存在 localStorage
+            // 点击 🔄 同步按钮手动推送
         }
 
         function updateSyncBadge(icon, text) {
@@ -3116,8 +3118,9 @@
                 showToast('⚠️ 请先点击 🔑 Token 配置 GitHub Token', 'error');
                 return;
             }
+            updateSyncBadge('⏳','推送中…');
             _ghSha = null;
-            await syncPush(false);
+            await syncPush(true);
         });
 
         document.getElementById('tokenBtn').addEventListener('click', function() {
@@ -3240,29 +3243,37 @@
         //  初始化
         // ============================================================
         async function init() {
-            const cloudData = await syncPull(false);
-            // 始终将 localStorage 中本地独有的条目合并到 _memData
+            const cloudData = await syncPull(true);  // silent: cloud is supplement
+            // localStorage 是主数据源，云端数据补充
             const lw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            if (Object.keys(lw).length > 0) {
-                let merged = 0;
-                for (const wk of Object.keys(lw)) {
-                    if (!_memData.weeks[wk]) { _memData.weeks[wk] = lw[wk]; continue; }
-                    for (const team of Object.keys(lw[wk])) {
-                        if (!_memData.weeks[wk][team]) { _memData.weeks[wk][team] = lw[wk][team]; continue; }
-                        for (const member of Object.keys(lw[wk][team])) {
-                            if (!_memData.weeks[wk][team][member]) { _memData.weeks[wk][team][member] = lw[wk][team][member]; continue; }
-                            const cIds = new Set(_memData.weeks[wk][team][member].map(it => it.id));
-                            for (const li of lw[wk][team][member]) {
-                                if (!cIds.has(li.id)) { _memData.weeks[wk][team][member].push(li); merged++; }
+            // 如果本地为空，使用云端数据
+            if (Object.keys(lw).length === 0 && cloudData && Object.keys(cloudData.weeks||{}).length > 0) {
+                _memData.weeks = cloudData.weeks;
+                _memData.users = cloudData.users || {};
+                _memData.history = cloudData.history || {};
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData.weeks));
+                localStorage.setItem(USERS_KEY, JSON.stringify(cloudData.users||{}));
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(cloudData.history||{}));
+                // 合并云端独有的条目到本地
+                if (cloudData) {
+                    const cw = cloudData.weeks || {};
+                    for (const wk of Object.keys(cw)) {
+                        if (!_memData.weeks[wk]) { _memData.weeks[wk] = cw[wk]; continue; }
+                        for (const team of Object.keys(cw[wk])) {
+                            if (!_memData.weeks[wk][team]) { _memData.weeks[wk][team] = cw[wk][team]; continue; }
+                            for (const member of Object.keys(cw[wk][team])) {
+                                if (!_memData.weeks[wk][team][member]) { _memData.weeks[wk][team][member] = cw[wk][team][member]; continue; }
+                                const lIds = new Set((_memData.weeks[wk][team][member]||[]).map(it => it.id));
+                                for (const ci of cw[wk][team][member]||[]) {
+                                    if (!lIds.has(ci.id)) _memData.weeks[wk][team][member].push(ci);
+                                }
                             }
                         }
                     }
+                    for (const u of Object.keys(cloudData.users||{})) {
+                        if (!_memData.users[u]) _memData.users[u] = cloudData.users[u];
+                    }
                 }
-                if (merged > 0) showToast('📋 已恢复 ' + merged + ' 条本地数据', 'info', 2000);
-            }
-            const lu = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-            for (const u of Object.keys(lu)) {
-                if (!_memData.users[u]) _memData.users[u] = lu[u];
             }
             initUsers();
 
