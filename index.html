@@ -991,7 +991,7 @@
         let _newIds = [];
         let _delIds = [];
 
-        function ghToken() { return localStorage.getItem('gh_token') || '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'; }
+        function ghToken() { return localStorage.getItem('gh_token') || ''; }
         function ghSetToken(t) { localStorage.setItem('gh_token', t); }
 
         function _b64e(s) { const b=new TextEncoder().encode(s); let r=''; for(let i=0;i<b.length;i++)r+=String.fromCharCode(b[i]); return btoa(r); }
