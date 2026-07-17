@@ -2959,7 +2959,7 @@
                     </div>
                     <div class="form-group">
                         <label for="f_progress">完成进展</label>
-                        <input type="text" id="f_progress" value="${escapeHtml(data.progress || '')}" placeholder="如：50%、进行中" />
+                        <textarea id="f_progress" rows="3" placeholder="该项工作完成情况简述">${escapeHtml(data.progress || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_status">状态 *</label>
