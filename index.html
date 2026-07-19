@@ -2103,13 +2103,6 @@
         //  主渲染
         // ============================================================
         function renderAll() {
-            // 同步：localStorage 优先，防止后台拉取覆盖用户编辑
-            const lw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            if (Object.keys(lw).length > 0) {
-                _memData.weeks = JSON.parse(JSON.stringify(lw));
-                _memData.users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}') || _memData.users;
-                _memData.history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}') || _memData.history;
-            }
             ensureDefaultMembers(currentWeekKey);
 
             if (currentView === 'normal') {
@@ -3533,6 +3526,12 @@
                 if (ghToken() && !_pushing) {
                     const fresh = await syncPull(true);
                     if (fresh) {
+                        // 同步云端数据到 localStorage
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks));
+                            localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users));
+                            localStorage.setItem(HISTORY_KEY, JSON.stringify(_memData.history));
+                        } catch(e) {}
                         renderAll();
                     }
                 }
@@ -3542,7 +3541,14 @@
             document.addEventListener('visibilitychange', async () => {
                 if (!document.hidden && ghToken() && !_pushing) {
                     const fresh = await syncPull(true);
-                    if (fresh) { renderAll(); }
+                    if (fresh) {
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks));
+                            localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users));
+                            localStorage.setItem(HISTORY_KEY, JSON.stringify(_memData.history));
+                        } catch(e) {}
+                        renderAll();
+                    }
                 }
             });
         }
