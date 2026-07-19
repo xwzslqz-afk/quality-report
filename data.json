@@ -763,256 +763,6 @@
   "history": {
     "2026-07-13": [
       {
-        "timestamp": "2026-07-17T05:25:06.036Z",
-        "data": {
-          "研发质量": {
-            "杨思睿": [],
-            "吴金鹏": [],
-            "张桂群": []
-          },
-          "供应商质量-智慧能源": {
-            "张春来": [],
-            "张敏": [],
-            "刘一宁": [],
-            "施佳伟": []
-          },
-          "供应商质量-电池": {
-            "邓超": [
-              {
-                "id": "mrn4vm6p_q7ciw",
-                "_ts": 1784183648785,
-                "_by": "邓超",
-                "dimension": "核心指标",
-                "category": "1",
-                "name": "1",
-                "target": "1",
-                "actual": "1",
-                "achieveStatus": "达标",
-                "workType": "",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "",
-                "responsible": "1",
-                "deadline": "",
-                "progress": "",
-                "status": "开展中",
-                "deviation": "1",
-                "action": "1"
-              }
-            ],
-            "张强": [],
-            "严鑫": [],
-            "张若愚": []
-          },
-          "过程质量": {
-            "崔得峰": [
-              {
-                "id": "mroh7mit_snagh",
-                "_ts": 1784265906036,
-                "_by": "崔得峰",
-                "dimension": "重点工作",
-                "category": "",
-                "name": "",
-                "target": "",
-                "actual": "",
-                "achieveStatus": "",
-                "workType": "生产",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "天津工厂282改制423通线协同与质量策划",
-                "responsible": "周海娜",
-                "deadline": "2026-07-23",
-                "progress": "1、充检机无法实现放电末端压差测试，暂未完成282上线测试 2、控制计划、过程流程图已初步评审",
-                "status": "开展中",
-                "deviation": "",
-                "action": "",
-                "comments": [],
-                "notes": [],
-                "confirmed": false,
-                "_taskStatus": ""
-              },
-              {
-                "id": "mrohp9it_j7m2t",
-                "_ts": 1784265885813,
-                "_by": "崔得峰",
-                "dimension": "重点工作",
-                "category": "",
-                "name": "",
-                "target": "",
-                "actual": "",
-                "achieveStatus": "",
-                "workType": "生产",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "CTB2.0 VAVE 钢铝箱体产品重量问题出货卡控：",
-                "responsible": "崔得峰",
-                "deadline": "2026-07-30",
-                "progress": "已通知： 1、钢铝箱体电池暂时不允许出货，待后续项目陆续释放可出货清单。 2、每个客户新出货组织出货评审。",
-                "status": "开展中",
-                "deviation": "",
-                "action": "",
-                "comments": [],
-                "notes": [],
-                "confirmed": false,
-                "_taskStatus": "",
-                "confirmedBy": "崔得峰",
-                "confirmedAt": "2026-07-17T05:22:09.499Z"
-              }
-            ],
-            "相茂岩": [],
-            "徐朝兴": [],
-            "张义": [],
-            "葛晨云": [],
-            "周海娜": [],
-            "张端奇": []
-          },
-          "客户质量及质量改进": {
-            "曹改芳": [],
-            "谢星炯": [],
-            "杨起翔": [],
-            "邹家祥": []
-          },
-          "质量体系": {
-            "杨思睿": [],
-            "葛晨云": []
-          }
-        }
-      },
-      {
-        "timestamp": "2026-07-17T05:25:17.443Z",
-        "data": {
-          "研发质量": {
-            "杨思睿": [],
-            "吴金鹏": [],
-            "张桂群": []
-          },
-          "供应商质量-智慧能源": {
-            "张春来": [],
-            "张敏": [],
-            "刘一宁": [],
-            "施佳伟": []
-          },
-          "供应商质量-电池": {
-            "邓超": [
-              {
-                "id": "mrn4vm6p_q7ciw",
-                "_ts": 1784183648785,
-                "_by": "邓超",
-                "dimension": "核心指标",
-                "category": "1",
-                "name": "1",
-                "target": "1",
-                "actual": "1",
-                "achieveStatus": "达标",
-                "workType": "",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "",
-                "responsible": "1",
-                "deadline": "",
-                "progress": "",
-                "status": "开展中",
-                "deviation": "1",
-                "action": "1"
-              }
-            ],
-            "张强": [],
-            "严鑫": [],
-            "张若愚": []
-          },
-          "过程质量": {
-            "崔得峰": [
-              {
-                "id": "mroh7mit_snagh",
-                "_ts": 1784265906036,
-                "_by": "崔得峰",
-                "dimension": "重点工作",
-                "category": "",
-                "name": "",
-                "target": "",
-                "actual": "",
-                "achieveStatus": "",
-                "workType": "生产",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "天津工厂282改制423通线协同与质量策划",
-                "responsible": "周海娜",
-                "deadline": "2026-07-23",
-                "progress": "1、充检机无法实现放电末端压差测试，暂未完成282上线测试 2、控制计划、过程流程图已初步评审",
-                "status": "开展中",
-                "deviation": "",
-                "action": "",
-                "comments": [],
-                "notes": [],
-                "confirmed": false,
-                "_taskStatus": ""
-              },
-              {
-                "id": "mrohp9it_j7m2t",
-                "_ts": 1784265917443,
-                "_by": "崔得峰",
-                "dimension": "重点工作",
-                "category": "",
-                "name": "",
-                "target": "",
-                "actual": "",
-                "achieveStatus": "",
-                "workType": "生产",
-                "problemDesc": "",
-                "causeAnalysis": "",
-                "tempMeasure": "",
-                "longTermMeasure": "",
-                "nextPlan": "",
-                "description": "CTB2.0 VAVE 钢铝箱体产品重量问题出货卡控：",
-                "responsible": "崔得峰",
-                "deadline": "2026-07-30",
-                "progress": "已通知： 1、钢铝箱体电池暂时不允许出货，待后续项目陆续释放可出货清单。 2、每个客户新出货组织出货评审。",
-                "status": "开展中",
-                "deviation": "",
-                "action": "",
-                "comments": [],
-                "notes": [],
-                "confirmed": false,
-                "_taskStatus": "",
-                "confirmedBy": "崔得峰",
-                "confirmedAt": "2026-07-17T05:22:09.499Z"
-              }
-            ],
-            "相茂岩": [],
-            "徐朝兴": [],
-            "张义": [],
-            "葛晨云": [],
-            "周海娜": [],
-            "张端奇": []
-          },
-          "客户质量及质量改进": {
-            "曹改芳": [],
-            "谢星炯": [],
-            "杨起翔": [],
-            "邹家祥": []
-          },
-          "质量体系": {
-            "杨思睿": [],
-            "葛晨云": []
-          }
-        }
-      },
-      {
         "timestamp": "2026-07-17T05:33:22.318Z",
         "data": {
           "研发质量": {
@@ -18650,6 +18400,256 @@
                 "notes": [],
                 "confirmed": false,
                 "_taskStatus": ""
+              }
+            ],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-17T05:24:45.813Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn4vm6p_q7ciw",
+                "_ts": 1784183648785,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "1"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [
+              {
+                "id": "mroh7mit_snagh",
+                "_ts": 1784265868832,
+                "_by": "崔得峰",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "生产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "天津工厂282改制423通线协同与质量策划",
+                "responsible": "周海娜",
+                "deadline": "2026-07-23",
+                "progress": "1、充检机无法实现放电末端压差测试，暂未完成282上线测试 2、控制计划、过程流程图已初步评审",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrohp9it_j7m2t",
+                "_ts": 1784265885813,
+                "_by": "崔得峰",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "生产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "CTB2.0 VAVE 钢铝箱体产品重量问题出货卡控：",
+                "responsible": "崔得峰",
+                "deadline": "2026-07-30",
+                "progress": "已通知： 1、钢铝箱体电池暂时不允许出货，待后续项目陆续释放可出货清单。 2、每个客户新出货组织出货评审。",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "",
+                "confirmedBy": "崔得峰",
+                "confirmedAt": "2026-07-17T05:22:09.499Z"
+              }
+            ],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-17T05:24:54.553Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mrn4vm6p_q7ciw",
+                "_ts": 1784183648785,
+                "_by": "邓超",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "1"
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [
+              {
+                "id": "mroh7mit_snagh",
+                "_ts": 1784265894553,
+                "_by": "崔得峰",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "生产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "天津工厂282改制423通线协同与质量策划",
+                "responsible": "周海娜",
+                "deadline": "2026-07-23",
+                "progress": "1、充检机无法实现放电末端压差测试，暂未完成282上线测试 2、控制计划、过程流程图已初步评审",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrohp9it_j7m2t",
+                "_ts": 1784265885813,
+                "_by": "崔得峰",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "生产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "CTB2.0 VAVE 钢铝箱体产品重量问题出货卡控：",
+                "responsible": "崔得峰",
+                "deadline": "2026-07-30",
+                "progress": "已通知： 1、钢铝箱体电池暂时不允许出货，待后续项目陆续释放可出货清单。 2、每个客户新出货组织出货评审。",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": "",
+                "confirmedBy": "崔得峰",
+                "confirmedAt": "2026-07-17T05:22:09.499Z"
               }
             ],
             "相茂岩": [],
