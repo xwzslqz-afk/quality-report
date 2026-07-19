@@ -3479,6 +3479,7 @@
                         // 云端密码覆盖本地（其他设备可能已修改密码）
                         _memData.users[u].password = cloudData.users[u].password;
                         _memData.users[u].role = cloudData.users[u].role;
+                        _memData.users[u].managedTeam = cloudData.users[u].managedTeam || "";
                     }
                 }
             }
