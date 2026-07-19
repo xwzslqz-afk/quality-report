@@ -1383,6 +1383,7 @@
             _newIds.push(newItem.id);
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
+            saveAllData(_memData.weeks);
             return newItem;
         }
 
@@ -1394,6 +1395,7 @@
             items[idx] = { ...items[idx], ...updates, _ts: Date.now(), _by: currentUser ? currentUser.username : '' };
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
+            saveAllData(_memData.weeks);
             return true;
         }
 
@@ -1408,6 +1410,7 @@
             _delIds.push(itemId);
             setMemberItems(weekKey, teamName, memberName, filtered);
             pushHistory(weekKey);
+            saveAllData(_memData.weeks);
             return true;
         }
 
