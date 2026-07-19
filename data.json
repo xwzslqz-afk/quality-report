@@ -697,7 +697,8 @@
     },
     "杨思睿": {
       "password": "yangsirui",
-      "role": "member"
+      "role": "sub-admin",
+      "managedTeam": "研发质量"
     },
     "吴金鹏": {
       "password": "wujinpeng",
