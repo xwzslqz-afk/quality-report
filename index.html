@@ -1001,7 +1001,7 @@
             const t = ghToken();
             if (t) {
                 try {
-                    const r = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t,'Cache-Control':'no-cache'}});
+                    const r = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t}});
                     if (r.ok) {
                         const info = await r.json();
                         _ghSha = info.sha;
