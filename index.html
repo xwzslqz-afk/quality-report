@@ -998,28 +998,30 @@
         function _b64d(s) { const b=atob(s.replace(/\s/g,'')); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i); return new TextDecoder().decode(u); }
 
                 async function syncPull(silent) {
-            // 只用 raw/Pages URL（不触发 CORS 预检）
-            for (const url of [RAW_DATA, PAGES_DATA]) {
+            // 优先走 API（绕过 CDN 缓存）
+            const t = ghToken();
+            if (t) {
                 try {
-                    const r = await fetch(url+'?t='+Date.now());
+                    const r = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t}});
                     if (r.ok) {
-                        const json = await r.json();
-                        _memData.weeks = json.weeks || {};
-                        _memData.users = json.users || {};
-                        _memData.history = json.history || {};
+                        const ci = await r.json();
+                        _ghSha = ci.sha;
+                        const data = JSON.parse(_b64d(ci.content));
+                        _memData.weeks = data.weeks || {};
+                        _memData.users = data.users || {};
+                        _memData.history = data.history || {};
                         updateSyncBadge('✅','已同步');
                         return _memData;
                     }
                 } catch(e) {}
             }
-            updateSyncBadge('❌','离线');
-            if (!silent) showToast('❌ 无法连接云端','error',3000);
+            updateSyncBadge('💻','本地');
             return null;
         }
 
         async function syncPush(manual) {
             if (!manual && !ghToken()) return;  // auto push requires token
-            if (!manual) { if (_autoPushTimer) clearTimeout(_autoPushTimer); _autoPushTimer = setTimeout(() => syncPush(true), 3000); return; }
+            if (!manual) { /* auto push disabled — use manual upload */ return; }
             const t = ghToken();
             if (!t) return;
             if (_pushing) { showToast('⏳ 正在推送中，请稍候','info'); return; }
@@ -1135,7 +1137,7 @@
         function schedulePush() {
             if (!ghToken() || !_dirty) return;
             clearTimeout(window._pushTimer);
-            window._pushTimer = setTimeout(() => syncPush(true), 300);
+            /* schedulePush disabled — manual upload only */
         }
 
         function updateSyncBadge(icon, text) {
@@ -1383,7 +1385,6 @@
             _newIds.push(newItem.id);
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
-            saveAllData(_memData.weeks);
             return newItem;
         }
 
@@ -1410,7 +1411,6 @@
             _delIds.push(itemId);
             setMemberItems(weekKey, teamName, memberName, filtered);
             pushHistory(weekKey);
-            saveAllData(_memData.weeks);
             return true;
         }
 
@@ -3298,38 +3298,11 @@
                 }
             });
 
-            // 自动刷新：每 30 秒拉取一次云端数据
-            setInterval(async () => {
-                if (ghToken() && !_pushing && !_dirty) {
-                    if (Date.now() - _justPushed < 60000) return;
-                    const fresh = await syncPull(true);
-                    if (fresh) {
-                        // 同步云端数据到 localStorage
-                        try {
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks));
-                            localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users));
-                            localStorage.setItem(HISTORY_KEY, JSON.stringify(_memData.history));
-                        } catch(e) {}
-                        renderAll();
-                    }
-                }
-            }, 30000);
+            // 自动刷新已移除，改为手动下载
+            
 
-            // 页面获得焦点时也刷新
-            document.addEventListener('visibilitychange', async () => {
-                if (!document.hidden && ghToken() && !_pushing && !_dirty) {
-                    if (Date.now() - _justPushed < 60000) return;
-                    const fresh = await syncPull(true);
-                    if (fresh) {
-                        try {
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks));
-                            localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users));
-                            localStorage.setItem(HISTORY_KEY, JSON.stringify(_memData.history));
-                        } catch(e) {}
-                        renderAll();
-                    }
-                }
-            });
+            // visibility自动刷新已移除
+            
         }
 
         document.addEventListener('DOMContentLoaded', init);
