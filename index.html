@@ -1019,7 +1019,7 @@
 
         async function syncPush(manual) {
             if (!manual && !ghToken()) return;  // auto push requires token
-            if (!manual) { /* auto push enabled with debounce */ if (_autoPushTimer) clearTimeout(_autoPushTimer); _autoPushTimer = setTimeout(() => syncPush(true), 3000); return; }
+            if (!manual) { if (_autoPushTimer) clearTimeout(_autoPushTimer); _autoPushTimer = setTimeout(() => syncPush(true), 3000); return; }
             const t = ghToken();
             if (!t) return;
             if (_pushing) { showToast('⏳ 正在推送中，请稍候','info'); return; }
@@ -1097,55 +1097,26 @@
                     return;
                 }
                 if (r.status === 409) {
-                    // 冲突重试（最多3次），每次重新拉取+合并+上传
-                    let retrySuccess = false;
-                    for (let retry = 0; retry < 3 && !retrySuccess; retry++) {
-                        try {
-                            await new Promise(r => setTimeout(r, 500 * (retry + 1))); // 递增延迟
-                            const cr2 = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t}});
-                            if (cr2.ok) {
-                                const ci2 = await cr2.json();
-                                _ghSha = ci2.sha;
-                                const remoteCloud = JSON.parse(_b64d(ci2.content));
-                                // 重新合并：用最新云端数据再做一次OT合并
-                                const lw2 = _memData.weeks || {};
-                                const lu2 = _memData.users || {};
-                                const lh2 = _memData.history || {};
-                                for (const wk of Object.keys(lw2)) {
-                                    if (!remoteCloud.weeks[wk]) remoteCloud.weeks[wk] = {};
-                                    for (const team of Object.keys(lw2[wk])) {
-                                        if (!remoteCloud.weeks[wk][team]) remoteCloud.weeks[wk][team] = {};
-                                        for (const member of Object.keys(lw2[wk][team])) {
-                                            const lItems = lw2[wk][team][member] || [];
-                                            const cItems = remoteCloud.weeks[wk][team][member] || [];
-                                            const merged = {};
-                                            for (const ci of cItems) { if (!delSet.has(ci.id)) merged[ci.id] = ci; }
-                                            for (const li of lItems) {
-                                                const ci = merged[li.id];
-                                                if (!ci || (li._ts||0) >= (ci._ts||0)) merged[li.id] = li;
-                                            }
-                                            remoteCloud.weeks[wk][team][member] = Object.values(merged);
-                                        }
-                                    }
-                                }
-                                const body2 = { message:'Retry #'+(retry+1), content:_b64e(JSON.stringify(remoteCloud,null,2)), sha:_ghSha };
-                                const r2 = await fetch(GH_API, { method:'PUT',
-                                    headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},
-                                    body:JSON.stringify(body2) });
-                                if (r2.ok) {
-                                    _ghSha = (await r2.json()).content.sha;
-                                    _dirty = false; _newIds = []; _delIds = [];
-                                    localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteCloud.weeks));
-                                    localStorage.setItem(USERS_KEY, JSON.stringify(remoteCloud.users));
-                                    localStorage.removeItem('_syncFailed');
-                                    updateSyncBadge('✅','已同步');
-                                    showToast('📤 已推送到云端（重试'+(retry+1)+'次后成功）','success',1500);
-                                    retrySuccess = true;
-                                }
+                    try {
+                        const cr2 = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t}});
+                        if (cr2.ok) {
+                            _ghSha = (await cr2.json()).sha;
+                            const body2 = { message:'Retry', content:body.content, sha:_ghSha };
+                            const r2 = await fetch(GH_API, { method:'PUT',
+                                headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},
+                                body:JSON.stringify(body2) });
+                            if (r2.ok) {
+                                _ghSha = (await r2.json()).content.sha;
+                                _dirty = false; _newIds = []; _delIds = [];
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloud.weeks));
+                                localStorage.setItem(USERS_KEY, JSON.stringify(cloud.users));
+                                localStorage.removeItem('_syncFailed');
+                                updateSyncBadge('✅','已同步');
+                                showToast('📤 已推送到云端','success',1500);
+                                return;
                             }
-                        } catch(e2) {}
-                    }
-                    if (retrySuccess) return;
+                        }
+                    } catch(e2) {}
                 }
                 localStorage.setItem('_syncFailed','1');
                 updateSyncBadge('❌','未同步');
@@ -3535,7 +3506,7 @@
 
             // 自动刷新：每 30 秒拉取一次云端数据
             setInterval(async () => {
-                if (ghToken() && !_pushing) {
+                if (ghToken() && !_pushing && !_dirty) {
                     const fresh = await syncPull(true);
                     if (fresh) {
                         // 同步云端数据到 localStorage
@@ -3551,7 +3522,7 @@
 
             // 页面获得焦点时也刷新
             document.addEventListener('visibilitychange', async () => {
-                if (!document.hidden && ghToken() && !_pushing) {
+                if (!document.hidden && ghToken() && !_pushing && !_dirty) {
                     const fresh = await syncPull(true);
                     if (fresh) {
                         try {
