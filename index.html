@@ -1144,13 +1144,14 @@
                 showToast('❌ 网络异常','error',4000);
             } finally {
                 _pushing = false;
-                if (_dirty) setTimeout(syncPush, 300);
+                if (_dirty) schedulePush();
             }
         }
 
         function schedulePush() {
-            // 自动推送已禁用（API 不可达），数据保存在 localStorage
-            // 点击 🔄 同步按钮手动推送
+            if (!ghToken() || !_dirty) return;
+            clearTimeout(window._pushTimer);
+            window._pushTimer = setTimeout(syncPush, 300);
         }
 
         function updateSyncBadge(icon, text) {
