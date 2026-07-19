@@ -997,25 +997,9 @@
         function _b64e(s) { const b=new TextEncoder().encode(s); let r=''; for(let i=0;i<b.length;i++)r+=String.fromCharCode(b[i]); return btoa(r); }
         function _b64d(s) { const b=atob(s.replace(/\s/g,'')); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i); return new TextDecoder().decode(u); }
 
-        async function syncPull(silent) {
-            const t = ghToken();
-            if (t) {
-                try {
-                    const r = await fetch(GH_API, {headers:{'Authorization':'Bearer '+t}});
-                    if (r.ok) {
-                        const info = await r.json();
-                        _ghSha = info.sha;
-                        const cloud = JSON.parse(_b64d(info.content));
-                        _memData.weeks = cloud.weeks || {};
-                        _memData.users = cloud.users || {};
-                        _memData.history = cloud.history || {};
-                        updateSyncBadge('✅','已同步');
-                        if (!silent) showToast('📥 云端数据已加载','success',1500);
-                        return _memData;
-                    }
-                } catch(e) { console.log('syncPull API:',e.message); }
-            }
-            for (const url of [RAW_DATA, PAGES_DATA]) {
+                async function syncPull(silent) {
+            // 只用 raw/Pages URL（不触发 CORS 预检）
+            for (const url of [RAW_DATA, PAGES_DATA]) {for (const url of [RAW_DATA, PAGES_DATA]) {
                 try {
                     const r = await fetch(url+'?t='+Date.now());
                     if (r.ok) {
