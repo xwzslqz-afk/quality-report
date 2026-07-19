@@ -986,7 +986,7 @@
         const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';
         const PAGES_DATA = 'data.json';
         let _ghSha = null;
-        let _pushing = false; let _autoPushTimer = null;
+        let _pushing = false; let _autoPushTimer = null; let _justPushed = 0;
         let _dirty = false;
         let _newIds = [];
         let _delIds = [];
@@ -1087,7 +1087,7 @@
 
                 if (r.ok) {
                     _ghSha = (await r.json()).content.sha;
-                    _dirty = false; _newIds = []; _delIds = [];
+                    _dirty = false; _newIds = []; _delIds = []; _justPushed = Date.now();
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(cloud.weeks));
                     localStorage.setItem(USERS_KEY, JSON.stringify(cloud.users));
                     localStorage.setItem(HISTORY_KEY, JSON.stringify(cloud.history));
@@ -1107,7 +1107,7 @@
                                 body:JSON.stringify(body2) });
                             if (r2.ok) {
                                 _ghSha = (await r2.json()).content.sha;
-                                _dirty = false; _newIds = []; _delIds = [];
+                                _dirty = false; _newIds = []; _delIds = []; _justPushed = Date.now();
                                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cloud.weeks));
                                 localStorage.setItem(USERS_KEY, JSON.stringify(cloud.users));
                                 localStorage.removeItem('_syncFailed');
@@ -3507,6 +3507,7 @@
             // 自动刷新：每 30 秒拉取一次云端数据
             setInterval(async () => {
                 if (ghToken() && !_pushing && !_dirty) {
+                    if (Date.now() - _justPushed < 60000) return;
                     const fresh = await syncPull(true);
                     if (fresh) {
                         // 同步云端数据到 localStorage
@@ -3523,6 +3524,7 @@
             // 页面获得焦点时也刷新
             document.addEventListener('visibilitychange', async () => {
                 if (!document.hidden && ghToken() && !_pushing && !_dirty) {
+                    if (Date.now() - _justPushed < 60000) return;
                     const fresh = await syncPull(true);
                     if (fresh) {
                         try {
