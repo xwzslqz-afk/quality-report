@@ -1385,6 +1385,7 @@
             _newIds.push(newItem.id);
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
             return newItem;
         }
 
@@ -1396,7 +1397,7 @@
             items[idx] = { ...items[idx], ...updates, _ts: Date.now(), _by: currentUser ? currentUser.username : '' };
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
-            saveAllData(_memData.weeks);
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
             return true;
         }
 
@@ -1411,6 +1412,7 @@
             _delIds.push(itemId);
             setMemberItems(weekKey, teamName, memberName, filtered);
             pushHistory(weekKey);
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
             return true;
         }
 
@@ -3083,7 +3085,7 @@
                     if (!item.comments) item.comments = [];
                     item.comments.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
                     _dirty = true;
-                    saveAllData(_memData.weeks);
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
                     renderAll();
                     showToast('💬 评论已添加', 'success');
                 }
@@ -3097,7 +3099,7 @@
                     if (!item.notes) item.notes = [];
                     item.notes.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
                     _dirty = true;
-                    saveAllData(_memData.weeks);
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
                     renderAll();
                     showToast('📝 任务备注已添加', 'success');
                 }
@@ -3122,7 +3124,7 @@
                     showToast(item.confirmed ? '✅ 已确认接收' : '↩ 已取消确认', 'success');
                 }
                 _dirty = true;
-                saveAllData(_memData.weeks);
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
                 renderAll();
             }
         });
