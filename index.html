@@ -3243,11 +3243,16 @@
         });
 
         document.getElementById('downloadBtn').addEventListener('click', async function() {
+            // 先推送本地未同步数据
+            if (_dirty) {
+                updateSyncBadge('⏳', '先推送…');
+                _ghSha = null;
+                await syncPush();
+            }
             updateSyncBadge('⏳', '下载中…');
             const ok = await syncPull(false);
             if (ok) {
                 renderAll();
-                // 同步到 localStorage
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks));
                     localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users));
