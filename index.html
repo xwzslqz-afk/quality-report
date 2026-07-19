@@ -1546,7 +1546,9 @@
             if (currentUser.role === 'admin') return true;
             // 子管理员：可以编辑所管团队内所有成员的数据
             if (currentUser.role === 'sub-admin') {
-                return currentTeam === currentUser.managedTeam;
+                const mt = currentUser.managedTeam || '';
+                if (!mt || !currentTeam) return false;
+                return currentTeam === mt;
             }
             // 普通成员：只能编辑自己的数据
             if (currentUser.role === 'member') {
@@ -2291,7 +2293,7 @@
         });
 
         document.getElementById('clearHistoryBtn').addEventListener('click', function() {
-            if (!currentUser || currentUser.role !== 'admin') {
+            if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'sub-admin')) {
                 showToast('仅管理员可清空历史版本', 'error');
                 return;
             }
@@ -2468,7 +2470,7 @@
         //  导入 Excel（仅管理员）
         // ============================================================
         document.getElementById('importBtn').addEventListener('click', function() {
-            if (!currentUser || currentUser.role !== 'admin') {
+            if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'sub-admin')) {
                 showToast('仅管理员可导入数据', 'error');
                 return;
             }
@@ -2495,370 +2497,152 @@
         function importExcel(workbook) {
             let importedCount = 0;
             const weekData = getWeekData(currentWeekKey);
+            const TEAMS = ['研发质量','供应商质量-智慧能源','供应商质量-电池','过程质量','客户质量及质量改进','质量体系'];
 
-            for (const sheetName of workbook.SheetNames) {
-                const ws = workbook.Sheets[sheetName];
-                const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                if (json.length < 3) continue;
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            if (!sheet) { showToast('未找到工作表', 'error'); return; }
+            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            if (!json || json.length < 3) { showToast('Excel为空或格式不正确', 'error'); return; }
 
-                let teamName = null;
-                for (const t of Object.keys(TEAMS_CONFIG)) {
-                    if (sheetName.includes(t) || t.includes(sheetName)) {
-                        teamName = t;
-                        break;
-                    }
+            let currentTeam = '', currentMember = '';
+            // 按列索引解析 headers
+            function idxOf(header, keywords) {
+                return header.findIndex(h => h && keywords.some(k => String(h).includes(k)));
+            }
+
+            for (let i = 0; i < json.length; i++) {
+                const row = json[i];
+                if (!row || row.length === 0) continue;
+                const firstCell = String(row[0] || '').trim();
+                if (!firstCell) continue;
+
+                // 识别团队名
+                const matchedTeam = TEAMS.find(t => firstCell.includes(t));
+                if (matchedTeam) { currentTeam = matchedTeam; continue; }
+
+                // 识别成员
+                if (firstCell.startsWith('👤')) {
+                    currentMember = firstCell.replace(/^👤\s*/, '').trim();
+                    if (!weekData[currentTeam]) weekData[currentTeam] = {};
+                    if (!weekData[currentTeam][currentMember]) weekData[currentTeam][currentMember] = [];
+                    continue;
                 }
-                if (!teamName) {
-                    const header = json[0];
-                    const teamColIdx = header.findIndex(h => h && h.includes('团队'));
-                    if (teamColIdx !== -1) {
-                        for (let i = 1; i < json.length; i++) {
-                            const row = json[i];
-                            if (!row || row.length <= teamColIdx) continue;
-                            const tName = String(row[teamColIdx] || '').trim();
-                            if (!tName) continue;
-                            const matchedTeam = Object.keys(TEAMS_CONFIG).find(t => t.includes(tName) || tName.includes(t));
-                            if (!matchedTeam) continue;
-                            const memberIdx = header.findIndex(h => h && h.includes('成员'));
-                            let memberName = '未命名';
-                            if (memberIdx !== -1 && row.length > memberIdx) {
-                                memberName = String(row[memberIdx] || '').trim() || '未命名';
-                            }
-                            if (!weekData[matchedTeam]) weekData[matchedTeam] = {};
-                            if (!weekData[matchedTeam][memberName]) weekData[matchedTeam][memberName] = [];
 
-                            if (header.some(h => h && h.includes('指标分类'))) {
-                                const catIdx = header.findIndex(h => h && h.includes('指标分类'));
-                                const nameIdx = header.findIndex(h => h && h.includes('指标名称'));
-                                const targetIdx = header.findIndex(h => h && h.includes('目标值'));
-                                const actualIdx = header.findIndex(h => h && h.includes('达成值'));
-                                const achieveIdx = header.findIndex(h => h && h.includes('达成状态'));
-                                const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                                const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
-                                const actionIdx = header.findIndex(h => h && h.includes('后续行动计划'));
-                                const item = {
-                                    dimension: '核心指标',
-                                    category: catIdx !== -1 ? String(row[catIdx] || '').trim() : '',
-                                    name: nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '',
-                                    target: targetIdx !== -1 ? String(row[targetIdx] || '').trim() : '',
-                                    actual: actualIdx !== -1 ? String(row[actualIdx] || '').trim() : '',
-                                    achieveStatus: achieveIdx !== -1 ? String(row[achieveIdx] || '').trim() : '达标',
-                                    responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                    deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
-                                    action: actionIdx !== -1 ? String(row[actionIdx] || '').trim() : '',
-                                    workType: '',
-                                    problemDesc: '',
-                                    causeAnalysis: '',
-                                    tempMeasure: '',
-                                    longTermMeasure: '',
-                                    nextPlan: '',
-                                    description: '',
-                                    deadline: '',
-                                    progress: '',
-                                    status: ''
-                                };
-                                if (item.category && item.name) {
-                                    weekData[matchedTeam][memberName].push({ id: generateId(), ...item });
-                                    importedCount++;
-                                }
-                            } else if (header.some(h => h && h.includes('问题描述'))) {
-                                const probIdx = header.findIndex(h => h && h.includes('问题描述'));
-                                const causeIdx = header.findIndex(h => h && h.includes('原因分析'));
-                                const tempIdx = header.findIndex(h => h && h.includes('临时措施'));
-                                const longIdx = header.findIndex(h => h && h.includes('长期措施'));
-                                const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                                const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
-                                const statIdx = header.findIndex(h => h && h.includes('状态'));
-                                const nextIdx = header.findIndex(h => h && (h.includes('下一步计划') || h.includes('延期后')));
-                                const item = {
-                                    dimension: '重大批量质量问题改进',
-                                    problemDesc: probIdx !== -1 ? String(row[probIdx] || '').trim() : '',
-                                    causeAnalysis: causeIdx !== -1 ? String(row[causeIdx] || '').trim() : '',
-                                    tempMeasure: tempIdx !== -1 ? String(row[tempIdx] || '').trim() : '',
-                                    longTermMeasure: longIdx !== -1 ? String(row[longIdx] || '').trim() : '',
-                                    responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                    deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
-                                    status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
-                                    nextPlan: nextIdx !== -1 ? String(row[nextIdx] || '').trim() : '',
-                                    category: '',
-                                    name: '',
-                                    target: '',
-                                    actual: '',
-                                    achieveStatus: '',
-                                    deviation: '',
-                                    action: '',
-                                    workType: '',
-                                    description: '',
-                                    progress: ''
-                                };
-                                if (item.problemDesc) {
-                                    weekData[matchedTeam][memberName].push({ id: generateId(), ...item });
-                                    importedCount++;
-                                }
-                            } else {
-                                const workTypeIdx = header.findIndex(h => h && h.includes('维度') && !h.includes('状态'));
-                                const descIdx = header.findIndex(h => h && (h.includes('目标') || h.includes('描述')));
-                                const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                                const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
-                                const progIdx = header.findIndex(h => h && h.includes('进展'));
-                                const statIdx = header.findIndex(h => h && h.includes('状态'));
-                                const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
-                                const item = {
-                                    dimension: '重点工作',
-                                    workType: workTypeIdx !== -1 ? String(row[workTypeIdx] || '').trim() : '',
-                                    description: descIdx !== -1 ? String(row[descIdx] || '').trim() : '',
-                                    responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                    deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
-                                    progress: progIdx !== -1 ? String(row[progIdx] || '').trim() : '',
-                                    status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
-                                    deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
-                                    category: '',
-                                    name: '',
-                                    target: '',
-                                    actual: '',
-                                    achieveStatus: '',
-                                    action: '',
-                                    problemDesc: '',
-                                    causeAnalysis: '',
-                                    tempMeasure: '',
-                                    longTermMeasure: '',
-                                    nextPlan: ''
-                                };
-                                if (item.description) {
-                                    weekData[matchedTeam][memberName].push({ id: generateId(), ...item });
-                                    importedCount++;
-                                }
-                            }
-                        }
-                        continue;
+                // 跳过
+                if (firstCell === '暂无任务' || firstCell.startsWith('质量团队') || firstCell.startsWith('周次') || firstCell.startsWith('导出人')) continue;
+                if (!currentTeam || !currentMember) continue;
+
+                // 检测section类型并解析下一行headers
+                if (firstCell === '📊 核心指标' || firstCell.startsWith('📊')) {
+                    i++; if (i >= json.length) break;
+                    const header = json[i];
+                    if (!header) continue;
+                    const catIdx = idxOf(header,['指标分类']);
+                    const nameIdx = idxOf(header,['指标名称']);
+                    const targetIdx = idxOf(header,['目标值']);
+                    const actualIdx = idxOf(header,['达成值']);
+                    const achieveIdx = idxOf(header,['达成状态']);
+                    const respIdx = idxOf(header,['责任人']);
+                    const devIdx = idxOf(header,['偏差分析']);
+                    const actionIdx = idxOf(header,['后续行动计划']);
+                    for (i++; i < json.length; i++) {
+                        const dr = json[i];
+                        if (!dr || !dr[0]) break;
+                        const first = String(dr[0]||'').trim();
+                        if (first.startsWith('👤') || first.startsWith('📊') || first.startsWith('📌') || first.startsWith('⚙️') || first === '暂无任务' || TEAMS.some(t => first.includes(t))) { i--; break; }
+                        const cat = catIdx>=0 ? String(dr[catIdx]||'').trim() : '';
+                        const nm = nameIdx>=0 ? String(dr[nameIdx]||'').trim() : '';
+                        if (!cat && !nm) continue;
+                        weekData[currentTeam][currentMember].push({
+                            id: generateId(), _ts: Date.now(), _by: currentUser?currentUser.username:'',
+                            dimension: '核心指标',
+                            category: cat, name: nm,
+                            target: targetIdx>=0?String(dr[targetIdx]||'').trim():'',
+                            actual: actualIdx>=0?String(dr[actualIdx]||'').trim():'',
+                            achieveStatus: achieveIdx>=0?String(dr[achieveIdx]||'').trim():'达标',
+                            responsible: respIdx>=0?String(dr[respIdx]||'').trim():'',
+                            deviation: devIdx>=0?String(dr[devIdx]||'').trim():'',
+                            action: actionIdx>=0?String(dr[actionIdx]||'').trim():'',
+                            workType:'',problemDesc:'',causeAnalysis:'',tempMeasure:'',longTermMeasure:'',
+                            nextPlan:'',description:'',deadline:'',progress:'',status:''
+                        });
+                        importedCount++;
                     }
                     continue;
                 }
 
-                const header = json[0];
-                const memberIdx = header.findIndex(h => h && h.includes('成员'));
-                if (memberIdx === -1) {
-                    let memberName = sheetName.replace(teamName, '').trim() || '未命名';
-                    if (!weekData[teamName]) weekData[teamName] = {};
-                    if (!weekData[teamName][memberName]) weekData[teamName][memberName] = [];
-
-                    for (let i = 1; i < json.length; i++) {
-                        const row = json[i];
-                        if (!row || row.length === 0) continue;
-                        if (header.some(h => h && h.includes('指标分类'))) {
-                            const catIdx = header.findIndex(h => h && h.includes('指标分类'));
-                            const nameIdx = header.findIndex(h => h && h.includes('指标名称'));
-                            const targetIdx = header.findIndex(h => h && h.includes('目标值'));
-                            const actualIdx = header.findIndex(h => h && h.includes('达成值'));
-                            const achieveIdx = header.findIndex(h => h && h.includes('达成状态'));
-                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
-                            const actionIdx = header.findIndex(h => h && h.includes('后续行动计划'));
-                            const item = {
-                                dimension: '核心指标',
-                                category: catIdx !== -1 ? String(row[catIdx] || '').trim() : '',
-                                name: nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '',
-                                target: targetIdx !== -1 ? String(row[targetIdx] || '').trim() : '',
-                                actual: actualIdx !== -1 ? String(row[actualIdx] || '').trim() : '',
-                                achieveStatus: achieveIdx !== -1 ? String(row[achieveIdx] || '').trim() : '达标',
-                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
-                                action: actionIdx !== -1 ? String(row[actionIdx] || '').trim() : '',
-                                workType: '',
-                                problemDesc: '',
-                                causeAnalysis: '',
-                                tempMeasure: '',
-                                longTermMeasure: '',
-                                nextPlan: '',
-                                description: '',
-                                deadline: '',
-                                progress: '',
-                                status: ''
-                            };
-                            if (item.category && item.name) {
-                                weekData[teamName][memberName].push({ id: generateId(), ...item });
-                                importedCount++;
-                            }
-                        } else if (header.some(h => h && h.includes('问题描述'))) {
-                            const probIdx = header.findIndex(h => h && h.includes('问题描述'));
-                            const causeIdx = header.findIndex(h => h && h.includes('原因分析'));
-                            const tempIdx = header.findIndex(h => h && h.includes('临时措施'));
-                            const longIdx = header.findIndex(h => h && h.includes('长期措施'));
-                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
-                            const statIdx = header.findIndex(h => h && h.includes('状态'));
-                            const nextIdx = header.findIndex(h => h && (h.includes('下一步计划') || h.includes('延期后')));
-                            const item = {
-                                dimension: '重大批量质量问题改进',
-                                problemDesc: probIdx !== -1 ? String(row[probIdx] || '').trim() : '',
-                                causeAnalysis: causeIdx !== -1 ? String(row[causeIdx] || '').trim() : '',
-                                tempMeasure: tempIdx !== -1 ? String(row[tempIdx] || '').trim() : '',
-                                longTermMeasure: longIdx !== -1 ? String(row[longIdx] || '').trim() : '',
-                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
-                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
-                                nextPlan: nextIdx !== -1 ? String(row[nextIdx] || '').trim() : '',
-                                category: '',
-                                name: '',
-                                target: '',
-                                actual: '',
-                                achieveStatus: '',
-                                deviation: '',
-                                action: '',
-                                workType: '',
-                                description: '',
-                                progress: ''
-                            };
-                            if (item.problemDesc) {
-                                weekData[teamName][memberName].push({ id: generateId(), ...item });
-                                importedCount++;
-                            }
-                        } else {
-                            const workTypeIdx = header.findIndex(h => h && h.includes('维度') && !h.includes('状态'));
-                            const descIdx = header.findIndex(h => h && (h.includes('目标') || h.includes('描述')));
-                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
-                            const progIdx = header.findIndex(h => h && h.includes('进展'));
-                            const statIdx = header.findIndex(h => h && h.includes('状态'));
-                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
-                            const item = {
-                                dimension: '重点工作',
-                                workType: workTypeIdx !== -1 ? String(row[workTypeIdx] || '').trim() : '',
-                                description: descIdx !== -1 ? String(row[descIdx] || '').trim() : '',
-                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
-                                progress: progIdx !== -1 ? String(row[progIdx] || '').trim() : '',
-                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
-                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
-                                category: '',
-                                name: '',
-                                target: '',
-                                actual: '',
-                                achieveStatus: '',
-                                action: '',
-                                problemDesc: '',
-                                causeAnalysis: '',
-                                tempMeasure: '',
-                                longTermMeasure: '',
-                                nextPlan: ''
-                            };
-                            if (item.description) {
-                                weekData[teamName][memberName].push({ id: generateId(), ...item });
-                                importedCount++;
-                            }
-                        }
+                if (firstCell === '📌 重点工作' || firstCell.startsWith('📌')) {
+                    i++; if (i >= json.length) break;
+                    const header = json[i];
+                    if (!header) continue;
+                    const typeIdx = idxOf(header,['维度']);
+                    const descIdx = idxOf(header,['目标','描述']);
+                    const respIdx = idxOf(header,['责任人']);
+                    const deadIdx = idxOf(header,['完成时间','截止']);
+                    const progIdx = idxOf(header,['进展']);
+                    const statIdx = idxOf(header,['状态']);
+                    const devIdx = idxOf(header,['偏差']);
+                    for (i++; i < json.length; i++) {
+                        const dr = json[i];
+                        if (!dr || !dr[0]) break;
+                        const first = String(dr[0]||'').trim();
+                        if (first.startsWith('👤') || first.startsWith('📊') || first.startsWith('📌') || first.startsWith('⚙️') || first === '暂无任务' || TEAMS.some(t => first.includes(t))) { i--; break; }
+                        const desc = descIdx>=0 ? String(dr[descIdx]||'').trim() : '';
+                        if (!desc) continue;
+                        weekData[currentTeam][currentMember].push({
+                            id: generateId(), _ts: Date.now(), _by: currentUser?currentUser.username:'',
+                            dimension: '重点工作',
+                            workType: typeIdx>=0?String(dr[typeIdx]||'').trim():'',
+                            description: desc,
+                            responsible: respIdx>=0?String(dr[respIdx]||'').trim():'',
+                            deadline: deadIdx>=0?String(dr[deadIdx]||'').trim():'',
+                            progress: progIdx>=0?String(dr[progIdx]||'').trim():'',
+                            status: statIdx>=0?String(dr[statIdx]||'').trim():'开展中',
+                            deviation: devIdx>=0?String(dr[devIdx]||'').trim():'',
+                            category:'',name:'',target:'',actual:'',achieveStatus:'',action:'',
+                            problemDesc:'',causeAnalysis:'',tempMeasure:'',longTermMeasure:'',nextPlan:''
+                        });
+                        importedCount++;
                     }
-                } else {
-                    for (let i = 1; i < json.length; i++) {
-                        const row = json[i];
-                        if (!row || row.length <= memberIdx) continue;
-                        const memberName = String(row[memberIdx] || '').trim() || '未命名';
-                        if (!weekData[teamName]) weekData[teamName] = {};
-                        if (!weekData[teamName][memberName]) weekData[teamName][memberName] = [];
+                    continue;
+                }
 
-                        if (header.some(h => h && h.includes('指标分类'))) {
-                            const catIdx = header.findIndex(h => h && h.includes('指标分类'));
-                            const nameIdx = header.findIndex(h => h && h.includes('指标名称'));
-                            const targetIdx = header.findIndex(h => h && h.includes('目标值'));
-                            const actualIdx = header.findIndex(h => h && h.includes('达成值'));
-                            const achieveIdx = header.findIndex(h => h && h.includes('达成状态'));
-                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
-                            const actionIdx = header.findIndex(h => h && h.includes('后续行动计划'));
-                            const item = {
-                                dimension: '核心指标',
-                                category: catIdx !== -1 ? String(row[catIdx] || '').trim() : '',
-                                name: nameIdx !== -1 ? String(row[nameIdx] || '').trim() : '',
-                                target: targetIdx !== -1 ? String(row[targetIdx] || '').trim() : '',
-                                actual: actualIdx !== -1 ? String(row[actualIdx] || '').trim() : '',
-                                achieveStatus: achieveIdx !== -1 ? String(row[achieveIdx] || '').trim() : '达标',
-                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
-                                action: actionIdx !== -1 ? String(row[actionIdx] || '').trim() : '',
-                                workType: '',
-                                problemDesc: '',
-                                causeAnalysis: '',
-                                tempMeasure: '',
-                                longTermMeasure: '',
-                                nextPlan: '',
-                                description: '',
-                                deadline: '',
-                                progress: '',
-                                status: ''
-                            };
-                            if (item.category && item.name) {
-                                weekData[teamName][memberName].push({ id: generateId(), ...item });
-                                importedCount++;
-                            }
-                        } else if (header.some(h => h && h.includes('问题描述'))) {
-                            const probIdx = header.findIndex(h => h && h.includes('问题描述'));
-                            const causeIdx = header.findIndex(h => h && h.includes('原因分析'));
-                            const tempIdx = header.findIndex(h => h && h.includes('临时措施'));
-                            const longIdx = header.findIndex(h => h && h.includes('长期措施'));
-                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
-                            const statIdx = header.findIndex(h => h && h.includes('状态'));
-                            const nextIdx = header.findIndex(h => h && (h.includes('下一步计划') || h.includes('延期后')));
-                            const item = {
-                                dimension: '重大批量质量问题改进',
-                                problemDesc: probIdx !== -1 ? String(row[probIdx] || '').trim() : '',
-                                causeAnalysis: causeIdx !== -1 ? String(row[causeIdx] || '').trim() : '',
-                                tempMeasure: tempIdx !== -1 ? String(row[tempIdx] || '').trim() : '',
-                                longTermMeasure: longIdx !== -1 ? String(row[longIdx] || '').trim() : '',
-                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
-                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
-                                nextPlan: nextIdx !== -1 ? String(row[nextIdx] || '').trim() : '',
-                                category: '',
-                                name: '',
-                                target: '',
-                                actual: '',
-                                achieveStatus: '',
-                                deviation: '',
-                                action: '',
-                                workType: '',
-                                description: '',
-                                progress: ''
-                            };
-                            if (item.problemDesc) {
-                                weekData[teamName][memberName].push({ id: generateId(), ...item });
-                                importedCount++;
-                            }
-                        } else {
-                            const workTypeIdx = header.findIndex(h => h && h.includes('维度') && !h.includes('状态'));
-                            const descIdx = header.findIndex(h => h && (h.includes('目标') || h.includes('描述')));
-                            const respIdx = header.findIndex(h => h && h.includes('责任人'));
-                            const deadIdx = header.findIndex(h => h && (h.includes('完成时间') || h.includes('截止')));
-                            const progIdx = header.findIndex(h => h && h.includes('进展'));
-                            const statIdx = header.findIndex(h => h && h.includes('状态'));
-                            const devIdx = header.findIndex(h => h && h.includes('偏差分析'));
-                            const item = {
-                                dimension: '重点工作',
-                                workType: workTypeIdx !== -1 ? String(row[workTypeIdx] || '').trim() : '',
-                                description: descIdx !== -1 ? String(row[descIdx] || '').trim() : '',
-                                responsible: respIdx !== -1 ? String(row[respIdx] || '').trim() : '',
-                                deadline: deadIdx !== -1 ? String(row[deadIdx] || '').trim() : '',
-                                progress: progIdx !== -1 ? String(row[progIdx] || '').trim() : '',
-                                status: statIdx !== -1 ? String(row[statIdx] || '').trim() : '开展中',
-                                deviation: devIdx !== -1 ? String(row[devIdx] || '').trim() : '',
-                                category: '',
-                                name: '',
-                                target: '',
-                                actual: '',
-                                achieveStatus: '',
-                                action: '',
-                                problemDesc: '',
-                                causeAnalysis: '',
-                                tempMeasure: '',
-                                longTermMeasure: '',
-                                nextPlan: ''
-                            };
-                            if (item.description) {
-                                weekData[teamName][memberName].push({ id: generateId(), ...item });
-                                importedCount++;
-                            }
-                        }
+                if (firstCell === '⚙️ 重大批量质量问题改进' || firstCell.startsWith('⚙️')) {
+                    i++; if (i >= json.length) break;
+                    const header = json[i];
+                    if (!header) continue;
+                    const probIdx = idxOf(header,['问题描述']);
+                    const causeIdx = idxOf(header,['原因分析']);
+                    const tempIdx = idxOf(header,['临时措施']);
+                    const longIdx = idxOf(header,['长期措施']);
+                    const respIdx = idxOf(header,['责任人']);
+                    const deadIdx = idxOf(header,['完成时间','截止']);
+                    const statIdx = idxOf(header,['状态']);
+                    const nextIdx = idxOf(header,['下一步','延期后']);
+                    for (i++; i < json.length; i++) {
+                        const dr = json[i];
+                        if (!dr || !dr[0]) break;
+                        const first = String(dr[0]||'').trim();
+                        if (first.startsWith('👤') || first.startsWith('📊') || first.startsWith('📌') || first.startsWith('⚙️') || first === '暂无任务' || TEAMS.some(t => first.includes(t))) { i--; break; }
+                        const prob = probIdx>=0 ? String(dr[probIdx]||'').trim() : '';
+                        if (!prob) continue;
+                        weekData[currentTeam][currentMember].push({
+                            id: generateId(), _ts: Date.now(), _by: currentUser?currentUser.username:'',
+                            dimension: '重大批量质量问题改进',
+                            problemDesc: prob,
+                            causeAnalysis: causeIdx>=0?String(dr[causeIdx]||'').trim():'',
+                            tempMeasure: tempIdx>=0?String(dr[tempIdx]||'').trim():'',
+                            longTermMeasure: longIdx>=0?String(dr[longIdx]||'').trim():'',
+                            responsible: respIdx>=0?String(dr[respIdx]||'').trim():'',
+                            deadline: deadIdx>=0?String(dr[deadIdx]||'').trim():'',
+                            status: statIdx>=0?String(dr[statIdx]||'').trim():'开展中',
+                            nextPlan: nextIdx>=0?String(dr[nextIdx]||'').trim():'',
+                            category:'',name:'',target:'',actual:'',achieveStatus:'',deviation:'',action:'',
+                            workType:'',description:'',progress:''
+                        });
+                        importedCount++;
                     }
+                    continue;
                 }
             }
 
@@ -2868,7 +2652,7 @@
                 renderAll();
                 showToast(`✅ 成功导入 ${importedCount} 条数据`, 'success');
             } else {
-                showToast('⚠️ 未导入任何数据，请检查Excel格式', 'error');
+                showToast('⚠️ 未导入任何数据，请检查Excel格式（需要: 团队名 → 👤成员 → 📊/📌/⚙️ + 表头 → 数据行）', 'error');
             }
         }
 
@@ -3470,7 +3254,14 @@
                 try {
                     const user = JSON.parse(saved);
                     const users = getUsers();
-                    if (users[user.username] && users[user.username].role === user.role) {
+                    if (users[user.username]) {
+                        const latest = users[user.username];
+                        // 角色变了？自动更新
+                        if (latest.role !== user.role || latest.managedTeam !== user.managedTeam) {
+                            user.role = latest.role;
+                            user.managedTeam = latest.managedTeam || '';
+                            sessionStorage.setItem('quality_user', JSON.stringify(user));
+                        }
                         currentUser = user;
                     } else {
                         sessionStorage.removeItem('quality_user');
