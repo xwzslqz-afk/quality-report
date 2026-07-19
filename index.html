@@ -1135,7 +1135,7 @@
         function schedulePush() {
             if (!ghToken() || !_dirty) return;
             clearTimeout(window._pushTimer);
-            window._pushTimer = setTimeout(syncPush, 300);
+            window._pushTimer = setTimeout(() => syncPush(true), 300);
         }
 
         function updateSyncBadge(icon, text) {
