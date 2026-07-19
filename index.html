@@ -1078,9 +1078,13 @@
                 // users
                 for (const u of Object.keys(lu)) {
                     if (!cloud.users[u]) cloud.users[u] = lu[u];
-                    else if (sessionStorage.getItem('_pwd_'+u) === '1') {
-                        cloud.users[u].password = lu[u].password;
-                        sessionStorage.removeItem('_pwd_'+u);
+                    else {
+                        if (sessionStorage.getItem('_pwd_'+u) === '1') {
+                            cloud.users[u].password = lu[u].password;
+                            sessionStorage.removeItem('_pwd_'+u);
+                        }
+                        cloud.users[u].role = lu[u].role;
+                        cloud.users[u].managedTeam = lu[u].managedTeam || cloud.users[u].managedTeam;
                     }
                 }
                 // history
