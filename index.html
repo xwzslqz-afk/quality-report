@@ -2472,11 +2472,11 @@
         //  导入 Excel（仅管理员）
         // ============================================================
         document.getElementById('importBtn').addEventListener('click', function() {
-            if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'sub-admin')) {
-                showToast('仅管理员可导入数据', 'error');
+            if (!currentUser) {
+                showToast('请先登录', 'error');
                 return;
             }
-            document.getElementById('fileInput').click();
+            if(confirm('请先点 📋导出Excel 下载模板，按格式填写后上传。\\n\\n⚠ 普通成员仅上传自己账号下的数据。\\n\\n是否继续？')){document.getElementById('fileInput').click();}
         });
 
         document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -2497,6 +2497,8 @@
         });
 
         function importExcel(workbook) {
+            // 非管理员只导入自己的数据
+            const importOnlySelf = currentUser && currentUser.role === 'member';
             let importedCount = 0;
             const weekData = getWeekData(currentWeekKey);
             const TEAMS = ['研发质量','供应商质量-智慧能源','供应商质量-电池','过程质量','客户质量及质量改进','质量体系'];
@@ -2533,6 +2535,7 @@
                 // 跳过
                 if (firstCell === '暂无任务' || firstCell.startsWith('质量团队') || firstCell.startsWith('周次') || firstCell.startsWith('导出人')) continue;
                 if (!currentTeam || !currentMember) continue;
+                if (importOnlySelf && currentMember !== currentUser.username) continue;; }
 
                 // 检测section类型并解析下一行headers
                 if (firstCell === '📊 核心指标' || firstCell.startsWith('📊')) {
