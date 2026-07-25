@@ -869,7 +869,8 @@
     },
     "杨思睿": {
       "password": "yangsirui",
-      "role": "member"
+      "role": "sub-admin",
+      "managedTeam": "研发质量"
     },
     "吴金鹏": {
       "password": "wujinpeng",
@@ -881,7 +882,8 @@
     },
     "张春来": {
       "password": "zhangchunlai",
-      "role": "member"
+      "role": "sub-admin",
+      "managedTeam": "供应商质量-智慧能源"
     },
     "张敏": {
       "password": "zhangmin",
@@ -897,7 +899,8 @@
     },
     "邓超": {
       "password": "dengchao",
-      "role": "member"
+      "role": "sub-admin",
+      "managedTeam": "供应商质量-电池"
     },
     "张强": {
       "password": "zhangqiang",
@@ -913,7 +916,8 @@
     },
     "崔得峰": {
       "password": "cuidefeng",
-      "role": "member"
+      "role": "sub-admin",
+      "managedTeam": "过程质量"
     },
     "相茂岩": {
       "password": "xiangmaoyan",
@@ -941,7 +945,8 @@
     },
     "曹改芳": {
       "password": "caogaifang",
-      "role": "member"
+      "role": "sub-admin",
+      "managedTeam": "客户质量及质量改进"
     },
     "谢星炯": {
       "password": "xiexingjiong",
