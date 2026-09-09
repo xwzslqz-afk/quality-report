@@ -1562,7 +1562,13 @@
             "status": "开展中",
             "deviation": "1",
             "action": "",
-            "comments": [],
+            "comments": [
+              {
+                "author": "邓超",
+                "text": "调整",
+                "time": "2026-09-09T12:48:45.651Z"
+              }
+            ],
             "notes": [],
             "confirmed": false,
             "_taskStatus": ""
