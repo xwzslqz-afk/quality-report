@@ -827,18 +827,184 @@
             "notes": [],
             "confirmed": false,
             "_taskStatus": ""
+          },
+          {
+            "id": "mttvoc74_bja73",
+            "_ts": 1788945020608,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "潜在供应商审核",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "充电桩供应商审核报告输出",
+            "responsible": "刘一宁",
+            "deadline": "2026-07-31",
+            "progress": "7/13永联、阳光电源审核报告审批流程已发起；\n7/17星星充电审核报告输出",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
           }
         ],
         "施佳伟": []
       },
       "供应商质量-电池": {
-        "邓超": [],
+        "邓超": [
+          {
+            "id": "mttvoc74_qeqig",
+            "_ts": 1788945020608,
+            "_by": "自动带入",
+            "dimension": "核心指标",
+            "category": "1",
+            "name": "1",
+            "target": "1",
+            "actual": "1",
+            "achieveStatus": "达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "1",
+            "deadline": "",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "1",
+            "action": "1",
+            "confirmed": false,
+            "comments": [],
+            "notes": []
+          }
+        ],
         "张强": [],
         "严鑫": [],
         "张若愚": []
       },
       "过程质量": {
-        "崔得峰": [],
+        "崔得峰": [
+          {
+            "id": "mttvoc74_j7mee",
+            "_ts": 1788945020608,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "过程质量",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "天津工厂282改制423通线协同与质量策划",
+            "responsible": "周海娜",
+            "deadline": "2026-07-23",
+            "progress": "1、充检机无法实现放电末端压差测试，暂未完成282上线测试 2、控制计划、过程流程图已初步评审",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvoc74_fsqb9",
+            "_ts": 1788945020608,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "过程质量",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "CTB2.0 VAVE 钢铝箱体产品重量问题出货卡控：",
+            "responsible": "崔得峰",
+            "deadline": "2026-07-30",
+            "progress": "已通知： 1、钢铝箱体电池暂时不允许出货，待后续项目陆续释放可出货清单。 2、每个客户新出货组织出货评审。",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false,
+            "confirmedBy": "崔得峰",
+            "confirmedAt": "2026-07-17T05:46:18.504Z"
+          },
+          {
+            "id": "mttvoc74_qb0xv",
+            "_ts": 1788945020608,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "过程质量",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "AI创新课题：电芯溯源信息远程查询获取",
+            "responsible": "相茂岩",
+            "deadline": "2026-08-20",
+            "progress": "本地版已初步实现功能",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvoc74_mvnro",
+            "_ts": 1788945020608,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "过程质量",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "AI课题：出货报告、合格证信息远程查询获取",
+            "responsible": "相茂岩",
+            "deadline": "2026-09-10",
+            "progress": "尚未开始",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
         "相茂岩": [],
         "徐朝兴": [],
         "张义": [],
@@ -903,8 +1069,334 @@
       },
       "供应商质量-智慧能源": {
         "张春来": [],
-        "张敏": [],
-        "刘一宁": [],
+        "张敏": [
+          {
+            "id": "mttvo9rt_28291",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "核心指标",
+            "category": "质量",
+            "name": "一次换电成功率（主供）",
+            "target": "99.6%",
+            "actual": "99.7%",
+            "achieveStatus": "达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "张敏",
+            "deadline": "",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_sme0e",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "核心指标",
+            "category": "质量",
+            "name": "一次换电成功率",
+            "target": "94%",
+            "actual": "99.4%",
+            "achieveStatus": "达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "张敏",
+            "deadline": "",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_si5ko",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "核心指标",
+            "category": "运营",
+            "name": "启动成功率",
+            "target": "95%",
+            "actual": "94.3%",
+            "achieveStatus": "不达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "张敏",
+            "deadline": "",
+            "progress": "",
+            "status": "",
+            "deviation": "玖行启动成功率较低，拖累整体指标",
+            "action": "玖行站控开发，区分停车不到位，司机行为导致的影响，后续统计去除。预计7月底开发完成",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_9tygp",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "生产",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "423项目上海玖行量产推进",
+            "responsible": "张敏",
+            "deadline": "2026-07-31",
+            "progress": "1.玖行振动实验跟进分析结论；\n2.玖行非金属蒙皮发起供应商变更，性能报告及OTS认可确认；\n3.玖行框架OTS风险承诺，及异常报告跟进整改评估",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_9dxpa",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "量产",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "423项目智锂量产推进",
+            "responsible": "张敏",
+            "deadline": "2026-07-31",
+            "progress": "1.智锂振动实验已完成，待增加蒙皮支架仿真报告结果，及焊缝失效报告评估；\n2.OTS及性能报告待补充确认；\n3.PACK包低压通讯线插头变更；\n4.PACK流道气密测试NG及总成气密NG返修待确认；\n5.分板编码异常，需待专用工装到位；",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_gdirl",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "质量",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "市场批量横展项关闭率≥90%",
+            "responsible": "张敏",
+            "deadline": "2026-09-30",
+            "progress": "当前总计10项进行中，关闭率60%",
+            "status": "开展中",
+            "deviation": "新增项陆续横展中",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_m8w45",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重大批量质量问题改进",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "",
+            "problemDesc": "玖行MINI站钢丝绳松绳断裂",
+            "causeAnalysis": "1.钢丝绳松动，绳入槽角度偏移；\n2.防脱槽结构顶部腰孔，受安装与累计使用误差，与卷筒的间距变大对钢丝绳的限制效果降低；",
+            "tempMeasure": "1.更换断裂钢丝绳；\n2.维保增加点检；",
+            "longTermMeasure": "1.调整压绳器设计结构:顶部压绳柱不可调节；防脱结构中增加自转外壳，让钢丝绳能更好的被收入卷盘内；\n2.钢丝绳收绳装置增加维护保养要求：\n①收绳圆柱到卷盘的距离，不得大于4mm；\n②定滑轮外罩到定滑轮的距离，不得大于5.5mm；",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "张敏",
+            "deadline": "2026-07-31",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "刘一宁": [
+          {
+            "id": "mttvo9rt_l90cj",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "自研项目开发",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "600KW放电机SE项目A样评审",
+            "responsible": "刘一宁",
+            "deadline": "2026-08-31",
+            "progress": "1.已完成方案评审，目前物料采购中； 2.计划下周二钣金厂确认加工要求。",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_tczcr",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "外购项目开发",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "英杰充检机试运行跟进",
+            "responsible": "刘一宁",
+            "deadline": "2026-07-31",
+            "progress": "7/16跟进英杰充检机市场问题，计划下周组织质量例会沟通闭环",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_8r0il",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "市场质量问题",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "新艾放电机市场问题处理",
+            "responsible": "刘一宁",
+            "deadline": "2026-08-31",
+            "progress": "1.当前灌胶模块整改进展约64%； 2.7/17组织质量例会沟通市场改进效果与问题分析进展及新需求评估",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_rbs8z",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "市场质量问题",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "科泰并网柜市场问题跟进",
+            "responsible": "刘一宁",
+            "deadline": "",
+            "progress": "跟进科泰任务项闭环，平台协议批量升级中，7/17更新后故障码已输出",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          },
+          {
+            "id": "mttvo9rt_wtbid",
+            "_ts": 1788945017465,
+            "_by": "自动带入",
+            "dimension": "重大批量质量问题改进",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "达标",
+            "workType": "",
+            "problemDesc": "600kw放电机设备突然断电或无法启动，经排查发现PCS内部电压不稳定，接触器频繁吸合、无交流输出。",
+            "causeAnalysis": "产生原因：逆变器输出电压低于185v，导致PCS开关电源保护不启动； 流出原因：因故障偶发，出厂测试仅启动一次未发现； 系统原因：设计评审时未识别逆变器输入电压要求与PCS规格匹配。",
+            "tempMeasure": "断掉原本PCS的220V供电，用4KW逆变器接UPS24V转220V代替原本PCS供电。",
+            "longTermMeasure": "针对产生原因：更换5.5kw逆变器与600w开关电源，保障输入电压大于185v； 针对流出原因：出厂启机次数增加至20次，试验过程中可复现故障； 针对系统原因：DFMEA中增加对逆变器与开关电源规格识别。",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "刘一宁",
+            "deadline": "2026-08-31",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
         "施佳伟": []
       },
       "供应商质量-电池": {
@@ -1019,14 +1511,14 @@
         "张若愚": [
           {
             "id": "mttvjbic_y87eq",
-            "_ts": 1788944786436,
+            "_ts": 1788944926051,
             "_by": "张若愚",
             "dimension": "重点工作",
             "category": "",
             "name": "",
             "target": "",
             "actual": "",
-            "achieveStatus": "达标",
+            "achieveStatus": "",
             "workType": "1",
             "problemDesc": "",
             "causeAnalysis": "",
@@ -1037,16 +1529,10 @@
             "responsible": "11",
             "deadline": "2026-09-13",
             "progress": "1",
-            "status": "已完成",
+            "status": "开展中",
             "deviation": "1",
             "action": "",
-            "comments": [
-              {
-                "author": "邓超",
-                "text": "uiuii",
-                "time": "2026-09-09T09:11:18.766Z"
-              }
-            ],
+            "comments": [],
             "notes": [],
             "confirmed": false,
             "_taskStatus": ""
@@ -1080,6 +1566,752 @@
             "_taskStatus": "pending"
           }
         ]
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-08-31": {
+      "客户质量及质量改进": {
+        "谢星炯": [
+          {
+            "id": "mttvly0x_newo4",
+            "_ts": 1788944908929,
+            "_by": "自动带入",
+            "dimension": "核心指标",
+            "category": "2",
+            "name": "2",
+            "target": "2",
+            "actual": "2",
+            "achieveStatus": "达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "2",
+            "deadline": "",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "2",
+            "action": "2",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "曹改芳": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-09-14": {
+      "供应商质量-电池": {
+        "张若愚": [
+          {
+            "id": "mttvmg69_m0mak",
+            "_ts": 1788944932449,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "1",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "1",
+            "responsible": "11",
+            "deadline": "2026-09-13",
+            "progress": "1",
+            "status": "开展中",
+            "deviation": "1",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "邓超": [],
+        "张强": [],
+        "严鑫": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-09-28": {
+      "供应商质量-电池": {
+        "张若愚": [
+          {
+            "id": "mttvn34e_sv03l",
+            "_ts": 1788944962190,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "1",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "1",
+            "responsible": "11",
+            "deadline": "2026-09-13",
+            "progress": "1",
+            "status": "开展中",
+            "deviation": "1",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "邓超": [],
+        "张强": [],
+        "严鑫": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-12-21": {
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-11-02": {
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-09-21": {
+      "供应商质量-电池": {
+        "张若愚": [
+          {
+            "id": "mttvniev_5jr6p",
+            "_ts": 1788944982007,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "1",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "1",
+            "responsible": "11",
+            "deadline": "2026-09-13",
+            "progress": "1",
+            "status": "开展中",
+            "deviation": "1",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "邓超": [],
+        "张强": [],
+        "严鑫": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-10-12": {
+      "供应商质量-电池": {
+        "张若愚": [
+          {
+            "id": "mttvnk7e_sc1a1",
+            "_ts": 1788944993292,
+            "_by": "张若愚",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "1",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "1",
+            "responsible": "11",
+            "deadline": "2026-09-13",
+            "progress": "1",
+            "status": "已延期",
+            "deviation": "1",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "邓超": [],
+        "张强": [],
+        "严鑫": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-10-05": {
+      "供应商质量-电池": {
+        "张若愚": [
+          {
+            "id": "mttvnt9f_61u3d",
+            "_ts": 1788944996067,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "1",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "1",
+            "responsible": "11",
+            "deadline": "2026-09-13",
+            "progress": "1",
+            "status": "开展中",
+            "deviation": "1",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "邓超": [],
+        "张强": [],
+        "严鑫": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-10-19": {
+      "供应商质量-电池": {
+        "张若愚": [
+          {
+            "id": "mttvnzhm_buyii",
+            "_ts": 1788945004138,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "1",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "1",
+            "responsible": "11",
+            "deadline": "2026-09-13",
+            "progress": "1",
+            "status": "已延期",
+            "deviation": "1",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "邓超": [],
+        "张强": [],
+        "严鑫": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-11-23": {
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-08-24": {
+      "客户质量及质量改进": {
+        "谢星炯": [
+          {
+            "id": "mttvoebh_q527u",
+            "_ts": 1788945023357,
+            "_by": "自动带入",
+            "dimension": "核心指标",
+            "category": "2",
+            "name": "2",
+            "target": "2",
+            "actual": "2",
+            "achieveStatus": "达标",
+            "workType": "",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "",
+            "responsible": "2",
+            "deadline": "",
+            "progress": "",
+            "status": "开展中",
+            "deviation": "2",
+            "action": "2",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "曹改芳": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-05-18": {
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
+      },
+      "供应商质量-电池": {
+        "邓超": [],
+        "张强": [],
+        "严鑫": [],
+        "张若愚": []
+      },
+      "过程质量": {
+        "崔得峰": [],
+        "相茂岩": [],
+        "徐朝兴": [],
+        "张义": [],
+        "葛晨云": [],
+        "周海娜": [],
+        "张端奇": []
+      },
+      "客户质量及质量改进": {
+        "曹改芳": [],
+        "谢星炯": [],
+        "杨起翔": [],
+        "邹家祥": []
+      },
+      "质量体系": {
+        "杨思睿": [],
+        "葛晨云": []
+      }
+    },
+    "2026-10-26": {
+      "供应商质量-电池": {
+        "张若愚": [
+          {
+            "id": "mttvpa1o_l7ovq",
+            "_ts": 1788945064476,
+            "_by": "自动带入",
+            "dimension": "重点工作",
+            "category": "",
+            "name": "",
+            "target": "",
+            "actual": "",
+            "achieveStatus": "",
+            "workType": "1",
+            "problemDesc": "",
+            "causeAnalysis": "",
+            "tempMeasure": "",
+            "longTermMeasure": "",
+            "nextPlan": "",
+            "description": "1",
+            "responsible": "11",
+            "deadline": "2026-09-13",
+            "progress": "1",
+            "status": "已延期",
+            "deviation": "1",
+            "action": "",
+            "comments": [],
+            "notes": [],
+            "confirmed": false
+          }
+        ],
+        "邓超": [],
+        "张强": [],
+        "严鑫": []
+      },
+      "研发质量": {
+        "杨思睿": [],
+        "吴金鹏": [],
+        "张桂群": []
+      },
+      "供应商质量-智慧能源": {
+        "张春来": [],
+        "张敏": [],
+        "刘一宁": [],
+        "施佳伟": []
       },
       "过程质量": {
         "崔得峰": [],
@@ -12715,6 +13947,579 @@
             "葛晨云": []
           }
         }
+      },
+      {
+        "timestamp": "2026-09-09T09:10:20.609Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [
+              {
+                "id": "mrsx94bd_bir35",
+                "_ts": 1784533638937,
+                "_by": "张敏",
+                "dimension": "核心指标",
+                "category": "质量",
+                "name": "一次换电成功率（主供）",
+                "target": "99.6%",
+                "actual": "99.7%",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsx9vv3_p87l5",
+                "_ts": 1784533674639,
+                "_by": "张敏",
+                "dimension": "核心指标",
+                "category": "质量",
+                "name": "一次换电成功率",
+                "target": "94%",
+                "actual": "99.4%",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsxb39j_4xedg",
+                "_ts": 1784533793917,
+                "_by": "张敏",
+                "dimension": "核心指标",
+                "category": "运营",
+                "name": "启动成功率",
+                "target": "95%",
+                "actual": "94.3%",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "玖行启动成功率较低，拖累整体指标",
+                "action": "玖行站控开发，区分停车不到位，司机行为导致的影响，后续统计去除。预计7月底开发完成",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsxhj22_ieeg9",
+                "_ts": 1784534031290,
+                "_by": "张敏",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "生产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "423项目上海玖行量产推进",
+                "responsible": "张敏",
+                "deadline": "2026-07-31",
+                "progress": "1.玖行振动实验跟进分析结论；\n2.玖行非金属蒙皮发起供应商变更，性能报告及OTS认可确认；\n3.玖行框架OTS风险承诺，及异常报告跟进整改评估",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsxx2jx_4sfgq",
+                "_ts": 1784534756397,
+                "_by": "张敏",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "量产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "423项目智锂量产推进",
+                "responsible": "张敏",
+                "deadline": "2026-07-31",
+                "progress": "1.智锂振动实验已完成，待增加蒙皮支架仿真报告结果，及焊缝失效报告评估；\n2.OTS及性能报告待补充确认；\n3.PACK包低压通讯线插头变更；\n4.PACK流道气密测试NG及总成气密NG返修待确认；\n5.分板编码异常，需待专用工装到位；",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsxytwc_qga57",
+                "_ts": 1784534838492,
+                "_by": "张敏",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "质量",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "市场批量横展项关闭率≥90%",
+                "responsible": "张敏",
+                "deadline": "2026-09-30",
+                "progress": "当前总计10项进行中，关闭率60%",
+                "status": "开展中",
+                "deviation": "新增项陆续横展中",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsy8xl7_4jinr",
+                "_ts": 1784535525364,
+                "_by": "张敏",
+                "dimension": "重大批量质量问题改进",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "",
+                "problemDesc": "玖行MINI站钢丝绳松绳断裂",
+                "causeAnalysis": "1.钢丝绳松动，绳入槽角度偏移；\n2.防脱槽结构顶部腰孔，受安装与累计使用误差，与卷筒的间距变大对钢丝绳的限制效果降低；",
+                "tempMeasure": "1.更换断裂钢丝绳；\n2.维保增加点检；",
+                "longTermMeasure": "1.调整压绳器设计结构:顶部压绳柱不可调节；防脱结构中增加自转外壳，让钢丝绳能更好的被收入卷盘内；\n2.钢丝绳收绳装置增加维护保养要求：\n①收绳圆柱到卷盘的距离，不得大于4mm；\n②定滑轮外罩到定滑轮的距离，不得大于5.5mm；",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "2026-07-31",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              }
+            ],
+            "刘一宁": [
+              {
+                "id": "mrsvxarn_ozv3c",
+                "_ts": 1784531438358,
+                "_by": "刘一宁",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "自研项目开发",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "600KW放电机SE项目A样评审",
+                "responsible": "刘一宁",
+                "deadline": "2026-08-31",
+                "progress": "1.已完成方案评审，目前物料采购中； 2.计划下周二钣金厂确认加工要求。",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsvxtyt_lhrmk",
+                "_ts": 1784531432693,
+                "_by": "刘一宁",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "自研项目开发",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "一体化并网柜B样评审",
+                "responsible": "刘一宁",
+                "deadline": "2026-07-13",
+                "progress": "已完成B样评审并输出问题清单。 下一步跟进评审问题闭环。",
+                "status": "已完成",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsvyn4g_wawam",
+                "_ts": 1784531470480,
+                "_by": "刘一宁",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "外购项目开发",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "英杰充检机试运行跟进",
+                "responsible": "刘一宁",
+                "deadline": "2026-07-31",
+                "progress": "7/16跟进英杰充检机市场问题，计划下周组织质量例会沟通闭环",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsvzdjv_h5ckp",
+                "_ts": 1784531504731,
+                "_by": "刘一宁",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "市场质量问题",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "新艾放电机市场问题处理",
+                "responsible": "刘一宁",
+                "deadline": "2026-08-31",
+                "progress": "1.当前灌胶模块整改进展约64%； 2.7/17组织质量例会沟通市场改进效果与问题分析进展及新需求评估",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsvzuh9_fsysh",
+                "_ts": 1784531526669,
+                "_by": "刘一宁",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "市场质量问题",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "科泰并网柜市场问题跟进",
+                "responsible": "刘一宁",
+                "deadline": "",
+                "progress": "跟进科泰任务项闭环，平台协议批量升级中，7/17更新后故障码已输出",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mrsw0k7o_k6bkx",
+                "_ts": 1784531560020,
+                "_by": "刘一宁",
+                "dimension": "重大批量质量问题改进",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "600kw放电机设备突然断电或无法启动，经排查发现PCS内部电压不稳定，接触器频繁吸合、无交流输出。",
+                "causeAnalysis": "产生原因：逆变器输出电压低于185v，导致PCS开关电源保护不启动； 流出原因：因故障偶发，出厂测试仅启动一次未发现； 系统原因：设计评审时未识别逆变器输入电压要求与PCS规格匹配。",
+                "tempMeasure": "断掉原本PCS的220V供电，用4KW逆变器接UPS24V转220V代替原本PCS供电。",
+                "longTermMeasure": "针对产生原因：更换5.5kw逆变器与600w开关电源，保障输入电压大于185v； 针对流出原因：出厂启机次数增加至20次，试验过程中可复现故障； 针对系统原因：DFMEA中增加对逆变器与开关电源规格识别。",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "刘一宁",
+                "deadline": "2026-08-31",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              },
+              {
+                "id": "mttvoc74_bja73",
+                "_ts": 1788945020608,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "潜在供应商审核",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "充电桩供应商审核报告输出",
+                "responsible": "刘一宁",
+                "deadline": "2026-07-31",
+                "progress": "7/13永联、阳光电源审核报告审批流程已发起；\n7/17星星充电审核报告输出",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [
+              {
+                "id": "mttvoc74_qeqig",
+                "_ts": 1788945020608,
+                "_by": "自动带入",
+                "dimension": "核心指标",
+                "category": "1",
+                "name": "1",
+                "target": "1",
+                "actual": "1",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "1",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "1",
+                "confirmed": false,
+                "comments": [],
+                "notes": []
+              }
+            ],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [
+              {
+                "id": "mttvoc74_j7mee",
+                "_ts": 1788945020608,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "过程质量",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "天津工厂282改制423通线协同与质量策划",
+                "responsible": "周海娜",
+                "deadline": "2026-07-23",
+                "progress": "1、充检机无法实现放电末端压差测试，暂未完成282上线测试 2、控制计划、过程流程图已初步评审",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvoc74_fsqb9",
+                "_ts": 1788945020608,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "过程质量",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "CTB2.0 VAVE 钢铝箱体产品重量问题出货卡控：",
+                "responsible": "崔得峰",
+                "deadline": "2026-07-30",
+                "progress": "已通知： 1、钢铝箱体电池暂时不允许出货，待后续项目陆续释放可出货清单。 2、每个客户新出货组织出货评审。",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "confirmedBy": "崔得峰",
+                "confirmedAt": "2026-07-17T05:46:18.504Z"
+              },
+              {
+                "id": "mttvoc74_qb0xv",
+                "_ts": 1788945020608,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "过程质量",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "AI创新课题：电芯溯源信息远程查询获取",
+                "responsible": "相茂岩",
+                "deadline": "2026-08-20",
+                "progress": "本地版已初步实现功能",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvoc74_mvnro",
+                "_ts": 1788945020608,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "过程质量",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "AI课题：出货报告、合格证信息远程查询获取",
+                "responsible": "相茂岩",
+                "deadline": "2026-09-10",
+                "progress": "尚未开始",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
       }
     ],
     "2026-08-03": [
@@ -12773,6 +14578,373 @@
             "张春来": [],
             "张敏": [],
             "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-09-09T09:10:17.466Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [
+              {
+                "id": "mttvo9rt_28291",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "核心指标",
+                "category": "质量",
+                "name": "一次换电成功率（主供）",
+                "target": "99.6%",
+                "actual": "99.7%",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_sme0e",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "核心指标",
+                "category": "质量",
+                "name": "一次换电成功率",
+                "target": "94%",
+                "actual": "99.4%",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_si5ko",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "核心指标",
+                "category": "运营",
+                "name": "启动成功率",
+                "target": "95%",
+                "actual": "94.3%",
+                "achieveStatus": "不达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "",
+                "progress": "",
+                "status": "",
+                "deviation": "玖行启动成功率较低，拖累整体指标",
+                "action": "玖行站控开发，区分停车不到位，司机行为导致的影响，后续统计去除。预计7月底开发完成",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_9tygp",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "生产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "423项目上海玖行量产推进",
+                "responsible": "张敏",
+                "deadline": "2026-07-31",
+                "progress": "1.玖行振动实验跟进分析结论；\n2.玖行非金属蒙皮发起供应商变更，性能报告及OTS认可确认；\n3.玖行框架OTS风险承诺，及异常报告跟进整改评估",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_9dxpa",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "量产",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "423项目智锂量产推进",
+                "responsible": "张敏",
+                "deadline": "2026-07-31",
+                "progress": "1.智锂振动实验已完成，待增加蒙皮支架仿真报告结果，及焊缝失效报告评估；\n2.OTS及性能报告待补充确认；\n3.PACK包低压通讯线插头变更；\n4.PACK流道气密测试NG及总成气密NG返修待确认；\n5.分板编码异常，需待专用工装到位；",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_gdirl",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "质量",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "市场批量横展项关闭率≥90%",
+                "responsible": "张敏",
+                "deadline": "2026-09-30",
+                "progress": "当前总计10项进行中，关闭率60%",
+                "status": "开展中",
+                "deviation": "新增项陆续横展中",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_m8w45",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重大批量质量问题改进",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "",
+                "problemDesc": "玖行MINI站钢丝绳松绳断裂",
+                "causeAnalysis": "1.钢丝绳松动，绳入槽角度偏移；\n2.防脱槽结构顶部腰孔，受安装与累计使用误差，与卷筒的间距变大对钢丝绳的限制效果降低；",
+                "tempMeasure": "1.更换断裂钢丝绳；\n2.维保增加点检；",
+                "longTermMeasure": "1.调整压绳器设计结构:顶部压绳柱不可调节；防脱结构中增加自转外壳，让钢丝绳能更好的被收入卷盘内；\n2.钢丝绳收绳装置增加维护保养要求：\n①收绳圆柱到卷盘的距离，不得大于4mm；\n②定滑轮外罩到定滑轮的距离，不得大于5.5mm；",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "张敏",
+                "deadline": "2026-07-31",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ],
+            "刘一宁": [
+              {
+                "id": "mttvo9rt_l90cj",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "自研项目开发",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "600KW放电机SE项目A样评审",
+                "responsible": "刘一宁",
+                "deadline": "2026-08-31",
+                "progress": "1.已完成方案评审，目前物料采购中； 2.计划下周二钣金厂确认加工要求。",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_tczcr",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "外购项目开发",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "英杰充检机试运行跟进",
+                "responsible": "刘一宁",
+                "deadline": "2026-07-31",
+                "progress": "7/16跟进英杰充检机市场问题，计划下周组织质量例会沟通闭环",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_8r0il",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "市场质量问题",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "新艾放电机市场问题处理",
+                "responsible": "刘一宁",
+                "deadline": "2026-08-31",
+                "progress": "1.当前灌胶模块整改进展约64%； 2.7/17组织质量例会沟通市场改进效果与问题分析进展及新需求评估",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_rbs8z",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "市场质量问题",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "科泰并网柜市场问题跟进",
+                "responsible": "刘一宁",
+                "deadline": "",
+                "progress": "跟进科泰任务项闭环，平台协议批量升级中，7/17更新后故障码已输出",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              },
+              {
+                "id": "mttvo9rt_wtbid",
+                "_ts": 1788945017465,
+                "_by": "自动带入",
+                "dimension": "重大批量质量问题改进",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "600kw放电机设备突然断电或无法启动，经排查发现PCS内部电压不稳定，接触器频繁吸合、无交流输出。",
+                "causeAnalysis": "产生原因：逆变器输出电压低于185v，导致PCS开关电源保护不启动； 流出原因：因故障偶发，出厂测试仅启动一次未发现； 系统原因：设计评审时未识别逆变器输入电压要求与PCS规格匹配。",
+                "tempMeasure": "断掉原本PCS的220V供电，用4KW逆变器接UPS24V转220V代替原本PCS供电。",
+                "longTermMeasure": "针对产生原因：更换5.5kw逆变器与600w开关电源，保障输入电压大于185v； 针对流出原因：出厂启机次数增加至20次，试验过程中可复现故障； 针对系统原因：DFMEA中增加对逆变器与开关电源规格识别。",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "刘一宁",
+                "deadline": "2026-08-31",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ],
             "施佳伟": []
           },
           "供应商质量-电池": {
@@ -13240,6 +15412,659 @@
           "质量体系": {
             "杨思睿": [],
             "葛晨云": []
+          }
+        }
+      },
+      {
+        "timestamp": "2026-09-09T09:08:46.051Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": [
+              {
+                "id": "mttvjbic_y87eq",
+                "_ts": 1788944926051,
+                "_by": "张若愚",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false,
+                "_taskStatus": ""
+              }
+            ]
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-08-31": [
+      {
+        "timestamp": "2026-09-09T09:08:28.929Z",
+        "data": {
+          "客户质量及质量改进": {
+            "谢星炯": [
+              {
+                "id": "mttvly0x_newo4",
+                "_ts": 1788944908929,
+                "_by": "自动带入",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "2026-09-14": [
+      {
+        "timestamp": "2026-09-09T09:08:52.449Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvmg69_m0mak",
+                "_ts": 1788944932449,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "2026-09-28": [
+      {
+        "timestamp": "2026-09-09T09:09:22.191Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvn34e_sv03l",
+                "_ts": 1788944962190,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "2026-12-21": [
+      {
+        "timestamp": "2026-09-09T09:09:25.136Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-11-02": [
+      {
+        "timestamp": "2026-09-09T09:09:27.970Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-09-21": [
+      {
+        "timestamp": "2026-09-09T09:09:42.008Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvniev_5jr6p",
+                "_ts": 1788944982007,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "2026-10-12": [
+      {
+        "timestamp": "2026-09-09T09:09:44.331Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvnk7e_sc1a1",
+                "_ts": 1788944984330,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      },
+      {
+        "timestamp": "2026-09-09T09:09:53.292Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvnk7e_sc1a1",
+                "_ts": 1788944993292,
+                "_by": "张若愚",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "已延期",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ],
+            "邓超": [],
+            "张强": [],
+            "严鑫": []
+          },
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-10-05": [
+      {
+        "timestamp": "2026-09-09T09:09:56.067Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvnt9f_61u3d",
+                "_ts": 1788944996067,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "开展中",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "2026-10-19": [
+      {
+        "timestamp": "2026-09-09T09:10:04.138Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvnzhm_buyii",
+                "_ts": 1788945004138,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "已延期",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "2026-11-23": [
+      {
+        "timestamp": "2026-09-09T09:10:06.903Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-08-24": [
+      {
+        "timestamp": "2026-09-09T09:10:23.357Z",
+        "data": {
+          "客户质量及质量改进": {
+            "谢星炯": [
+              {
+                "id": "mttvoebh_q527u",
+                "_ts": 1788945023357,
+                "_by": "自动带入",
+                "dimension": "核心指标",
+                "category": "2",
+                "name": "2",
+                "target": "2",
+                "actual": "2",
+                "achieveStatus": "达标",
+                "workType": "",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "",
+                "responsible": "2",
+                "deadline": "",
+                "progress": "",
+                "status": "开展中",
+                "deviation": "2",
+                "action": "2",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "2026-05-18": [
+      {
+        "timestamp": "2026-09-09T09:10:33.998Z",
+        "data": {
+          "研发质量": {
+            "杨思睿": [],
+            "吴金鹏": [],
+            "张桂群": []
+          },
+          "供应商质量-智慧能源": {
+            "张春来": [],
+            "张敏": [],
+            "刘一宁": [],
+            "施佳伟": []
+          },
+          "供应商质量-电池": {
+            "邓超": [],
+            "张强": [],
+            "严鑫": [],
+            "张若愚": []
+          },
+          "过程质量": {
+            "崔得峰": [],
+            "相茂岩": [],
+            "徐朝兴": [],
+            "张义": [],
+            "葛晨云": [],
+            "周海娜": [],
+            "张端奇": []
+          },
+          "客户质量及质量改进": {
+            "曹改芳": [],
+            "谢星炯": [],
+            "杨起翔": [],
+            "邹家祥": []
+          },
+          "质量体系": {
+            "杨思睿": [],
+            "葛晨云": []
+          }
+        }
+      }
+    ],
+    "2026-10-26": [
+      {
+        "timestamp": "2026-09-09T09:11:04.477Z",
+        "data": {
+          "供应商质量-电池": {
+            "张若愚": [
+              {
+                "id": "mttvpa1o_l7ovq",
+                "_ts": 1788945064476,
+                "_by": "自动带入",
+                "dimension": "重点工作",
+                "category": "",
+                "name": "",
+                "target": "",
+                "actual": "",
+                "achieveStatus": "",
+                "workType": "1",
+                "problemDesc": "",
+                "causeAnalysis": "",
+                "tempMeasure": "",
+                "longTermMeasure": "",
+                "nextPlan": "",
+                "description": "1",
+                "responsible": "11",
+                "deadline": "2026-09-13",
+                "progress": "1",
+                "status": "已延期",
+                "deviation": "1",
+                "action": "",
+                "comments": [],
+                "notes": [],
+                "confirmed": false
+              }
+            ]
           }
         }
       }
