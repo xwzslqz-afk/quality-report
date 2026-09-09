@@ -458,6 +458,26 @@
         .achieve-tag.fail {
             background: #ef4444;
         }
+        .workclass-tag {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .workclass-tag.dep {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .workclass-tag.team {
+            background: #fef3c7;
+            color: #8b5d0b;
+        }
+        .workclass-tag.personal {
+            background: #f1f5f9;
+            color: #475569;
+        }
         .empty-row td {
             text-align: center;
             color: #94a3b8;
@@ -757,6 +777,7 @@
                             <table id="coreTable">
                                 <thead>
                                     <tr>
+                                        <th>工作分类</th>
                                         <th>指标分类</th>
                                         <th>指标名称</th>
                                         <th>目标值</th>
@@ -765,6 +786,7 @@
                                         <th>责任人</th>
                                         <th>偏差分析</th>
                                         <th>后续行动计划</th>
+                                        <th>评论/备注</th>
                                         <th style="text-align:center;">操作</th>
                                     </tr>
                                 </thead>
@@ -784,6 +806,7 @@
                             <table id="keyTable">
                                 <thead>
                                     <tr>
+                                        <th>工作分类</th>
                                         <th>维度（自定义）</th>
                                         <th>目标 / 任务描述</th>
                                         <th>责任人</th>
@@ -791,6 +814,7 @@
                                         <th>完成进展</th>
                                         <th>状态</th>
                                         <th>偏差分析</th>
+                                        <th>评论/备注</th>
                                         <th style="text-align:center;">操作</th>
                                     </tr>
                                 </thead>
@@ -810,6 +834,7 @@
                             <table id="majorTable">
                                 <thead>
                                     <tr>
+                                        <th>工作分类</th>
                                         <th>问题描述</th>
                                         <th>原因分析</th>
                                         <th>临时措施</th>
@@ -818,6 +843,7 @@
                                         <th>完成时间</th>
                                         <th>状态</th>
                                         <th>延期后下一步计划</th>
+                                        <th>评论/备注</th>
                                         <th style="text-align:center;">操作</th>
                                     </tr>
                                 </thead>
@@ -846,6 +872,7 @@
                                     <tr>
                                         <th>团队</th>
                                         <th>成员</th>
+                                        <th>工作分类</th>
                                         <th>指标分类</th>
                                         <th>指标名称</th>
                                         <th>目标值</th>
@@ -870,6 +897,7 @@
                                         <th>团队</th>
                                         <th>成员</th>
                                         <th>类型</th>
+                                        <th>工作分类</th>
                                         <th>描述</th>
                                         <th>责任人</th>
                                         <th>完成时间</th>
@@ -938,12 +966,24 @@
             <h3>📤 导入 Excel 数据</h3>
             <p class="tip-text">导入前请先下载导入模板（Excel 版），按模板格式填写后即可导入。</p>
             <p class="tip-text"><span class="tip-highlight">请勿修改模板表头</span>，否则可能无法正确导入。</p>
+            <p class="tip-text" id="importMemberTip" style="display:none;">👤 普通成员导入：仅“成员”列为本人姓名（或留空）的数据会导入到自己名下，其他成员的数据将被自动跳过。</p>
             <div class="template-download-wrap">
                 <a class="btn btn-primary" id="templateDownloadLink">📥 下载导入模板（Excel 版）</a>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-outline" id="importModalCancelBtn">取消</button>
                 <button type="button" class="btn btn-primary" id="importSelectFileBtn">📂 选择 Excel 文件导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 查看 评论/备注 模态框 ===== -->
+    <div class="modal-overlay" id="viewCommentsModal">
+        <div class="modal-box" style="max-width:560px;">
+            <h3>💬 评论 / 备注</h3>
+            <div id="viewCommentsContent" style="font-size:14px;color:#334155;line-height:1.8;"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" id="viewCommentsCloseBtn">关闭</button>
             </div>
         </div>
     </div>
@@ -1060,8 +1100,6 @@
         }
 
         async function syncPush(manual) {
-            if (!manual && !ghToken()) return;  // auto push requires token
-            if (!manual) { /* auto push disabled — use manual upload */ return; }
             const t = ghToken();
             if (!t) return;
             if (_pushing) { showToast('⏳ 正在推送中，请稍候','info'); return; }
@@ -1135,7 +1173,7 @@
                     localStorage.setItem(HISTORY_KEY, JSON.stringify(cloud.history));
                     localStorage.removeItem('_syncFailed');
                     updateSyncBadge('✅','已同步');
-                    showToast('📤 已推送到云端','success',1500);
+                    if (manual) showToast('📤 已推送到云端','success',1500);
                     return;
                 }
                 if (r.status === 409) {
@@ -1154,7 +1192,7 @@
                                 localStorage.setItem(USERS_KEY, JSON.stringify(cloud.users));
                                 localStorage.removeItem('_syncFailed');
                                 updateSyncBadge('✅','已同步');
-                                showToast('📤 已推送到云端','success',1500);
+                                if (manual) showToast('📤 已推送到云端','success',1500);
                                 return;
                             }
                         }
@@ -1177,7 +1215,8 @@
         function schedulePush() {
             if (!ghToken() || !_dirty) return;
             clearTimeout(window._pushTimer);
-            /* schedulePush disabled — manual upload only */
+            // 数据变更后自动上传云端（防抖 1.5 秒，避免频繁请求）
+            window._pushTimer = setTimeout(function () { syncPush(false); }, 1500);
         }
 
         function updateSyncBadge(icon, text) {
@@ -1187,6 +1226,7 @@
 
         const DIMENSION_TYPES = ['核心指标', '重点工作', '重大批量质量问题改进'];
         const STATUS_LIST = ['已完成', '开展中', '延期风险', '已延期'];
+        const WORK_CLASS_LIST = ['部门重点', '小组重点', '个人重点'];
         const STATUS_CLASS = {
             '已完成': 'done',
             '开展中': 'ongoing',
@@ -1508,6 +1548,7 @@
                 actual: item.actual || '',
                 achieveStatus: item.achieveStatus || '达标',
                 workType: item.workType || '',
+                workClass: item.workClass && WORK_CLASS_LIST.includes(item.workClass) ? item.workClass : '个人重点',
                 problemDesc: item.problemDesc || '',
                 causeAnalysis: item.causeAnalysis || '',
                 tempMeasure: item.tempMeasure || '',
@@ -1673,6 +1714,26 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // 工作分类单元格
+        function workClassCellHtml(item) {
+            const wc = item.workClass || '';
+            const map = { '部门重点': 'dep', '小组重点': 'team', '个人重点': 'personal' };
+            const cls = map[wc];
+            return '<td>' + (cls
+                ? `<span class="workclass-tag ${cls}">${wc}</span>`
+                : '<span style="color:#cbd5e1;">—</span>') + '</td>';
+        }
+
+        // 评论/备注查看单元格（所有角色可见，点击查看）
+        function commentsCellHtml(item) {
+            const c = (item.comments || []).length;
+            const n = (item.notes || []).length;
+            return `<td style="white-space:nowrap;text-align:center;">
+                <button class="btn btn-xs ${c ? 'btn-warning' : 'btn-outline'} comment-view-btn" data-id="${item.id}" title="查看评论">💬${c}</button>
+                <button class="btn btn-xs ${n ? 'btn-warning' : 'btn-outline'} note-view-btn" data-id="${item.id}" title="查看备注" style="margin-left:2px;">📝${n}</button>
+            </td>`;
         }
 
         // ============================================================
@@ -1990,7 +2051,7 @@
             // ---- 核心指标 ----
             const coreBody = document.getElementById('coreBody');
             if (coreItems.length === 0) {
-                coreBody.innerHTML = `<tr class="empty-row"><td colspan="9">暂无核心指标</td></tr>`;
+                coreBody.innerHTML = `<tr class="empty-row"><td colspan="11">暂无核心指标</td></tr>`;
             } else {
                 coreBody.innerHTML = '';
                 for (const item of coreItems) {
@@ -1998,6 +2059,7 @@
                     const tr = document.createElement('tr');
                     if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
+                        ${workClassCellHtml(item)}
                         <td>${escapeHtml(item.category)}</td>
                         <td>${escapeHtml(item.name)}</td>
                         <td>${escapeHtml(item.target)}</td>
@@ -2006,6 +2068,7 @@
                         <td>${escapeHtml(item.responsible)}</td>
                         <td>${escapeHtml(item.deviation)}</td>
                         <td>${escapeHtml(item.action)}</td>
+                        ${commentsCellHtml(item)}
                         <td style="text-align:center;white-space:nowrap;">
                             ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-core-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-core-btn" data-id="${item.id}">✕</button>` : ''}
                     ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
@@ -2041,7 +2104,7 @@
             // ---- 重点工作 ----
             const keyBody = document.getElementById('keyBody');
             if (keyItems.length === 0) {
-                keyBody.innerHTML = `<tr class="empty-row"><td colspan="8">暂无重点工作</td></tr>`;
+                keyBody.innerHTML = `<tr class="empty-row"><td colspan="10">暂无重点工作</td></tr>`;
             } else {
                 keyBody.innerHTML = '';
                 for (const item of keyItems) {
@@ -2049,6 +2112,7 @@
                     const tr = document.createElement('tr');
                     if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
+                        ${workClassCellHtml(item)}
                         <td>${escapeHtml(item.workType || '')}</td>
                         <td>${escapeHtml(item.description)}</td>
                         <td>${escapeHtml(item.responsible)}</td>
@@ -2056,6 +2120,7 @@
                         <td>${escapeHtml(item.progress)}</td>
                         <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
                         <td>${escapeHtml(item.deviation)}</td>
+                        ${commentsCellHtml(item)}
                         <td style="text-align:center;white-space:nowrap;">
                             ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-key-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-key-btn" data-id="${item.id}">✕</button>` : ''}
                     ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
@@ -2091,7 +2156,7 @@
             // ---- 重大批量质量问题改进 ----
             const majorBody = document.getElementById('majorBody');
             if (majorItems.length === 0) {
-                majorBody.innerHTML = `<tr class="empty-row"><td colspan="9">暂无重大改进</td></tr>`;
+                majorBody.innerHTML = `<tr class="empty-row"><td colspan="11">暂无重大改进</td></tr>`;
             } else {
                 majorBody.innerHTML = '';
                 for (const item of majorItems) {
@@ -2099,6 +2164,7 @@
                     const tr = document.createElement('tr');
                     if (item._taskStatus === 'pending') tr.className = 'pending';
                     tr.innerHTML = `
+                        ${workClassCellHtml(item)}
                         <td>${escapeHtml(item.problemDesc)}</td>
                         <td>${escapeHtml(item.causeAnalysis)}</td>
                         <td>${escapeHtml(item.tempMeasure)}</td>
@@ -2107,6 +2173,7 @@
                         <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
                         <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
                         <td>${escapeHtml(item.nextPlan)}</td>
+                        ${commentsCellHtml(item)}
                         <td style="text-align:center;white-space:nowrap;">
                             ${canEditCurrent ? `<button class="btn btn-sm btn-outline edit-major-btn" data-id="${item.id}" style="margin-right:4px;">✎</button><button class="btn btn-sm btn-danger delete-major-btn" data-id="${item.id}">✕</button>` : ''}
                     ${(currentUser && (currentUser.role==="admin"||currentUser.role==="sub-admin")) ? `<button class="btn btn-xs btn-warning comment-btn" data-id="${item.id}" style="margin-right:2px;">💬</button><button class="btn btn-xs btn-outline note-btn" data-id="${item.id}" style="margin-right:2px;">📝</button>` : ''}
@@ -2179,7 +2246,7 @@
 
             const coreBody = document.getElementById('abnormalCoreBody');
             if (coreAbnormal.length === 0) {
-                coreBody.innerHTML = `<tr class="empty-row"><td colspan="10">🎉 暂无核心指标不达标</td></tr>`;
+                coreBody.innerHTML = `<tr class="empty-row"><td colspan="11">🎉 暂无核心指标不达标</td></tr>`;
             } else {
                 coreBody.innerHTML = '';
                 for (const entry of coreAbnormal) {
@@ -2190,6 +2257,7 @@
                     tr.innerHTML = `
                         <td>${escapeHtml(team)}</td>
                         <td>${escapeHtml(member)}</td>
+                        ${workClassCellHtml(item)}
                         <td>${escapeHtml(item.category)}</td>
                         <td>${escapeHtml(item.name)}</td>
                         <td>${escapeHtml(item.target)}</td>
@@ -2205,7 +2273,7 @@
 
             const otherBody = document.getElementById('abnormalOtherBody');
             if (otherAbnormal.length === 0) {
-                otherBody.innerHTML = `<tr class="empty-row"><td colspan="8">🎉 暂无延期风险或已延期任务</td></tr>`;
+                otherBody.innerHTML = `<tr class="empty-row"><td colspan="9">🎉 暂无延期风险或已延期任务</td></tr>`;
             } else {
                 otherBody.innerHTML = '';
                 for (const entry of otherAbnormal) {
@@ -2219,6 +2287,7 @@
                         <td>${escapeHtml(team)}</td>
                         <td>${escapeHtml(member)}</td>
                         <td>${escapeHtml(type)}</td>
+                        ${workClassCellHtml(item)}
                         <td>${escapeHtml(desc)}</td>
                         <td>${escapeHtml(item.responsible)}</td>
                         <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
@@ -2469,21 +2538,21 @@
         const EXPORT_SHEETS = [
             {
                 name: '核心指标',
-                headers: ['团队', '成员', '指标分类', '指标名称', '目标值', '达成值', '达成状态', '责任人', '偏差分析', '后续行动计划'],
-                widths: [14, 10, 14, 24, 12, 12, 10, 10, 28, 28],
-                pick: it => [it.category || '', it.name || '', it.target || '', it.actual || '', it.achieveStatus || '达标', it.responsible || '', it.deviation || '', it.action || '']
+                headers: ['团队', '成员', '工作分类', '指标分类', '指标名称', '目标值', '达成值', '达成状态', '责任人', '偏差分析', '后续行动计划'],
+                widths: [14, 10, 12, 14, 24, 12, 12, 10, 10, 28, 28],
+                pick: it => [it.workClass || '个人重点', it.category || '', it.name || '', it.target || '', it.actual || '', it.achieveStatus || '达标', it.responsible || '', it.deviation || '', it.action || '']
             },
             {
                 name: '重点工作',
-                headers: ['团队', '成员', '维度（自定义）', '目标/任务描述', '责任人', '完成时间', '完成进展', '状态', '偏差分析'],
-                widths: [14, 10, 14, 36, 10, 12, 30, 10, 28],
-                pick: it => [it.workType || '', it.description || '', it.responsible || '', it.deadline ? formatDateDisplay(it.deadline) : '', it.progress || '', it.status || '开展中', it.deviation || '']
+                headers: ['团队', '成员', '工作分类', '维度（自定义）', '目标/任务描述', '责任人', '完成时间', '完成进展', '状态', '偏差分析'],
+                widths: [14, 10, 12, 14, 36, 10, 12, 30, 10, 28],
+                pick: it => [it.workClass || '个人重点', it.workType || '', it.description || '', it.responsible || '', it.deadline ? formatDateDisplay(it.deadline) : '', it.progress || '', it.status || '开展中', it.deviation || '']
             },
             {
                 name: '重大批量质量问题改进',
-                headers: ['团队', '成员', '问题描述', '原因分析', '临时措施', '长期措施', '责任人', '完成时间', '状态', '延期后下一步计划'],
-                widths: [14, 10, 34, 28, 28, 28, 10, 12, 10, 28],
-                pick: it => [it.problemDesc || '', it.causeAnalysis || '', it.tempMeasure || '', it.longTermMeasure || '', it.responsible || '', it.deadline ? formatDateDisplay(it.deadline) : '', it.status || '开展中', it.nextPlan || '']
+                headers: ['团队', '成员', '工作分类', '问题描述', '原因分析', '临时措施', '长期措施', '责任人', '完成时间', '状态', '延期后下一步计划'],
+                widths: [14, 10, 12, 34, 28, 28, 28, 10, 12, 10, 28],
+                pick: it => [it.workClass || '个人重点', it.problemDesc || '', it.causeAnalysis || '', it.tempMeasure || '', it.longTermMeasure || '', it.responsible || '', it.deadline ? formatDateDisplay(it.deadline) : '', it.status || '开展中', it.nextPlan || '']
             }
         ];
 
@@ -2544,11 +2613,19 @@
             showToast('📥 Excel 导出成功', 'success');
         }
 
-        // 生成导入模板（导出格式的空表格，表头一致）
+        // 生成导入模板（导出格式的空表格，表头一致；普通成员预填本人团队/姓名）
         function buildTemplateWorkbook() {
             const wb = XLSX.utils.book_new();
+            const isMember = currentUser && currentUser.role === 'member';
+            let sampleTeam = '';
+            if (isMember) sampleTeam = getTeamsOfMember(currentUser.username)[0] || '';
             for (const def of EXPORT_SHEETS) {
-                const ws = XLSX.utils.aoa_to_sheet([def.headers]);
+                const rows = [def.headers];
+                if (isMember) {
+                    // 预填示例行（仅 团队/成员，内容为空，导入时会被跳过）
+                    rows.push([sampleTeam, currentUser.username].concat(new Array(def.headers.length - 2).fill('')));
+                }
+                const ws = XLSX.utils.aoa_to_sheet(rows);
                 styleHeaderRow(ws, def.headers.length);
                 ws['!cols'] = def.widths.map(w => ({ wch: w }));
                 XLSX.utils.book_append_sheet(wb, ws, def.name);
@@ -2576,11 +2653,11 @@
         }
 
         // ============================================================
-        //  导入 Excel（仅管理员）
+        //  导入 Excel（所有登录用户；成员仅能导入自己名下的数据）
         // ============================================================
         document.getElementById('importBtn').addEventListener('click', function() {
-            if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'sub-admin')) {
-                showToast('仅管理员可导入数据', 'error');
+            if (!currentUser) {
+                showToast('请先登录', 'error');
                 return;
             }
             // 打开导入弹窗，并生成模板下载链接（导入前提醒下载模板）
@@ -2591,6 +2668,7 @@
             link.dataset.url = url;
             link.href = url;
             link.download = '质量团队周报_导入模板.xlsx';
+            document.getElementById('importMemberTip').style.display = (currentUser.role === 'member') ? 'block' : 'none';
             document.getElementById('importModal').classList.add('active');
         });
 
@@ -2625,15 +2703,13 @@
         });
 
         // 新格式导入：按模板（导出格式）解析，表头含 团队/成员 列
+        // 权限规则：管理员可导入全部；子管理员仅限所管团队；普通成员仅能导入“成员”列为自己（留空默认导入到自己名下）
         function importExcelNew(workbook) {
             let importedCount = 0;
+            let skippedCount = 0;
             const weekData = getWeekData(currentWeekKey);
-            const memberCheck = (team) => {
-                if (!currentUser) return false;
-                if (currentUser.role === 'admin') return true;
-                if (currentUser.role === 'sub-admin') return team === currentUser.managedTeam;
-                return false;
-            };
+            const isMemberRole = currentUser && currentUser.role === 'member';
+            const myTeams = isMemberRole ? getTeamsOfMember(currentUser.username) : [];
 
             for (const def of EXPORT_SHEETS) {
                 const sheet = workbook.Sheets[def.name];
@@ -2648,11 +2724,24 @@
 
                 for (let i = 1; i < json.length; i++) {
                     const r = json[i] || [];
-                    const team = String(r[teamIdx] || '').trim();
-                    const member = String(r[memberIdx] || '').trim();
+                    let team = String(r[teamIdx] || '').trim();
+                    let member = String(r[memberIdx] || '').trim();
+
+                    if (isMemberRole) {
+                        // 普通成员：只能导入自己账号对应的内容
+                        if (member && member !== currentUser.username) { skippedCount++; continue; }
+                        member = currentUser.username;
+                        if (!team) team = myTeams[0] || '';
+                        if (!myTeams.includes(team)) { skippedCount++; continue; }
+                    }
+
                     if (!team || !member) continue;
                     if (!TEAMS_CONFIG[team]) continue;
-                    if (!memberCheck(team)) continue;
+                    if (currentUser && currentUser.role === 'sub-admin' && team !== currentUser.managedTeam) { skippedCount++; continue; }
+
+                    // 工作分类（下拉：部门重点/小组重点/个人重点，非法值默认个人重点）
+                    const wcRaw = String(r[hidx('工作分类')] || '').trim();
+                    const workClass = WORK_CLASS_LIST.includes(wcRaw) ? wcRaw : '个人重点';
 
                     let item = null;
                     if (def.name === '核心指标') {
@@ -2663,6 +2752,7 @@
                         item = {
                             id: generateId(), _ts: Date.now(), _by: currentUser ? currentUser.username : '',
                             dimension: '核心指标',
+                            workClass,
                             category: cat, name: nm,
                             target: String(r[hidx('目标值')] || '').trim(),
                             actual: String(r[hidx('达成值')] || '').trim(),
@@ -2681,6 +2771,7 @@
                         item = {
                             id: generateId(), _ts: Date.now(), _by: currentUser ? currentUser.username : '',
                             dimension: '重点工作',
+                            workClass,
                             workType: String(r[hidx('维度')] || '').trim(),
                             description: desc,
                             responsible: String(r[hidx('责任人')] || '').trim(),
@@ -2699,6 +2790,7 @@
                         item = {
                             id: generateId(), _ts: Date.now(), _by: currentUser ? currentUser.username : '',
                             dimension: '重大批量质量问题改进',
+                            workClass,
                             problemDesc: prob,
                             causeAnalysis: String(r[hidx('原因分析')] || '').trim(),
                             tempMeasure: String(r[hidx('临时措施')] || '').trim(),
@@ -2724,9 +2816,11 @@
                 setWeekData(currentWeekKey, weekData);
                 pushHistory(currentWeekKey);
                 renderAll();
-                showToast(`✅ 成功导入 ${importedCount} 条数据`, 'success');
+                showToast(`✅ 成功导入 ${importedCount} 条数据` + (skippedCount > 0 ? `（跳过 ${skippedCount} 条非本人/无权限数据）` : ''), 'success');
             } else {
-                showToast('⚠️ 未导入任何数据，请先下载模板并按要求填写（需包含 团队、成员 列）', 'error');
+                showToast(skippedCount > 0
+                    ? `⚠️ 未导入任何数据：${skippedCount} 条数据不属于您的账号（成员只能导入自己的数据）`
+                    : '⚠️ 未导入任何数据，请先下载模板并按要求填写（需包含 团队、成员 列）', 'error');
             }
         }
 
@@ -2737,8 +2831,12 @@
             else importExcelLegacy(workbook);
         }
 
-        // 旧格式导入（兼容原 HTML 式 .xls 导出文件）
+        // 旧格式导入（兼容原 HTML 式 .xls 导出文件，仅管理员/子管理员使用）
         function importExcelLegacy(workbook) {
+            if (currentUser && currentUser.role === 'member') {
+                showToast('⚠️ 普通成员请先下载新版导入模板（含 团队、成员 列）后再导入', 'error');
+                return;
+            }
             let importedCount = 0;
             const weekData = getWeekData(currentWeekKey);
             const TEAMS = ['研发质量','供应商质量-智慧能源','供应商质量-电池','过程质量','客户质量及质量改进','质量体系'];
@@ -2800,6 +2898,7 @@
                         weekData[currentTeam][currentMember].push({
                             id: generateId(), _ts: Date.now(), _by: currentUser?currentUser.username:'',
                             dimension: '核心指标',
+                            workClass: '个人重点',
                             category: cat, name: nm,
                             target: targetIdx>=0?String(dr[targetIdx]||'').trim():'',
                             actual: actualIdx>=0?String(dr[actualIdx]||'').trim():'',
@@ -2836,6 +2935,7 @@
                         weekData[currentTeam][currentMember].push({
                             id: generateId(), _ts: Date.now(), _by: currentUser?currentUser.username:'',
                             dimension: '重点工作',
+                            workClass: '个人重点',
                             workType: typeIdx>=0?String(dr[typeIdx]||'').trim():'',
                             description: desc,
                             responsible: respIdx>=0?String(dr[respIdx]||'').trim():'',
@@ -2873,6 +2973,7 @@
                         weekData[currentTeam][currentMember].push({
                             id: generateId(), _ts: Date.now(), _by: currentUser?currentUser.username:'',
                             dimension: '重大批量质量问题改进',
+                            workClass: '个人重点',
                             problemDesc: prob,
                             causeAnalysis: causeIdx>=0?String(dr[causeIdx]||'').trim():'',
                             tempMeasure: tempIdx>=0?String(dr[tempIdx]||'').trim():'',
@@ -2913,9 +3014,17 @@
         const editDimension = document.getElementById('editDimension');
 
         function buildFormFields(dimension, data = {}) {
+            const wcDefault = (data.workClass && WORK_CLASS_LIST.includes(data.workClass)) ? data.workClass : '个人重点';
+            const wcSel = `
+                    <div class="form-group">
+                        <label for="f_workClass">工作分类 *</label>
+                        <select id="f_workClass">
+                            ${WORK_CLASS_LIST.map(o => `<option value="${o}" ${o === wcDefault ? 'selected' : ''}>${o}</option>`).join('')}
+                        </select>
+                    </div>`;
             let html = '';
             if (dimension === '核心指标') {
-                html = `
+                html = `${wcSel}
                     <div class="form-group">
                         <label for="f_category">指标分类 *</label>
                         <input type="text" id="f_category" value="${escapeHtml(data.category || '')}" placeholder="如：质量、效率" required />
@@ -2953,7 +3062,7 @@
                     </div>
                 `;
             } else if (dimension === '重点工作') {
-                html = `
+                html = `${wcSel}
                     <div class="form-group">
                         <label for="f_workType">维度（自定义） *</label>
                         <input type="text" id="f_workType" value="${escapeHtml(data.workType || '')}" placeholder="如：研发、生产" required />
@@ -2986,7 +3095,7 @@
                     </div>
                 `;
             } else if (dimension === '重大批量质量问题改进') {
-                html = `
+                html = `${wcSel}
                     <div class="form-group">
                         <label for="f_problemDesc">问题描述 *</label>
                         <textarea id="f_problemDesc" rows="2" placeholder="请描述问题" required>${escapeHtml(data.problemDesc || '')}</textarea>
@@ -3076,6 +3185,7 @@
             const dimension = editDimension.value;
 
             let updates = {};
+            const workClass = document.getElementById('f_workClass') ? document.getElementById('f_workClass').value : '个人重点';
             if (dimension === '核心指标') {
                 const category = document.getElementById('f_category').value.trim();
                 const name = document.getElementById('f_name').value.trim();
@@ -3091,6 +3201,7 @@
                 }
                 updates = {
                     dimension: '核心指标',
+                    workClass,
                     category,
                     name,
                     target,
@@ -3124,6 +3235,7 @@
                 }
                 updates = {
                     dimension: '重点工作',
+                    workClass,
                     workType,
                     description,
                     responsible,
@@ -3158,6 +3270,7 @@
                 }
                 updates = {
                     dimension: '重大批量质量问题改进',
+                    workClass,
                     problemDesc,
                     causeAnalysis,
                     tempMeasure,
@@ -3317,7 +3430,49 @@
         // ============================================================
         //  评论 / 备注 / 确认
         // ============================================================
+        // 查看评论/备注（所有登录用户可查看管理员添加的内容）
+        function openViewComments(item) {
+            const box = document.getElementById('viewCommentsContent');
+            const fmtTime = (t) => { try { return new Date(t).toLocaleString('zh-CN', { hour12: false }); } catch (e) { return ''; } };
+            let html = '';
+            html += `<div style="margin-bottom:6px;font-weight:700;color:#0b2b4a;">💬 评论（${(item.comments || []).length} 条）</div>`;
+            if ((item.comments || []).length === 0) {
+                html += `<div style="color:#94a3b8;padding:4px 0 10px;">暂无评论</div>`;
+            } else {
+                html += item.comments.map(c => `
+                    <div style="padding:6px 0;border-bottom:1px dashed #eef2f6;">
+                        <b>${escapeHtml(c.author || '')}</b>
+                        <span style="color:#94a3b8;font-size:12px;margin-left:8px;">${fmtTime(c.time)}</span>
+                        <div>${escapeHtml(c.text || '')}</div>
+                    </div>`).join('');
+            }
+            html += `<div style="margin:14px 0 6px;font-weight:700;color:#0b2b4a;">📝 备注（${(item.notes || []).length} 条）</div>`;
+            if ((item.notes || []).length === 0) {
+                html += `<div style="color:#94a3b8;padding:4px 0;">暂无备注</div>`;
+            } else {
+                html += item.notes.map(n => `
+                    <div style="padding:6px 0;border-bottom:1px dashed #eef2f6;">
+                        <b>${escapeHtml(n.author || '')}</b>
+                        <span style="color:#94a3b8;font-size:12px;margin-left:8px;">${fmtTime(n.time)}</span>
+                        <div>${escapeHtml(n.text || '')}</div>
+                    </div>`).join('');
+            }
+            box.innerHTML = html;
+            document.getElementById('viewCommentsModal').classList.add('active');
+        }
+
+        document.getElementById('viewCommentsCloseBtn').addEventListener('click', function() {
+            document.getElementById('viewCommentsModal').classList.remove('active');
+        });
+        document.getElementById('viewCommentsModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('active');
+        });
+
         document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('comment-view-btn') || e.target.classList.contains('note-view-btn')) {
+                const item = findItemById(e.target.dataset.id);
+                if (item) openViewComments(item);
+            }
             if (e.target.classList.contains('comment-btn')) {
                 const id = e.target.dataset.id;
                 const item = findItemById(id);
@@ -3328,6 +3483,7 @@
                     item.comments.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
                     _dirty = true;
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
+                    schedulePush();
                     renderAll();
                     showToast('💬 评论已添加', 'success');
                 }
@@ -3342,6 +3498,7 @@
                     item.notes.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
                     _dirty = true;
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
+                    schedulePush();
                     renderAll();
                     showToast('📝 任务备注已添加', 'success');
                 }
@@ -3367,6 +3524,7 @@
                 }
                 _dirty = true;
                 try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
+                schedulePush();
                 renderAll();
             }
         });
@@ -3545,6 +3703,7 @@
                     document.getElementById('loginModal').classList.remove('active');
                     document.getElementById('changePwdModal').classList.remove('active');
                     document.getElementById('importModal').classList.remove('active');
+                    document.getElementById('viewCommentsModal').classList.remove('active');
                 }
             });
 
