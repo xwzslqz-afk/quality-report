@@ -257,6 +257,99 @@
             line-height: 20px;
         }
 
+        /* ===== 汇总信息页 ===== */
+        .sidebar .summary-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            margin: 0 6px 8px 6px;
+            background: #e0f2fe;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #075985;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: 1px solid #bae6fd;
+        }
+        .sidebar .summary-entry:hover {
+            background: #bae6fd;
+        }
+        .sidebar .summary-entry.active {
+            background: #0284c7;
+            color: #fff;
+            border-color: #0284c7;
+        }
+        .sidebar .summary-entry .scope {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.85;
+        }
+        .summary-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            margin: 10px 0 14px 0;
+            background: #f8fafc;
+            border: 1px solid #eef2f6;
+            border-radius: 12px;
+        }
+        .sum-btn {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1.5px solid #d1d9e6;
+            background: #fff;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .sum-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .sum-btn small {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.75;
+            margin-top: 1px;
+        }
+        .sum-btn.active {
+            border-color: transparent;
+            color: #fff;
+        }
+        .sum-btn.dep.active { background: #2563eb; }
+        .sum-btn.team.active { background: #f59e0b; }
+        .sum-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+        .sum-stat-card {
+            flex: 1 1 150px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #eef2f6;
+        }
+        .sum-stat-card .num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0b2b4a;
+        }
+        .sum-stat-card .lbl {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .sum-stat-card.warn .num { color: #dc2626; }
+
         .sidebar .team-group {
             margin-bottom: 4px;
         }
@@ -387,6 +480,11 @@
             border-color: #2acc8e;
             color: #2acc8e;
             background: #f6fdfa;
+        }
+        .content .section-title .count {
+            font-size: 13px;
+            font-weight: 400;
+            color: #94a3b8;
         }
         .content .table-wrap {
             overflow-x: auto;
@@ -908,6 +1006,113 @@
                                 <tbody id="abnormalOtherBody"></tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 汇总信息视图（管理员：全员；子管理员：本小组） -->
+                <div id="summaryView" style="display:none;">
+                    <div class="member-title">
+                        <span>📊 重点工作分类汇总</span>
+                        <span class="count" id="summaryScopeText"></span>
+                    </div>
+
+                    <div class="summary-toolbar">
+                        <button type="button" class="sum-btn dep active" id="sumDepBtn">
+                            团队重点
+                            <small>工作分类：部门重点</small>
+                        </button>
+                        <button type="button" class="sum-btn team" id="sumTeamBtn">
+                            小组重点
+                            <small>工作分类：小组重点</small>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" id="sumExportBtn" style="margin-left:auto;">
+                            📥 导出汇总 Excel
+                        </button>
+                    </div>
+
+                    <div class="sum-stats" id="sumStats"></div>
+
+                    <!-- 核心指标汇总 -->
+                    <div class="section-title">
+                        <span>📊 核心指标</span>
+                        <span class="count" id="sumCoreCount">0 项</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="sumCoreTable">
+                            <thead>
+                                <tr>
+                                    <th>团队</th>
+                                    <th>成员</th>
+                                    <th>工作分类</th>
+                                    <th>指标分类</th>
+                                    <th>指标名称</th>
+                                    <th>目标值</th>
+                                    <th>达成值</th>
+                                    <th>达成状态</th>
+                                    <th>责任人</th>
+                                    <th>偏差分析</th>
+                                    <th>后续行动计划</th>
+                                    <th>评论/备注</th>
+                                    <th style="text-align:center;">定位</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sumCoreBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- 重点工作汇总 -->
+                    <div class="section-title">
+                        <span>📌 重点工作</span>
+                        <span class="count" id="sumKeyCount">0 项</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="sumKeyTable">
+                            <thead>
+                                <tr>
+                                    <th>团队</th>
+                                    <th>成员</th>
+                                    <th>工作分类</th>
+                                    <th>维度（自定义）</th>
+                                    <th>目标 / 任务描述</th>
+                                    <th>责任人</th>
+                                    <th>完成时间</th>
+                                    <th>完成进展</th>
+                                    <th>状态</th>
+                                    <th>偏差分析</th>
+                                    <th>评论/备注</th>
+                                    <th style="text-align:center;">定位</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sumKeyBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- 重大改进汇总 -->
+                    <div class="section-title">
+                        <span>⚙️ 重大批量质量问题改进</span>
+                        <span class="count" id="sumMajorCount">0 项</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="sumMajorTable">
+                            <thead>
+                                <tr>
+                                    <th>团队</th>
+                                    <th>成员</th>
+                                    <th>工作分类</th>
+                                    <th>问题描述</th>
+                                    <th>原因分析</th>
+                                    <th>临时措施</th>
+                                    <th>长期措施</th>
+                                    <th>责任人</th>
+                                    <th>完成时间</th>
+                                    <th>状态</th>
+                                    <th>延期后下一步计划</th>
+                                    <th>评论/备注</th>
+                                    <th style="text-align:center;">定位</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sumMajorBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1743,6 +1948,13 @@
         let currentTeam = '';
         let currentMember = '';
         let currentView = 'normal';
+        // 汇总信息页当前分类：'部门重点'（团队重点按钮） / '小组重点'（小组重点按钮）
+        let summaryClass = '部门重点';
+
+        // 是否有权访问汇总信息页（管理员：全员；子管理员：本小组）
+        function canViewSummary() {
+            return !!(currentUser && (currentUser.role === 'admin' || currentUser.role === 'sub-admin'));
+        }
 
         // 是否允许编辑（根据权限）
         function canEdit() {
@@ -1788,6 +2000,26 @@
         function renderSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.innerHTML = '';
+
+            // 汇总信息入口（管理员 / 子管理员）
+            if (canViewSummary()) {
+                const summaryEntry = document.createElement('div');
+                summaryEntry.className = 'summary-entry' + (currentView === 'summary' ? ' active' : '');
+                const scopeLabel = currentUser.role === 'admin' ? '全员' : (currentUser.managedTeam || '本小组');
+                summaryEntry.innerHTML = `
+                    <span>📊 汇总信息</span>
+                    <span class="scope">${escapeHtml(scopeLabel)}</span>
+                `;
+                summaryEntry.addEventListener('click', function() {
+                    if (currentView !== 'summary') {
+                        currentView = 'summary';
+                        currentTeam = '';
+                        currentMember = '';
+                        renderAll();
+                    }
+                });
+                sidebar.appendChild(summaryEntry);
+            }
 
             // 异常分析入口
             const abnormalEntry = document.createElement('div');
@@ -2306,10 +2538,224 @@
         }
 
         // ============================================================
+        //  汇总信息视图：按"团队重点（部门重点）" / "小组重点"分类整合汇总
+        // ============================================================
+        // 收集权限范围内、符合当前工作分类的三类内容
+        function collectSummaryEntries() {
+            const weekData = getWeekData(currentWeekKey);
+            const scopeOk = (team, member) => {
+                if (!currentUser) return false;
+                if (currentUser.role === 'admin') return true;
+                if (currentUser.role === 'sub-admin') return team === currentUser.managedTeam;
+                if (currentUser.role === 'member') return member === currentUser.username;
+                return false;
+            };
+            const matchClass = (item) => {
+                const wc = item.workClass || '个人重点';
+                // 团队重点按钮 → 部门重点；小组重点按钮 → 小组重点
+                if (summaryClass === '部门重点') return wc === '部门重点' || wc === '团队重点';
+                return wc === '小组重点';
+            };
+            const groups = { '核心指标': [], '重点工作': [], '重大批量质量问题改进': [] };
+            const teamSet = new Set();
+            const memberSet = new Set();
+            const teamOrder = Object.keys(TEAMS_CONFIG || {});
+            const allTeams = teamOrder.concat(Object.keys(weekData).filter(t => !teamOrder.includes(t)));
+            for (const team of allTeams) {
+                const members = weekData[team] || {};
+                for (const member of Object.keys(members)) {
+                    if (!scopeOk(team, member)) continue;
+                    for (const item of (members[member] || [])) {
+                        if (!matchClass(item)) continue;
+                        if (!groups[item.dimension]) continue;
+                        groups[item.dimension].push({ team, member, item });
+                        teamSet.add(team);
+                        memberSet.add(team + '/' + member);
+                    }
+                }
+            }
+            return { groups, teamCount: teamSet.size, memberCount: memberSet.size };
+        }
+
+        function summaryClassLabel() {
+            return summaryClass === '部门重点' ? '团队重点（部门重点）' : '小组重点';
+        }
+
+        function renderSummaryView() {
+            if (!canViewSummary()) {
+                currentView = 'normal';
+                renderAll();
+                return;
+            }
+            const { groups, memberCount } = collectSummaryEntries();
+            const core = groups['核心指标'];
+            const key = groups['重点工作'];
+            const major = groups['重大批量质量问题改进'];
+            const isAdmin = currentUser.role === 'admin';
+            const total = core.length + key.length + major.length;
+
+            const abnormal = core.concat(key, major).filter(function(e) {
+                const it = e.item;
+                if (it.dimension === '核心指标') return it.achieveStatus === '不达标';
+                return it.status === '延期风险' || it.status === '已延期';
+            }).length;
+
+            document.getElementById('summaryScopeText').textContent = isAdmin
+                ? `范围：全部团队（${memberCount} 人）`
+                : `范围：${currentUser.managedTeam || '本小组'}（${memberCount} 人）`;
+
+            document.getElementById('sumStats').innerHTML = `
+                <div class="sum-stat-card"><div class="num">${total}</div><div class="lbl">汇总条目合计</div></div>
+                <div class="sum-stat-card"><div class="num">${core.length}</div><div class="lbl">📊 核心指标</div></div>
+                <div class="sum-stat-card"><div class="num">${key.length}</div><div class="lbl">📌 重点工作</div></div>
+                <div class="sum-stat-card"><div class="num">${major.length}</div><div class="lbl">⚙️ 重大改进</div></div>
+                <div class="sum-stat-card ${abnormal ? 'warn' : ''}"><div class="num">${abnormal}</div><div class="lbl">🚨 异常（不达标/延期）</div></div>
+                <div class="sum-stat-card"><div class="num">${memberCount}</div><div class="lbl">👤 覆盖成员</div></div>
+            `;
+
+            const attr = (s) => escapeHtml(s).replace(/"/g, '&quot;');
+            const jumpBtn = (team, member, id) =>
+                `<button class="btn btn-xs btn-outline sum-jump-btn" data-team="${attr(team)}" data-member="${attr(member)}" data-id="${attr(id)}" title="定位到该成员">🔍</button>`;
+            const emptyText = `暂无「${summaryClassLabel()}」分类的内容`;
+
+            // ===== 核心指标 =====
+            const coreBody = document.getElementById('sumCoreBody');
+            document.getElementById('sumCoreCount').textContent = core.length + ' 项';
+            coreBody.innerHTML = core.length === 0
+                ? `<tr class="empty-row"><td colspan="13">${emptyText}</td></tr>`
+                : core.map(e => {
+                    const { team, member, item } = e;
+                    const achieveClass = item.achieveStatus === '达标' ? 'pass' : 'fail';
+                    return `<tr${item._taskStatus === 'pending' ? ' class="pending"' : ''}>
+                        <td>${escapeHtml(team)}</td>
+                        <td>${escapeHtml(member)}</td>
+                        ${workClassCellHtml(item)}
+                        <td>${escapeHtml(item.category)}</td>
+                        <td>${escapeHtml(item.name)}</td>
+                        <td>${escapeHtml(item.target)}</td>
+                        <td>${escapeHtml(item.actual)}</td>
+                        <td><span class="achieve-tag ${achieveClass}">${item.achieveStatus || '达标'}</span></td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${escapeHtml(item.deviation)}</td>
+                        <td>${escapeHtml(item.action)}</td>
+                        ${commentsCellHtml(item)}
+                        <td style="text-align:center;">${jumpBtn(team, member, item.id)}</td>
+                    </tr>`;
+                }).join('');
+
+            // ===== 重点工作 =====
+            const keyBody = document.getElementById('sumKeyBody');
+            document.getElementById('sumKeyCount').textContent = key.length + ' 项';
+            keyBody.innerHTML = key.length === 0
+                ? `<tr class="empty-row"><td colspan="12">${emptyText}</td></tr>`
+                : key.map(e => {
+                    const { team, member, item } = e;
+                    const statusClass = STATUS_CLASS[item.status] || 'default';
+                    return `<tr${item._taskStatus === 'pending' ? ' class="pending"' : ''}>
+                        <td>${escapeHtml(team)}</td>
+                        <td>${escapeHtml(member)}</td>
+                        ${workClassCellHtml(item)}
+                        <td>${escapeHtml(item.workType)}</td>
+                        <td>${escapeHtml(item.description)}</td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
+                        <td>${escapeHtml(item.progress)}</td>
+                        <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
+                        <td>${escapeHtml(item.deviation)}</td>
+                        ${commentsCellHtml(item)}
+                        <td style="text-align:center;">${jumpBtn(team, member, item.id)}</td>
+                    </tr>`;
+                }).join('');
+
+            // ===== 重大批量质量问题改进 =====
+            const majorBody = document.getElementById('sumMajorBody');
+            document.getElementById('sumMajorCount').textContent = major.length + ' 项';
+            majorBody.innerHTML = major.length === 0
+                ? `<tr class="empty-row"><td colspan="13">${emptyText}</td></tr>`
+                : major.map(e => {
+                    const { team, member, item } = e;
+                    const statusClass = STATUS_CLASS[item.status] || 'default';
+                    return `<tr${item._taskStatus === 'pending' ? ' class="pending"' : ''}>
+                        <td>${escapeHtml(team)}</td>
+                        <td>${escapeHtml(member)}</td>
+                        ${workClassCellHtml(item)}
+                        <td>${escapeHtml(item.problemDesc)}</td>
+                        <td>${escapeHtml(item.causeAnalysis)}</td>
+                        <td>${escapeHtml(item.tempMeasure)}</td>
+                        <td>${escapeHtml(item.longTermMeasure)}</td>
+                        <td>${escapeHtml(item.responsible)}</td>
+                        <td>${item.deadline ? formatDateDisplay(item.deadline) : ''}</td>
+                        <td><span class="status-tag ${statusClass}">${item.status || '开展中'}</span></td>
+                        <td>${escapeHtml(item.nextPlan)}</td>
+                        ${commentsCellHtml(item)}
+                        <td style="text-align:center;">${jumpBtn(team, member, item.id)}</td>
+                    </tr>`;
+                }).join('');
+
+            document.getElementById('sumDepBtn').classList.toggle('active', summaryClass === '部门重点');
+            document.getElementById('sumTeamBtn').classList.toggle('active', summaryClass === '小组重点');
+        }
+
+        // 导出汇总 Excel
+        function exportSummaryExcel() {
+            const { groups } = collectSummaryEntries();
+            const defs = [
+                {
+                    name: '核心指标',
+                    headers: ['团队', '成员', '工作分类', '指标分类', '指标名称', '目标值', '达成值', '达成状态', '责任人', '偏差分析', '后续行动计划'],
+                    rows: groups['核心指标'].map(e => [e.team, e.member, e.item.workClass || '', e.item.category || '', e.item.name || '', e.item.target || '', e.item.actual || '', e.item.achieveStatus || '达标', e.item.responsible || '', e.item.deviation || '', e.item.action || ''])
+                },
+                {
+                    name: '重点工作',
+                    headers: ['团队', '成员', '工作分类', '维度（自定义）', '目标/任务描述', '责任人', '完成时间', '完成进展', '状态', '偏差分析'],
+                    rows: groups['重点工作'].map(e => [e.team, e.member, e.item.workClass || '', e.item.workType || '', e.item.description || '', e.item.responsible || '', e.item.deadline ? formatDateDisplay(e.item.deadline) : '', e.item.progress || '', e.item.status || '开展中', e.item.deviation || ''])
+                },
+                {
+                    name: '重大改进',
+                    headers: ['团队', '成员', '工作分类', '问题描述', '原因分析', '临时措施', '长期措施', '责任人', '完成时间', '状态', '延期后下一步计划'],
+                    rows: groups['重大批量质量问题改进'].map(e => [e.team, e.member, e.item.workClass || '', e.item.problemDesc || '', e.item.causeAnalysis || '', e.item.tempMeasure || '', e.item.longTermMeasure || '', e.item.responsible || '', e.item.deadline ? formatDateDisplay(e.item.deadline) : '', e.item.status || '开展中', e.item.nextPlan || ''])
+                }
+            ];
+            const wb = XLSX.utils.book_new();
+            for (const def of defs) {
+                const ws = XLSX.utils.aoa_to_sheet([def.headers].concat(def.rows));
+                if (typeof styleHeaderRow === 'function') styleHeaderRow(ws, def.headers.length);
+                ws['!cols'] = def.headers.map((h, i) => ({ wch: (i === 4 || i === 3) ? 30 : 14 }));
+                XLSX.utils.book_append_sheet(wb, ws, def.name);
+            }
+            XLSX.writeFile(wb, `重点工作分类汇总_${summaryClassLabel()}_${currentWeekKey}.xlsx`);
+            showToast('📥 汇总已导出', 'success');
+        }
+
+        // 汇总页按钮事件
+        document.getElementById('sumDepBtn').addEventListener('click', function() {
+            if (summaryClass !== '部门重点') { summaryClass = '部门重点'; renderSummaryView(); }
+        });
+        document.getElementById('sumTeamBtn').addEventListener('click', function() {
+            if (summaryClass !== '小组重点') { summaryClass = '小组重点'; renderSummaryView(); }
+        });
+        document.getElementById('sumExportBtn').addEventListener('click', function() {
+            if (!canViewSummary()) { showToast('无权导出汇总', 'error'); return; }
+            exportSummaryExcel();
+        });
+        // 定位按钮：跳转到该成员的明细视图
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.sum-jump-btn');
+            if (!btn) return;
+            currentView = 'normal';
+            currentTeam = btn.dataset.team || '';
+            currentMember = btn.dataset.member || '';
+            renderAll();
+        });
+
+        // ============================================================
         //  主渲染
         // ============================================================
         function renderAll() {
             ensureDefaultMembers(currentWeekKey);
+
+            // 无权访问汇总页时回退到普通视图
+            if (currentView === 'summary' && !canViewSummary()) currentView = 'normal';
 
             if (currentView === 'normal') {
                 if (!currentUser) {
@@ -2338,11 +2784,18 @@
                 }
                 document.getElementById('normalView').style.display = 'block';
                 document.getElementById('abnormalView').style.display = 'none';
+                document.getElementById('summaryView').style.display = 'none';
                 renderNormalView();
-            } else {
+            } else if (currentView === 'abnormal') {
                 document.getElementById('normalView').style.display = 'none';
                 document.getElementById('abnormalView').style.display = 'block';
+                document.getElementById('summaryView').style.display = 'none';
                 renderAbnormalView();
+            } else {
+                document.getElementById('normalView').style.display = 'none';
+                document.getElementById('abnormalView').style.display = 'none';
+                document.getElementById('summaryView').style.display = 'block';
+                renderSummaryView();
             }
 
             renderSidebar();
