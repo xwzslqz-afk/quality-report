@@ -2482,38 +2482,41 @@
             "notes": [],
             "confirmed": false,
             "_taskStatus": ""
-          },
+          }
+        ],
+        "吴金鹏": [
           {
-            "id": "mujqk7gn_a8gv1",
-            "_ts": 1790508550343,
-            "_by": "杨思睿",
+            "id": "mujqjv3b_7szl4",
+            "_ts": 1790508534311,
+            "_by": "吴金鹏",
             "dimension": "重点工作",
             "category": "",
             "name": "",
             "target": "",
             "actual": "",
             "achieveStatus": "达标",
-            "workType": "新项目开发",
+            "workType": "AD600开发问题跟进",
             "workClass": "个人重点",
             "problemDesc": "",
             "causeAnalysis": "",
             "tempMeasure": "",
             "longTermMeasure": "",
             "nextPlan": "",
-            "description": "VE846 APQP资料收集，结项资料质量资料整理",
-            "responsible": "杨思睿",
-            "deadline": "2026-09-22",
-            "progress": "1、完成VE846 APQP资料整理，路试报告评审；2、完成结项资料质量资料整理上传",
-            "status": "已完成",
+            "description": "自研AD600框架A样生产过程质量问题及样件评审问题改善闭环",
+            "responsible": "吴金鹏",
+            "deadline": "2026-10-22",
+            "progress": "1. 审核问题41项，试制过程问题28项，评审问题13项，当前100%有临时措施；8/24\n2. 后续审核问题闭环集中在振动确认，审核问题已经关闭90%，剩余3项需要振动后确认。图纸没有进行锁定，后续我们会持续跟进问题闭环，震动结束后发起评审，同时传递给AD400 和堆叠项目",
+            "status": "开展中",
             "deviation": "",
             "action": "",
             "comments": [],
             "notes": [],
-            "confirmed": false,
-            "_taskStatus": ""
+            "confirmed": true,
+            "_taskStatus": "",
+            "confirmedBy": "吴金鹏",
+            "confirmedAt": "2026-09-27T11:29:17.710Z"
           }
         ],
-        "吴金鹏": [],
         "张桂群": []
       },
       "供应商质量-智慧能源": {
@@ -26990,7 +26993,7 @@
         }
       },
       {
-        "timestamp": "2026-09-27T11:29:10.345Z",
+        "timestamp": "2026-09-27T11:28:54.313Z",
         "data": {
           "供应商质量-电池": {
             "张若愚": [
@@ -27143,29 +27146,31 @@
                 "notes": [],
                 "confirmed": false,
                 "_taskStatus": ""
-              },
+              }
+            ],
+            "吴金鹏": [
               {
-                "id": "mujqk7gn_a8gv1",
-                "_ts": 1790508550343,
-                "_by": "杨思睿",
+                "id": "mujqjv3b_7szl4",
+                "_ts": 1790508534311,
+                "_by": "吴金鹏",
                 "dimension": "重点工作",
                 "category": "",
                 "name": "",
                 "target": "",
                 "actual": "",
                 "achieveStatus": "达标",
-                "workType": "新项目开发",
+                "workType": "AD600开发问题跟进",
                 "workClass": "个人重点",
                 "problemDesc": "",
                 "causeAnalysis": "",
                 "tempMeasure": "",
                 "longTermMeasure": "",
                 "nextPlan": "",
-                "description": "VE846 APQP资料收集，结项资料质量资料整理",
-                "responsible": "杨思睿",
-                "deadline": "2026-09-22",
-                "progress": "1、完成VE846 APQP资料整理，路试报告评审；2、完成结项资料质量资料整理上传",
-                "status": "已完成",
+                "description": "自研AD600框架A样生产过程质量问题及样件评审问题改善闭环",
+                "responsible": "吴金鹏",
+                "deadline": "2026-10-22",
+                "progress": "1. 审核问题41项，试制过程问题28项，评审问题13项，当前100%有临时措施；8/24\n2. 后续审核问题闭环集中在振动确认，审核问题已经关闭90%，剩余3项需要振动后确认。图纸没有进行锁定，后续我们会持续跟进问题闭环，震动结束后发起评审，同时传递给AD400 和堆叠项目",
+                "status": "开展中",
                 "deviation": "",
                 "action": "",
                 "comments": [],
@@ -27174,7 +27179,6 @@
                 "_taskStatus": ""
               }
             ],
-            "吴金鹏": [],
             "张桂群": []
           },
           "供应商质量-智慧能源": {
