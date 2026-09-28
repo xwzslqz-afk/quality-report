@@ -705,6 +705,114 @@
             background: #1e4b8a;
         }
 
+        /* ===== 同步进度面板 ===== */
+        .sync-panel {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            width: min(440px, 92vw);
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.16);
+            font-family: inherit;
+            z-index: 1100;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .sync-panel.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .sync-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 11px 16px;
+            border-bottom: 1px solid #eef2f6;
+            background: #f8fafc;
+        }
+        .sync-panel-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0b2b4a;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .sync-panel-state {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 9px;
+            border-radius: 20px;
+            background: #e2e8f0;
+            color: #475569;
+            white-space: nowrap;
+        }
+        .sync-panel-state.run { background: #dbeafe; color: #1d4ed8; }
+        .sync-panel-state.ok { background: #dcfce7; color: #15803d; }
+        .sync-panel-state.err { background: #fee2e2; color: #b91c1c; }
+        .sync-panel-body {
+            padding: 10px 16px 13px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .sync-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            padding: 5px 0;
+            font-size: 12.5px;
+            color: #475569;
+            line-height: 1.5;
+        }
+        .sync-step .ico {
+            flex: 0 0 16px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .sync-step .txt { flex: 1; }
+        .sync-step .txt b { color: #0b2b4a; font-weight: 600; }
+        .sync-step .txt small {
+            display: block;
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 1px;
+        }
+        .sync-step.done .txt { color: #334155; }
+        .sync-step.run .txt { color: #1d4ed8; font-weight: 600; }
+        .sync-step.err .txt { color: #b91c1c; }
+        .sync-step.err .txt small { color: #dc2626; }
+        .sync-panel-foot {
+            padding: 8px 16px 11px;
+            border-top: 1px solid #eef2f6;
+            display: none;
+        }
+        .sync-panel-foot.show { display: block; }
+        .sync-panel-foot .sync-close-btn {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            background: #0b6e4f;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .sync-panel-foot .sync-close-btn:hover { background: #095a41; }
+        .sync-panel-foot .sync-close-btn.fail { background: #b91c1c; }
+        .sync-panel-foot .sync-close-btn.fail:hover { background: #991b1b; }
+        .spin { display: inline-block; animation: spin 0.9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* ===== 滚动条 ===== */
         .content::-webkit-scrollbar,
         .sidebar::-webkit-scrollbar {
@@ -830,7 +938,6 @@
                 </div>
                 <span class="sync-badge" id="syncBadge" title="同步状态" style="font-size:12px;color:#64748b;margin:0 4px;white-space:nowrap;">💻 本地</span>
                 <button class="btn btn-xs btn-outline" id="saveLocalBtn" title="保存到本地并同步云端" style="font-size:11px;">💾 保存</button>
-                <button class="btn btn-xs btn-outline" id="tokenBtn" title="云端同步设置" style="font-size:11px;">🔑</button>
                 <div class="user-bar" id="userBar">
                     <!-- 动态渲染 -->
                 </div>
@@ -1212,6 +1319,18 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <!-- 同步进度面板 -->
+    <div class="sync-panel" id="syncPanel">
+        <div class="sync-panel-head">
+            <div class="sync-panel-title"><span id="syncPanelIcon">☁️</span><span id="syncPanelHeading">数据同步</span></div>
+            <span class="sync-panel-state" id="syncPanelState">准备中</span>
+        </div>
+        <div class="sync-panel-body" id="syncPanelBody"></div>
+        <div class="sync-panel-foot" id="syncPanelFoot">
+            <button class="sync-close-btn" id="syncPanelCloseBtn">关闭</button>
+        </div>
+    </div>
+
     <script>
         // ============================================================
         //  配置 & 用户数据
@@ -1458,34 +1577,115 @@
         }
 
         // ---- 推送：合并云端（绝不删除云端他人数据）----
-        async function syncPush(manual) {
+        // syncPush(manual, progress)
+        //   manual: true 表示用户主动点保存（联动进度面板与提示）
+        //   progress: true 表示无论 manual 与否都更新进度面板
+        async function syncPush(manual, progress) {
             const t = ghToken();
-            if (!t) { if (manual) showToast('⚠️ 未配置 API Key，数据仅保存在本地', 'error'); return false; }
-            if (_pushing) { if (manual) showToast('⏳ 正在同步中，请稍候', 'info'); return false; }
+            const show = progress || manual;
+            if (!t) {
+                if (show) {
+                    syncPanelOpen('保存并同步');
+                    syncPanelStep('检查同步凭据', '代码内置 API Key 缺失', 'err');
+                    setSyncPanelState('err', '无法同步');
+                    syncPanelFinish(false, '同步未执行', '请检查网络环境后重试', 0);
+                }
+                return false;
+            }
+            if (_pushing) {
+                if (show) showToast('⏳ 正在同步中，请稍候', 'info');
+                return false;
+            }
             _pushing = true;
             updateSyncBadge('⏳', '同步中…');
+            if (show) syncPanelOpen('保存并同步');
+
+            const t0 = Date.now();
+            let stepRead = null, stepMerge = null, stepWrite = null;
+            let cloudCount = 0, mergedCount = 0, changed = 0;
+
             try {
+                // ---- 步骤 1：本地落盘 ----
+                if (show) {
+                    syncPanelStep('写入本地缓存', '正在保存到浏览器本地存储…', 'run');
+                    await new Promise(r => setTimeout(r, 0));
+                }
+                persistLocal();
+                if (show) {
+                    const body = document.getElementById('syncPanelBody');
+                    const last = body && body.lastElementChild;
+                    syncPanelUpdate(last, '本地缓存已更新', '浏览器本地存储写入成功', 'done');
+                }
+
+                // ---- 步骤 2：读取云端 ----
+                if (show) stepRead = syncPanelStep('读取云端数据', '正在连接 GitHub…', 'run');
                 let cloud = null;
                 try {
                     const r = await fetch(GH_API + '?t=' + Date.now(), { headers: { 'Authorization': 'Bearer ' + t } });
-                    if (r.ok) { const ci = await r.json(); _ghSha = ci.sha; cloud = JSON.parse(_b64d(ci.content)); }
+                    if (r.ok) {
+                        const ci = await r.json();
+                        _ghSha = ci.sha;
+                        cloud = JSON.parse(_b64d(ci.content));
+                    } else if (show && stepRead) {
+                        syncPanelUpdate(stepRead, '读取云端失败 HTTP ' + r.status, '将按本地数据推送', 'err');
+                    }
                 } catch (e) { console.warn('syncPush read:', e); }
-                if (!cloud) cloud = { weeks: {}, users: {}, history: {} };
 
+                if (!cloud) {
+                    cloud = { weeks: {}, users: {}, history: {} };
+                    if (show && stepRead) syncPanelUpdate(stepRead, '云端暂不可读', '按本地数据建立云端副本', 'wait');
+                } else {
+                    for (const wk of Object.keys(cloud.weeks || {})) {
+                        for (const team of Object.keys(cloud.weeks[wk] || {})) {
+                            for (const m of Object.keys(cloud.weeks[wk][team] || {})) cloudCount += (cloud.weeks[wk][team][m] || []).length;
+                        }
+                    }
+                    if (show && stepRead) syncPanelUpdate(stepRead, '云端数据读取成功',
+                        '云端已有 ' + cloudCount + ' 条记录 / ' + Object.keys(cloud.weeks || {}).length + ' 个周次 / ' + Object.keys(cloud.users || {}).length + ' 个账号', 'done');
+                }
+
+                // ---- 步骤 3：合并 ----
+                if (show) stepMerge = syncPanelStep('合并本地与云端', '按归属与时间戳逐条比对…', 'run');
+                const myCount = (function () {
+                    let n = 0;
+                    for (const wk of Object.keys(_memData.weeks || {})) {
+                        for (const team of Object.keys(_memData.weeks[wk] || {})) {
+                            for (const m of Object.keys(_memData.weeks[wk][team] || {})) n += (_memData.weeks[wk][team][m] || []).length;
+                        }
+                    }
+                    return n;
+                })();
                 const merged = {};
                 merged.weeks = mergeWeeks(cloud.weeks || {}, _memData.weeks || {});
                 merged.users = mergeUsers(cloud.users || {}, _memData.users || {});
                 merged.history = mergeHistory(cloud.history || {}, _memData.history || {});
+                for (const wk of Object.keys(merged.weeks || {})) {
+                    for (const team of Object.keys(merged.weeks[wk] || {})) {
+                        for (const m of Object.keys(merged.weeks[wk][team] || {})) mergedCount += (merged.weeks[wk][team][m] || []).length;
+                    }
+                }
+                changed = Math.max(0, mergedCount - cloudCount);
+                if (show && stepMerge) {
+                    syncPanelUpdate(stepMerge, '合并完成',
+                        '本地 ' + myCount + ' 条 + 云端 ' + cloudCount + ' 条 → 合并后 ' + mergedCount + ' 条'
+                        + (changed > 0 ? '（新增 ' + changed + ' 条）' : '（无新增）'), 'done');
+                }
 
+                // ---- 步骤 4：写入云端 ----
+                if (show) stepWrite = syncPanelStep('写入云端', '正在提交到 GitHub 仓库…', 'run');
                 const ok = await putCloud(merged, t);
                 if (!ok) {
+                    if (show && stepWrite) syncPanelUpdate(stepWrite, '写入云端失败', '网络异常或权限不足', 'err');
                     localStorage.setItem('_syncFailed', '1');
                     updateSyncBadge('❌', '未同步');
-                    if (manual) showToast('❌ 同步失败：数据已保存在本地，网络恢复后自动重试', 'error', 4000);
+                    if (show) {
+                        syncPanelFinish(false, '云端同步未完成',
+                            '数据已完整保存在本地，网络恢复后会自动重试（也可再点一次「保存」）', 0);
+                    }
                     return false;
                 }
 
-                // 推送成功后：以合并结果回归本地（本地与云端完全一致）
+                // ---- 步骤 5：回写本地，保证两端一致 ----
                 _memData.weeks = merged.weeks;
                 _memData.users = merged.users;
                 _memData.history = merged.history;
@@ -1497,13 +1697,21 @@
                 for (const u of Object.keys(merged.users)) sessionStorage.removeItem('_pwd_' + u);
                 localStorage.removeItem('_syncFailed');
                 updateSyncBadge('✅', '已同步');
-                if (manual) showToast('✅ 已保存并同步到云端', 'success', 1800);
+
+                if (show && stepWrite) {
+                    syncPanelUpdate(stepWrite, '云端写入成功', '仓库文件已更新并生成新版本', 'done');
+                    const cost = ((Date.now() - t0) / 1000).toFixed(1);
+                    syncPanelFinish(true, '本地与云端已一致',
+                        '共 ' + mergedCount + ' 条记录 · ' + Object.keys(merged.weeks || {}).length + ' 个周次 · 耗时 ' + cost + ' 秒', 3200);
+                }
                 return true;
             } catch (e) {
                 console.error('syncPush:', e);
                 localStorage.setItem('_syncFailed', '1');
                 updateSyncBadge('❌', '未同步');
-                if (manual) showToast('❌ 网络异常：数据已保存在本地', 'error', 4000);
+                if (show) {
+                    syncPanelFinish(false, '同步过程异常', (e && e.message) ? e.message : '未知错误，数据已保存在本地', 0);
+                }
                 return false;
             } finally {
                 _pushing = false;
@@ -1547,12 +1755,83 @@
             if (!ghToken() || !_dirty) return;
             clearTimeout(window._pushTimer);
             // 数据变更后自动同步云端（防抖 1.5 秒，避免频繁请求）
-            window._pushTimer = setTimeout(function () { syncPush(false); }, 1500);
+            window._pushTimer = setTimeout(function () { syncPush(false, false); }, 1500);
         }
 
         function updateSyncBadge(icon, text) {
             const el = document.getElementById('syncBadge');
             if (el) { el.textContent = icon + ' ' + text; }
+        }
+
+        // ============================================================
+        //  同步进度面板：实时显示与云端同步的每一步结果
+        // ============================================================
+        let _syncPanelTimer = null;
+
+        function syncPanelOpen(heading) {
+            const p = document.getElementById('syncPanel');
+            if (!p) return;
+            clearTimeout(_syncPanelTimer);
+            document.getElementById('syncPanelHeading').textContent = heading || '数据同步';
+            document.getElementById('syncPanelIcon').textContent = '☁️';
+            document.getElementById('syncPanelBody').innerHTML = '';
+            document.getElementById('syncPanelFoot').classList.remove('show');
+            setSyncPanelState('run', '同步中');
+            p.classList.add('show');
+        }
+
+        function setSyncPanelState(kind, text) {
+            const el = document.getElementById('syncPanelState');
+            if (!el) return;
+            el.className = 'sync-panel-state ' + (kind || '');
+            el.textContent = text;
+        }
+
+        // 追加一个步骤；kind: run | done | err | wait
+        // 返回该步骤的 DOM 元素，便于后续原地更新
+        function syncPanelStep(text, sub, kind) {
+            const body = document.getElementById('syncPanelBody');
+            if (!body) return null;
+            const div = document.createElement('div');
+            div.className = 'sync-step ' + (kind || 'run');
+            const ico = kind === 'done' ? '✅' : kind === 'err' ? '❌' : kind === 'wait' ? '⏳' : '<span class="spin">🔄</span>';
+            div.innerHTML = '<span class="ico">' + ico + '</span><span class="txt"><b>' + escapeHtml(text || '') + '</b>'
+                          + (sub ? '<small>' + escapeHtml(sub) + '</small>' : '') + '</span>';
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+            return div;
+        }
+
+        function syncPanelUpdate(el, text, sub, kind) {
+            if (!el) return;
+            el.className = 'sync-step ' + (kind || 'done');
+            const ico = kind === 'done' ? '✅' : kind === 'err' ? '❌' : kind === 'wait' ? '⏳' : '<span class="spin">🔄</span>';
+            el.innerHTML = '<span class="ico">' + ico + '</span><span class="txt"><b>' + escapeHtml(text || '') + '</b>'
+                         + (sub ? '<small>' + escapeHtml(sub) + '</small>' : '') + '</span>';
+            const body = document.getElementById('syncPanelBody');
+            if (body) body.scrollTop = body.scrollHeight;
+        }
+
+        // 收尾：ok=true 成功；ok=false 失败。autoHideMs 为 0 表示保持打开等用户点关闭
+        function syncPanelFinish(ok, summary, detail, autoHideMs) {
+            setSyncPanelState(ok ? 'ok' : 'err', ok ? '已完成' : '未完成');
+            document.getElementById('syncPanelIcon').textContent = ok ? '✅' : '⚠️';
+            syncPanelStep(summary, detail, ok ? 'done' : 'err');
+            const btn = document.getElementById('syncPanelCloseBtn');
+            const foot = document.getElementById('syncPanelFoot');
+            btn.textContent = ok ? '关闭' : '关闭（数据已存本地）';
+            btn.className = 'sync-close-btn' + (ok ? '' : ' fail');
+            foot.classList.add('show');
+            clearTimeout(_syncPanelTimer);
+            if (ok && autoHideMs !== 0) {
+                _syncPanelTimer = setTimeout(closeSyncPanel, autoHideMs || 2600);
+            }
+        }
+
+        function closeSyncPanel() {
+            clearTimeout(_syncPanelTimer);
+            const p = document.getElementById('syncPanel');
+            if (p) p.classList.remove('show');
         }
 
         const DIMENSION_TYPES = ['核心指标', '重点工作', '重大批量质量问题改进'];
@@ -3019,8 +3298,6 @@
             const canManageHistory = currentUser && (currentUser.role === 'admin' || currentUser.role === 'sub-admin');
             document.getElementById('restoreHistoryBtn').style.display = canManageHistory ? 'inline-flex' : 'none';
             document.getElementById('clearHistoryBtn').style.display = isAdmin ? 'inline-flex' : 'none';
-            // 只有管理员可配置 Token
-            document.getElementById('tokenBtn').style.display = 'inline-flex';
         }
 
         // ============================================================
@@ -4005,26 +4282,25 @@
         });
 
         // ============================================================
-        //  保存（本地 + 云端 双写）
+        //  保存（本地 + 云端 双写，实时显示同步结果）
         // ============================================================
         document.getElementById('saveLocalBtn').addEventListener('click', async function() {
             const btn = this;
-            const old = btn.textContent;
+            if (btn.disabled) return;
             btn.disabled = true;
+            const old = btn.textContent;
+            btn.textContent = '⏳ 同步中';
+
+            // 立即打开进度面板，让用户看到实时过程
+            syncPanelOpen('保存并同步');
+            setSyncPanelState('run', '已启动');
+
             try {
-                // 1) 先落本地，确保任何情况下数据不丢
-                persistLocal();
-                updateSyncBadge('⏳', '同步中…');
-
-                // 2) 立即推送云端（同步等待完成）
-                _dirty = true;
-                const ok = await syncPush(true);
-
+                const ok = await syncPush(true, true);
                 if (ok) {
-                    showToast('✅ 已保存：本地与云端均为最新版本', 'success', 2000);
+                    showToast('✅ 保存成功：本地与云端数据已一致', 'success', 2000);
                 } else {
-                    showToast('⚠️ 已保存到本地；云端同步失败，系统将自动重试', 'error', 4000);
-                    schedulePush();
+                    showToast('⚠️ 已保存到本地；云端同步未完成，可再点一次保存', 'error', 3600);
                 }
             } finally {
                 btn.disabled = false;
@@ -4032,46 +4308,8 @@
             }
         });
 
-        document.getElementById('tokenBtn').addEventListener('click', function() {
-            const usingDefault = isDefaultKey();
-            const cur = usingDefault ? DEFAULT_GH_KEY : localStorage.getItem('gh_token');
-            const mask = cur ? (cur.slice(0, 8) + '••••••' + cur.slice(-4)) : '（未配置）';
-            const msg = `云端同步设置\n\n当前 API Key：${mask}\n来源：${usingDefault ? '代码内置（默认）' : '浏览器本地覆盖'}\n\n• 点「确定」输入新的 API Key\n• 点「取消」恢复使用代码内置的默认 Key`;
-            const action = prompt(msg, '');
-            if (action === null) {
-                if (!usingDefault) {
-                    ghSetToken('');
-                    _ghSha = null;
-                    showToast('🔁 已恢复使用代码内置的默认 API Key', 'info');
-                }
-                return;
-            }
-            const v = action.trim();
-            if (!v) return;
-            ghSetToken(v);
-            _ghSha = null;
-            updateSyncBadge('⏳', '验证中…');
-            fetch(GH_API + '?t=' + Date.now(), { headers: { 'Authorization': 'Bearer ' + ghToken() } })
-                .then(async r => {
-                    if (r.ok) {
-                        updateSyncBadge('✅', '已连接');
-                        showToast('✅ API Key 有效，正在同步…', 'success');
-                        await syncPull(false);
-                        autoCarryOver(currentWeekKey);
-                        renderAll();
-                    } else {
-                        ghSetToken('');
-                        _ghSha = null;
-                        updateSyncBadge('❌', '无效');
-                        showToast('❌ API Key 无效，已回退到内置默认 Key', 'error');
-                    }
-                })
-                .catch(() => {
-                    ghSetToken('');
-                    updateSyncBadge('⚠️', '网络错误');
-                    showToast('⚠️ 网络不通，已回退到内置默认 Key', 'error');
-                });
-        });
+        const _closeBtn = document.getElementById('syncPanelCloseBtn');
+        if (_closeBtn) _closeBtn.addEventListener('click', closeSyncPanel);
 
 
         // ============================================================
@@ -4242,16 +4480,18 @@
                 const saved = JSON.parse(sessionStorage.getItem('quality_user') || '{}');
                 saved.password = newPwd;
                 sessionStorage.setItem('quality_user', JSON.stringify(saved));
-                // 自动同步云端（密码修改后本地 + 云端同时生效）
+                // 自动同步云端（密码修改后本地 + 云端同时生效），并显示同步结果
                 _dirty = true;
                 persistLocal();
                 updateSyncBadge('⏳', '同步中…');
-                syncPush(true).then(ok => {
+                syncPanelOpen('修改密码并同步');
+                setSyncPanelState('run', '已启动');
+                syncPanelStep('密码已更新', '本地密码已修改，正在同步云端', 'done');
+                syncPush(true, true).then(ok => {
                     if (ok) {
                         showToast('✅ 密码已修改并同步到云端', 'success', 2600);
                     } else {
-                        showToast('⚠️ 密码已在本地生效；云端同步失败，稍后自动重试', 'error', 4000);
-                        schedulePush();
+                        showToast('⚠️ 密码已在本地生效；云端同步未完成，可点「保存」重试', 'error', 4000);
                     }
                 });
             } else {
