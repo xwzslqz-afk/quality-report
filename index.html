@@ -1416,13 +1416,36 @@
         let _newIds = [];
         let _delIds = [];
 
-        // 内置 Key 优先，若用户在浏览器手动覆盖过则用覆盖值
-        function ghToken() { return localStorage.getItem('gh_token') || DEFAULT_GH_KEY; }
-        function ghSetToken(t) {
-            if (!t || t === DEFAULT_GH_KEY) localStorage.removeItem('gh_token');
-            else localStorage.setItem('gh_token', t);
+        // 内置 Key 优先（避免浏览器残留的失效旧值把同步拖垮）
+        // 历史版本曾把用户手填的 Key 写入 localStorage，若该 Key 已失效会导致永久 401
+        function ghToken() { return DEFAULT_GH_KEY || localStorage.getItem('gh_token') || ''; }
+        // 仅在内置 Key 不可用时才回退到本地覆盖值
+        function ghTokenOverride() { return localStorage.getItem('gh_token') || ''; }
+        function ghClearOverride() { localStorage.removeItem('gh_token'); }
+
+        // 启动自检：浏览器里若残留失效的覆盖 Key，会拖垮所有同步请求
+        // 这里主动验证一次，无效立即清除，避免用户陷入永久 401
+        async function healStaleKey() {
+            const stale = ghTokenOverride();
+            if (!stale) return false;
+            if (stale === DEFAULT_GH_KEY) { ghClearOverride(); return false; }
+            const ok = await verifyToken(stale);
+            if (!ok) {
+                ghClearOverride();
+                console.info('[同步] 已清除浏览器中失效的旧密钥');
+                return true;
+            }
+            return false;
         }
-        function isDefaultKey() { return !localStorage.getItem('gh_token'); }
+
+        // 校验给定 Key 是否可读写仓库（HEAD 读取 contents）
+        async function verifyToken(t) {
+            if (!t) return false;
+            try {
+                const r = await fetchTimeout(GH_API + '?t=' + Date.now(), { headers: ghHeaders(t) }, 15000);
+                return !!r && r.ok;
+            } catch (e) { return false; }
+        }
 
         function _b64e(s) { const b=new TextEncoder().encode(s); let r=''; for(let i=0;i<b.length;i++)r+=String.fromCharCode(b[i]); return btoa(r); }
         function _b64d(s) { const b=atob(String(s).replace(/\s/g,'')); const u=new Uint8Array(b.length); for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i); return new TextDecoder().decode(u); }
@@ -1589,12 +1612,26 @@
         // ---- 拉取：云端为权威源，强制刷新本地（修复「无法同步最新状态」）----
         // 最近一次拉取/推送的失败原因（用于面板诊断）
         let _lastPullErr = '';
+        // 自愈提示（401 时自动清除失效旧密钥）
+        let _selfHealNote = '';
 
         async function syncPull(silent) {
-            const t = ghToken();
+            let t = ghToken();
             if (!t) { updateSyncBadge('💻', '本地'); _lastPullErr = '未配置同步凭据'; return null; }
             try {
-                const r = await ghFetch(GH_API + '?t=' + Date.now(), { headers: ghHeaders(t) });
+                let r = await ghFetch(GH_API + '?t=' + Date.now(), { headers: ghHeaders(t) });
+                // 401 自愈：清除浏览器残留的失效覆盖 Key，回退内置 Key 重试
+                if (r.status === 401) {
+                    const stale = ghTokenOverride();
+                    if (stale) {
+                        ghClearOverride();
+                        t = ghToken();
+                        if (t && t !== stale) {
+                            _selfHealNote = '已自动清除浏览器中失效的旧密钥，改用内置密钥';
+                            r = await ghFetch(GH_API + '?t=' + Date.now(), { headers: ghHeaders(t) });
+                        }
+                    }
+                }
                 if (r.ok) {
                     const ci = await r.json();
                     _ghSha = ci.sha;
@@ -1663,6 +1700,7 @@
             _pushing = true;
             updateSyncBadge('⏳', '同步中…');
             if (show) syncPanelOpen('保存并同步');
+            _selfHealNote = '';
 
             const t0 = Date.now();
             let stepRead = null, stepMerge = null, stepWrite = null;
@@ -1706,7 +1744,8 @@
                         }
                     }
                     if (show && stepRead) syncPanelUpdate(stepRead, '云端数据读取成功',
-                        '云端已有 ' + cloudCount + ' 条记录 / ' + Object.keys(cloud.weeks || {}).length + ' 个周次 / ' + Object.keys(cloud.users || {}).length + ' 个账号', 'done');
+                        '云端已有 ' + cloudCount + ' 条记录 / ' + Object.keys(cloud.weeks || {}).length + ' 个周次 / ' + Object.keys(cloud.users || {}).length + ' 个账号'
+                        + (_selfHealNote ? '　·　' + _selfHealNote : ''), 'done');
                 }
 
                 // ---- 步骤 3：合并 ----
@@ -1815,6 +1854,21 @@
             // 读响应体拿具体错误信息
             let detail = '';
             try { detail = (await r.text()).slice(0, 300); } catch (e) {}
+
+            // 401：可能是浏览器残留的失效覆盖 Key → 清除后回退内置 Key 重试一次
+            if (r.status === 401 && retry === 0) {
+                const stale = ghTokenOverride();
+                if (stale) {
+                    ghClearOverride();
+                    const retryTok = ghToken();
+                    if (retryTok && retryTok !== stale) {
+                        const again = await putCloud(data, retryTok, 1);
+                        if (again.ok) again.selfHealed = '已自动清除浏览器中失效的旧密钥';
+                        else again.msg = (again.msg || '') + '（已尝试清除本地旧密钥）';
+                        return again;
+                    }
+                }
+            }
 
             // sha 过期或冲突 → 重读云端，二次合并后重试
             if ((r.status === 409 || r.status === 422 || r.status === 404) && retry < 2) {
@@ -4668,6 +4722,10 @@
         async function init() {
             // 载入本地墓碑（删除记录）
             try { _tombstones = JSON.parse(localStorage.getItem('quality_tombstones') || '[]'); } catch (e) { _tombstones = []; }
+
+            // 启动自检：清除浏览器中残留的失效旧密钥（修复永久 401）
+            const healed = await healStaleKey();
+            if (healed) _selfHealNote = '已自动清除浏览器中失效的旧密钥';
 
             // 先载入本地缓存作为容错底稿
             const lw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
