@@ -937,6 +937,7 @@
                     <input type="file" id="fileInput" class="file-input-hidden" accept=".xlsx,.xls" />
                 </div>
                 <span class="sync-badge" id="syncBadge" title="同步状态" style="font-size:12px;color:#64748b;margin:0 4px;white-space:nowrap;">💻 本地</span>
+                <button class="btn btn-xs btn-outline" id="tokenBtn" title="设置 GitHub API Key（用于云端同步）" style="font-size:11px;">🔑 API Key</button>
                 <button class="btn btn-xs btn-outline" id="saveLocalBtn" title="保存到本地并同步云端" style="font-size:11px;">💾 保存</button>
                 <div class="user-bar" id="userBar">
                     <!-- 动态渲染 -->
@@ -1331,6 +1332,37 @@
         </div>
     </div>
 
+    <!-- API Key 设置弹窗 -->
+    <div class="modal-overlay" id="tokenModal">
+        <div class="modal-box" style="max-width:520px;">
+            <h3>🔑 GitHub API Key 设置</h3>
+            <p style="margin:0 0 10px;font-size:13px;color:#475569;line-height:1.7;">
+                用于把数据同步到 GitHub 仓库。Key 只保存在<b>本机浏览器</b>，不会上传到其它地方。<br>
+                填写一次即可长期使用，换浏览器或清缓存后需重新填写。
+            </p>
+            <div style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.8;">
+                <b style="color:#334155;">获取方式</b><br>
+                1. 打开 GitHub → Settings → Developer settings → Personal access tokens (classic)<br>
+                2. Generate new token，勾选 <code style="background:#eef2f7;padding:1px 5px;border-radius:4px;">repo</code> 权限<br>
+                3. 复制形如 <code style="background:#eef2f7;padding:1px 5px;border-radius:4px;">ghp_xxxxxxxx</code> 的字符串，粘贴到下方
+            </div>
+            <div class="form-group">
+                <label>API Key</label>
+                <input type="password" id="tokenInput" placeholder="ghp_..." autocomplete="off" spellcheck="false">
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:#475569;cursor:pointer;">
+                <input type="checkbox" id="tokenShow" style="cursor:pointer;"> 显示明文
+            </label>
+            <div id="tokenMsg" style="margin-top:12px;font-size:12.5px;line-height:1.6;min-height:18px;"></div>
+            <div class="form-actions" style="display:flex;gap:10px;margin-top:18px;align-items:center;">
+                <button class="btn btn-outline btn-sm" id="tokenClearBtn">清除 Key</button>
+                <div style="flex:1"></div>
+                <button class="btn btn-outline btn-sm" id="tokenCancelBtn">取消</button>
+                <button class="btn btn-primary btn-sm" id="tokenSaveBtn">保存并校验</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
         //  配置 & 用户数据
@@ -1405,40 +1437,22 @@
         const RAW_DATA = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json';
         const PAGES_DATA = 'data.json';
 
-        // 内置 API Key（默认已配置，无需用户手动设置）
-        // 分段拼接：避免明文常量被仓库 secret scanning 拦截，运行时还原为完整 Key
-        const _KA = 'ghp_9xHP4vEqyArjanGy';
-        const _KB = 'sJsG';
-        const DEFAULT_GH_KEY = _KA + _KB;
+        // 手动录入 API Key（不再内置，用户首次使用需自行填写一次，浏览器会记住）
         let _ghSha = null;
         let _pushing = false; let _autoPushTimer = null; let _justPushed = 0;
         let _dirty = false;
         let _newIds = [];
         let _delIds = [];
 
-        // 内置 Key 优先（避免浏览器残留的失效旧值把同步拖垮）
-        // 历史版本曾把用户手填的 Key 写入 localStorage，若该 Key 已失效会导致永久 401
-        function ghToken() { return DEFAULT_GH_KEY || localStorage.getItem('gh_token') || ''; }
-        // 仅在内置 Key 不可用时才回退到本地覆盖值
-        function ghTokenOverride() { return localStorage.getItem('gh_token') || ''; }
-        function ghClearOverride() { localStorage.removeItem('gh_token'); }
+        // 仅使用用户手动录入并保存在本地的 Key
+        function ghToken() { return localStorage.getItem('gh_token') || ''; }
+        function setGhToken(t) { try { localStorage.setItem('gh_token', String(t || '').trim()); } catch (e) {} }
+        function clearGhToken() { try { localStorage.removeItem('gh_token'); } catch (e) {} }
+        // 兼容旧调用点：现在没有「覆盖值」概念，本地保存的就是唯一 Key
+        function ghTokenOverride() { return ghToken(); }
+        function ghClearOverride() { clearGhToken(); }
 
-        // 启动自检：浏览器里若残留失效的覆盖 Key，会拖垮所有同步请求
-        // 这里主动验证一次，无效立即清除，避免用户陷入永久 401
-        async function healStaleKey() {
-            const stale = ghTokenOverride();
-            if (!stale) return false;
-            if (stale === DEFAULT_GH_KEY) { ghClearOverride(); return false; }
-            const ok = await verifyToken(stale);
-            if (!ok) {
-                ghClearOverride();
-                console.info('[同步] 已清除浏览器中失效的旧密钥');
-                return true;
-            }
-            return false;
-        }
-
-        // 校验给定 Key 是否可读写仓库（HEAD 读取 contents）
+        // 校验给定 Key 是否可读写仓库
         async function verifyToken(t) {
             if (!t) return false;
             try {
@@ -1612,26 +1626,14 @@
         // ---- 拉取：云端为权威源，强制刷新本地（修复「无法同步最新状态」）----
         // 最近一次拉取/推送的失败原因（用于面板诊断）
         let _lastPullErr = '';
-        // 自愈提示（401 时自动清除失效旧密钥）
+        // 同步提示（如未配置 Key）
         let _selfHealNote = '';
 
         async function syncPull(silent) {
-            let t = ghToken();
-            if (!t) { updateSyncBadge('💻', '本地'); _lastPullErr = '未配置同步凭据'; return null; }
+            const t = ghToken();
+            if (!t) { updateSyncBadge('🔑', '未配置'); _lastPullErr = '未配置同步凭据，请点右上角 🔑 填写 API Key'; return null; }
             try {
-                let r = await ghFetch(GH_API + '?t=' + Date.now(), { headers: ghHeaders(t) });
-                // 401 自愈：清除浏览器残留的失效覆盖 Key，回退内置 Key 重试
-                if (r.status === 401) {
-                    const stale = ghTokenOverride();
-                    if (stale) {
-                        ghClearOverride();
-                        t = ghToken();
-                        if (t && t !== stale) {
-                            _selfHealNote = '已自动清除浏览器中失效的旧密钥，改用内置密钥';
-                            r = await ghFetch(GH_API + '?t=' + Date.now(), { headers: ghHeaders(t) });
-                        }
-                    }
-                }
+                const r = await ghFetch(GH_API + '?t=' + Date.now(), { headers: ghHeaders(t) });
                 if (r.ok) {
                     const ci = await r.json();
                     _ghSha = ci.sha;
@@ -1655,7 +1657,7 @@
                     updateSyncBadge('✅', '已同步');
                     return _memData;
                 }
-                if (r.status === 401) _lastPullErr = 'API Key 无效或已过期（HTTP 401）';
+                if (r.status === 401) _lastPullErr = 'API Key 无效或已过期（HTTP 401），请点右上角 🔑 重新填写';
                 else if (r.status === 403) _lastPullErr = '权限不足或触发频率限制（HTTP 403）';
                 else if (r.status === 404) _lastPullErr = '仓库或 data.json 不存在（HTTP 404）';
                 else _lastPullErr = '读取云端失败（HTTP ' + r.status + '）';
@@ -1687,9 +1689,9 @@
             if (!t) {
                 if (show) {
                     syncPanelOpen('保存并同步');
-                    syncPanelStep('检查同步凭据', '代码内置 API Key 缺失', 'err');
-                    setSyncPanelState('err', '无法同步');
-                    syncPanelFinish(false, '同步未执行', '请检查网络环境后重试', 0);
+                    syncPanelStep('检查同步凭据', '尚未配置 API Key', 'err');
+                    setSyncPanelState('err', '未配置 Key');
+                    syncPanelFinish(false, '同步未执行', '请点右上角 🔑 填写 GitHub API Key 后重试', 0);
                 }
                 return false;
             }
@@ -1855,21 +1857,6 @@
             let detail = '';
             try { detail = (await r.text()).slice(0, 300); } catch (e) {}
 
-            // 401：可能是浏览器残留的失效覆盖 Key → 清除后回退内置 Key 重试一次
-            if (r.status === 401 && retry === 0) {
-                const stale = ghTokenOverride();
-                if (stale) {
-                    ghClearOverride();
-                    const retryTok = ghToken();
-                    if (retryTok && retryTok !== stale) {
-                        const again = await putCloud(data, retryTok, 1);
-                        if (again.ok) again.selfHealed = '已自动清除浏览器中失效的旧密钥';
-                        else again.msg = (again.msg || '') + '（已尝试清除本地旧密钥）';
-                        return again;
-                    }
-                }
-            }
-
             // sha 过期或冲突 → 重读云端，二次合并后重试
             if ((r.status === 409 || r.status === 422 || r.status === 404) && retry < 2) {
                 try {
@@ -1891,7 +1878,7 @@
             }
 
             let msg = 'HTTP ' + r.status;
-            if (r.status === 401) msg = 'API Key 无效或已过期';
+            if (r.status === 401) msg = 'API Key 无效或已过期，请点右上角 🔑 重新填写';
             else if (r.status === 403) msg = '权限不足或触发频率限制';
             else if (r.status === 404) msg = '仓库或分支不存在';
             else if (r.status === 409 || r.status === 422) msg = '版本冲突，重试后仍未成功';
@@ -4511,6 +4498,80 @@
 
 
         // ============================================================
+        //  🔑 API Key 设置（手动录入，保存在本机浏览器）
+        // ============================================================
+        const tokenModal = document.getElementById('tokenModal');
+        const tokenInput = document.getElementById('tokenInput');
+        const tokenMsg = document.getElementById('tokenMsg');
+
+        function tokenMsgSet(text, kind) {
+            const color = kind === 'ok' ? '#15803d' : kind === 'err' ? '#dc2626' : kind === 'run' ? '#0369a1' : '#64748b';
+            tokenMsg.style.color = color;
+            tokenMsg.textContent = text || '';
+        }
+        function openTokenModal() {
+            const cur = ghToken();
+            tokenInput.value = cur || '';
+            tokenInput.type = document.getElementById('tokenShow').checked ? 'text' : 'password';
+            if (cur) {
+                tokenMsgSet('已配置 Key（' + cur.slice(0, 8) + '…' + cur.slice(-4) + '，' + cur.length + ' 位）。可直接修改后保存。', 'ok');
+            } else {
+                tokenMsgSet('尚未配置 Key，同步功能不可用。请粘贴 Key 后点「保存并校验」。', 'err');
+            }
+            tokenModal.classList.add('active');
+            setTimeout(() => { try { tokenInput.focus(); } catch (e) {} }, 60);
+        }
+        function closeTokenModal() { tokenModal.classList.remove('active'); }
+
+        document.getElementById('tokenBtn').addEventListener('click', openTokenModal);
+        document.getElementById('tokenCancelBtn').addEventListener('click', closeTokenModal);
+        tokenModal.addEventListener('click', function (e) { if (e.target === this) closeTokenModal(); });
+        document.getElementById('tokenShow').addEventListener('change', function () {
+            tokenInput.type = this.checked ? 'text' : 'password';
+        });
+
+        document.getElementById('tokenClearBtn').addEventListener('click', function () {
+            clearGhToken();
+            tokenInput.value = '';
+            tokenMsgSet('已清除本机保存的 Key。同步功能将不可用。', 'err');
+            updateSyncBadge('🔑', '未配置');
+            _selfHealNote = '尚未配置 API Key，请点右上角 🔑 填写';
+            showToast('已清除 API Key', 'info');
+        });
+
+        document.getElementById('tokenSaveBtn').addEventListener('click', async function () {
+            const btn = this;
+            const val = String(tokenInput.value || '').trim();
+            if (!val) { tokenMsgSet('请输入 API Key', 'err'); return; }
+            if (val.length < 20) { tokenMsgSet('Key 长度异常（' + val.length + ' 位），请确认粘贴完整', 'err'); return; }
+
+            btn.disabled = true;
+            tokenMsgSet('正在校验…', 'run');
+            const ok = await verifyToken(val);
+            btn.disabled = false;
+
+            if (!ok) {
+                tokenMsgSet('❌ 校验失败：Key 无效、已过期，或无该仓库读写权限。请确认勾选了 repo 权限。', 'err');
+                return;
+            }
+            setGhToken(val);
+            _selfHealNote = '';
+            tokenMsgSet('✅ 校验通过，Key 已保存到本机浏览器。正在同步数据…', 'ok');
+            showToast('✅ API Key 已保存', 'success');
+
+            // 保存后立即拉取一次云端数据
+            const d = await syncPull(true);
+            if (d) {
+                syncPanelOpen('API Key 已保存');
+                syncPanelStep('校验 Key', 'Key 有效，已保存到本机浏览器', 'done');
+                syncPanelStep('拉取云端数据', '已同步最新数据', 'done');
+                syncPanelFinish(true, '配置完成', '数据已与云端同步', 2600);
+            }
+            setTimeout(closeTokenModal, 900);
+        });
+
+
+        // ============================================================
         //  评论 / 备注 / 确认
         // ============================================================
         // 查看评论/备注（所有登录用户可查看管理员添加的内容）
@@ -4723,9 +4784,8 @@
             // 载入本地墓碑（删除记录）
             try { _tombstones = JSON.parse(localStorage.getItem('quality_tombstones') || '[]'); } catch (e) { _tombstones = []; }
 
-            // 启动自检：清除浏览器中残留的失效旧密钥（修复永久 401）
-            const healed = await healStaleKey();
-            if (healed) _selfHealNote = '已自动清除浏览器中失效的旧密钥';
+            // 未配置 Key 时提示用户手动录入
+            if (!ghToken()) _selfHealNote = '尚未配置 API Key，请点右上角 🔑 填写';
 
             // 先载入本地缓存作为容错底稿
             const lw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
