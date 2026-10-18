@@ -511,6 +511,9 @@
             border-bottom: 1px solid #eef2f6;
             vertical-align: middle;
             word-break: break-word;
+            /* 保留填写时输入的换行与空格（与弹窗内回车换行一致） */
+            white-space: pre-wrap;
+            line-height: 1.7;
         }
         tr.pending { background: #fef3c7 !important; }
         table tbody tr:hover {
@@ -679,6 +682,33 @@
         .modal-box .form-group textarea {
             resize: vertical;
             min-height: 60px;
+        }
+        /* 单行内容也用可自增高的多行框：回车即换行，不再触发保存 */
+        .modal-box .form-group textarea.autogrow {
+            min-height: 42px;
+            resize: none;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+        /* 回车/Ctrl+Enter 操作提示 */
+        .enter-hint {
+            margin-right: auto;
+            align-self: center;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.5;
+            user-select: none;
+        }
+        .enter-hint kbd {
+            display: inline-block;
+            padding: 0 5px;
+            border: 1px solid #d1d9e6;
+            border-bottom-width: 2px;
+            border-radius: 4px;
+            background: #f8fafc;
+            font-family: inherit;
+            font-size: 11px;
+            color: #475569;
         }
         .modal-actions {
             display: flex;
@@ -1333,6 +1363,7 @@
                 <input type="hidden" id="editDimension" />
                 <div id="modalFields"></div>
                 <div class="modal-actions">
+                    <span class="enter-hint">↵ <kbd>Enter</kbd> 换行 · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 保存</span>
                     <button type="button" class="btn btn-outline" id="modalCancelBtn">取消</button>
                     <button type="submit" class="btn btn-primary">💾 保存</button>
                 </div>
@@ -4459,19 +4490,19 @@
                 html = `${wcSel}
                     <div class="form-group">
                         <label for="f_category">指标分类 *</label>
-                        <input type="text" id="f_category" value="${escapeHtml(data.category || '')}" placeholder="如：质量、效率" required />
+                        <textarea id="f_category" class="autogrow" rows="1" placeholder="如：质量、效率" required>${escapeHtml(data.category || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_name">指标名称 *</label>
-                        <input type="text" id="f_name" value="${escapeHtml(data.name || '')}" placeholder="如：一次通过率" required />
+                        <textarea id="f_name" class="autogrow" rows="1" placeholder="如：一次通过率" required>${escapeHtml(data.name || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_target">目标值</label>
-                        <input type="text" id="f_target" value="${escapeHtml(data.target || '')}" placeholder="如：98%" />
+                        <textarea id="f_target" class="autogrow" rows="1" placeholder="如：98%">${escapeHtml(data.target || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_actual">达成值</label>
-                        <input type="text" id="f_actual" value="${escapeHtml(data.actual || '')}" placeholder="如：96.5%" />
+                        <textarea id="f_actual" class="autogrow" rows="1" placeholder="如：96.5%">${escapeHtml(data.actual || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_achieveStatus">达成状态 *</label>
@@ -4482,7 +4513,7 @@
                     </div>
                     <div class="form-group">
                         <label for="f_responsible">责任人</label>
-                        <input type="text" id="f_responsible" value="${escapeHtml(data.responsible || '')}" placeholder="姓名" />
+                        <textarea id="f_responsible" class="autogrow" rows="1" placeholder="姓名">${escapeHtml(data.responsible || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_deviation">偏差分析</label>
@@ -4497,7 +4528,7 @@
                 html = `${wcSel}
                     <div class="form-group">
                         <label for="f_workType">维度（自定义） *</label>
-                        <input type="text" id="f_workType" value="${escapeHtml(data.workType || '')}" placeholder="如：研发、生产" required />
+                        <textarea id="f_workType" class="autogrow" rows="1" placeholder="如：研发、生产" required>${escapeHtml(data.workType || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_description">目标 / 任务描述 *</label>
@@ -4505,7 +4536,7 @@
                     </div>
                     <div class="form-group">
                         <label for="f_responsible">责任人</label>
-                        <input type="text" id="f_responsible" value="${escapeHtml(data.responsible || '')}" placeholder="姓名" />
+                        <textarea id="f_responsible" class="autogrow" rows="1" placeholder="姓名">${escapeHtml(data.responsible || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_deadline">完成时间</label>
@@ -4546,7 +4577,7 @@
                     </div>
                     <div class="form-group">
                         <label for="f_responsible">责任人</label>
-                        <input type="text" id="f_responsible" value="${escapeHtml(data.responsible || '')}" placeholder="姓名" />
+                        <textarea id="f_responsible" class="autogrow" rows="1" placeholder="姓名">${escapeHtml(data.responsible || '')}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="f_deadline">完成时间</label>
@@ -4624,7 +4655,70 @@
             }
 
             modalOverlay.classList.add('active');
+            // 必须先显示弹窗再自动增高（display:none 时 scrollHeight 为 0）
+            initAutoGrow();
         }
+
+        // ============================================================
+        //  输入框内「回车 = 换行」策略
+        //   1) 所有文本字段均为多行框（自动增高），回车只换行，绝不提交
+        //   2) 单行控件（日期等）按回车也不会提交，避免误保存
+        //   3) Ctrl/⌘ + Enter = 保存，保留快捷确认
+        //   4) 中文输入法组词状态下的回车不拦截（否则无法上屏）
+        // ============================================================
+        function isModalTextArea(el) {
+            return !!el && el.tagName === 'TEXTAREA';
+        }
+
+        // 自动增高：按内容撑开高度，隐藏滚动条
+        function autoGrow(el) {
+            if (!el || !isModalTextArea(el)) return;
+            el.style.height = 'auto';
+            const h = Math.max(el.scrollHeight, 42);
+            el.style.height = h + 'px';
+        }
+
+        function initAutoGrow() {
+            const areas = modalFields.querySelectorAll('textarea.autogrow');
+            for (const el of areas) {
+                autoGrow(el);
+                el.addEventListener('input', function () { autoGrow(this); });
+            }
+        }
+
+        // 提交表单（兼容不支持 requestSubmit 的环境）
+        function submitModalForm() {
+            if (typeof modalForm.requestSubmit === 'function') {
+                modalForm.requestSubmit();
+            } else {
+                modalForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+        }
+
+        modalForm.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter') return;
+            // 输入法组词中：交给输入法处理
+            if (e.isComposing || e.keyCode === 229) return;
+
+            const t = e.target;
+            const tag = (t && t.tagName) || '';
+
+            // Ctrl / ⌘ + Enter → 保存
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                submitModalForm();
+                return;
+            }
+
+            // 多行框：浏览器原生换行
+            if (tag === 'TEXTAREA') return;
+
+            // 焦点在按钮上：回车等同点击（保存/取消）
+            if (tag === 'BUTTON') return;
+
+            // 其余单行控件（日期、下拉等）：回车不再提交
+            e.preventDefault();
+        });
 
         function closeModal() {
             modalOverlay.classList.remove('active');
@@ -4948,7 +5042,7 @@
                     <div style="padding:6px 0;border-bottom:1px dashed #eef2f6;">
                         <b>${escapeHtml(c.author || '')}</b>
                         <span style="color:#94a3b8;font-size:12px;margin-left:8px;">${fmtTime(c.time)}</span>
-                        <div>${escapeHtml(c.text || '')}</div>
+                        <div style="white-space:pre-wrap;">${escapeHtml(c.text || '')}</div>
                     </div>`).join('');
             }
             html += `<div style="margin:14px 0 6px;font-weight:700;color:#0b2b4a;">📝 备注（${(item.notes || []).length} 条）</div>`;
@@ -4959,7 +5053,7 @@
                     <div style="padding:6px 0;border-bottom:1px dashed #eef2f6;">
                         <b>${escapeHtml(n.author || '')}</b>
                         <span style="color:#94a3b8;font-size:12px;margin-left:8px;">${fmtTime(n.time)}</span>
-                        <div>${escapeHtml(n.text || '')}</div>
+                        <div style="white-space:pre-wrap;">${escapeHtml(n.text || '')}</div>
                     </div>`).join('');
             }
             box.innerHTML = html;
