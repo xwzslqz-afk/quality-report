@@ -576,6 +576,29 @@
             background: #f1f5f9;
             color: #475569;
         }
+        /* 补充任务标记 */
+        .assign-tag {
+            display: inline-block;
+            margin-left: 4px;
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+            white-space: nowrap;
+        }
+        .assign-hint {
+            font-size: 12px;
+            color: #b45309;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
         .empty-row td {
             text-align: center;
             color: #94a3b8;
@@ -1510,50 +1533,125 @@
         }
 
         // ============================================================
-        //  云端同步核心（归属化合并 + 服务端权威 + 删除墓碑）
+        //  云端同步核心 v2（时间戳 LWW + 三类删除墓碑）
         //  原则：
-        //   1) 每条数据带 _owner（最后编辑者账号），只有本人可覆盖本人数据
-        //   2) 合并按 id 取 _ts 较新者胜，旧数据永不回退覆盖新数据
-        //   3) 删除用 _deleted 墓碑标记，不再整块 delete 云端成员（修复「云端被无故覆盖」）
-        //   4) 拉取时以此为基础，本地缺失的云端数据一律保留
+        //   1) 每条数据带 _ts（毫秒时间戳），合并严格「新者胜」，旧数据绝不覆盖新数据
+        //   2) 每次修改都用 nextTs() 让 _ts 严格递增（同毫秒连续改也不丢）
+        //   3) 缺失 _ts 的历史数据一律视为 0，绝不用「当前时间」补
+        //      ——旧版此处的 Date.now() 补戳，正是「历史数据覆盖最新修改」的根因
+        //   4) 删除用墓碑（条目 / 成员 / 账号）并上传云端，多设备一致，旧副本无法复活
+        //   5) 并集语义：一方缺失的数据一律保留
         // ============================================================
         const TOMBSTONE_KEEP_MS = 1000 * 60 * 60 * 24 * 60; // 墓碑保留 60 天
+        const CLOCK_SKEW_MS = 1000 * 60 * 60 * 24;          // 本机时钟超前容差 1 天
+        const SEP = '\u0001';
 
-        // 记录已删除条目：week/team/member/id/ts/by
+        // 条目删除墓碑：{ id, week, team, member, ts, by }
         let _tombstones = [];
+        // 成员删除墓碑：{ team, member, ts, by }
+        let _memberTombs = [];
+        // 账号删除墓碑：{ name, ts, by }
+        let _userTombs = [];
+
+        // 统一时间戳读取：缺失=0；时钟超前按当前时间截断
+        function tsOf(rec) {
+            let t = Number((rec && rec._ts) || 0);
+            if (!isFinite(t) || t < 0) t = 0;
+            const now = Date.now();
+            if (t > now + CLOCK_SKEW_MS) t = now;
+            return t;
+        }
+        // 严格递增的新时间戳
+        function nextTs(prev) {
+            return Math.max(Date.now(), Number(prev || 0) + 1);
+        }
+        // 修改条目：刷新时间戳（并记录最后编辑人）
+        function touchItem(item, by) {
+            if (!item) return item;
+            item._ts = nextTs(item._ts);
+            if (by) item._updBy = by;
+            return item;
+        }
 
         function normItem(it) {
             if (!it) return it;
-            if (it._ts == null) it._ts = Date.now();
+            if (it._ts == null) it._ts = 0;      // 绝不补当前时间（否则旧数据会伪装成最新）
             if (it._owner == null) it._owner = it._by || '';
             return it;
         }
 
-        // 按 id 合并两组条目（并集，新者胜，墓碑优先删除）
-        function mergeItemLists(cloudItems, localItems, deadSet) {
+        // 墓碑合并：同一 key 取 ts 较新者
+        function mergeStamps(cloudList, localList, keyFn) {
             const map = new Map();
-            for (const it of (cloudItems || [])) { const c = { ...normItem({ ...it }) }; map.set(c.id, c); }
+            for (const t of [...(cloudList || []), ...(localList || [])]) {
+                if (!t) continue;
+                const k = keyFn(t);
+                if (!k) continue;
+                const prev = map.get(k);
+                if (!prev || (Number(t.ts) || 0) >= (Number(prev.ts) || 0)) map.set(k, t);
+            }
+            return Array.from(map.values());
+        }
+        function pruneStamps(list) {
+            const now = Date.now();
+            return (list || []).filter(t => t && (now - (Number(t.ts) || 0)) < TOMBSTONE_KEEP_MS);
+        }
+
+        // 条目墓碑：Map<id, ts>
+        function tombMap() {
+            const m = new Map();
+            for (const t of (_tombstones || [])) {
+                if (!t || !t.id) continue;
+                const prev = m.get(t.id) || 0;
+                if ((Number(t.ts) || 0) > prev) m.set(t.id, Number(t.ts) || 0);
+            }
+            return m;
+        }
+        function isMemberDead(team, member) {
+            for (const t of (_memberTombs || [])) {
+                if (t && t.team === team && t.member === member) return true;
+            }
+            return false;
+        }
+        function isUserDead(name) {
+            for (const t of (_userTombs || [])) if (t && t.name === name) return true;
+            return false;
+        }
+
+        // 按 id 合并两组条目（并集，时间戳严格新者胜，墓碑优先删除）
+        function mergeItemLists(cloudItems, localItems, deadSet) {
+            // 兼容传入 Set（旧调用）
+            let dead = null;
+            if (deadSet && typeof deadSet.get === 'function') dead = deadSet;
+            else if (deadSet && typeof deadSet.has === 'function') {
+                dead = new Map();
+                for (const id of deadSet) dead.set(id, Infinity);
+            }
+            const map = new Map();
+            for (const it of (cloudItems || [])) {
+                const c = normItem({ ...it });
+                if (c && c.id) map.set(c.id, c);
+            }
             for (const it of (localItems || [])) {
                 const l = normItem({ ...it });
+                if (!l || !l.id) continue;
                 const c = map.get(l.id);
                 if (!c) { map.set(l.id, l); continue; }
-                // 归属校验：非本人数据不允许覆盖
-                const canOverwrite = !l._owner || !c._owner || l._owner === c._owner
-                                     || (currentUser && currentUser.role === 'admin');
-                if (canOverwrite && (l._ts || 0) >= (c._ts || 0)) map.set(l.id, l);
+                // 只有严格更新才覆盖；相同或更旧一律保留云端版本（服务端权威）
+                if (tsOf(l) > tsOf(c)) map.set(l.id, l);
             }
             const out = [];
             for (const it of map.values()) {
-                if (deadSet && deadSet.has(it.id)) continue;
                 if (it._deleted) continue;
+                if (dead && dead.has(it.id) && (dead.get(it.id) || 0) >= tsOf(it)) continue;
                 out.push(it);
             }
             return out;
         }
 
-        // 合并整份 weeks（并集语义，绝不丢云端数据）
+        // 合并整份 weeks（并集语义；被删除的成员整块不再出现）
         function mergeWeeks(cloudWeeks, localWeeks) {
-            const deadSet = new Set((_tombstones || []).map(t => t.id));
+            const deadItems = tombMap();
             const out = {};
             const weekKeys = new Set([...Object.keys(cloudWeeks || {}), ...Object.keys(localWeeks || {})]);
             for (const wk of weekKeys) {
@@ -1567,36 +1665,70 @@
                     const lm = lw[team] || {};
                     const members = new Set([...Object.keys(cm), ...Object.keys(lm)]);
                     for (const member of members) {
-                        const merged = mergeItemLists(cm[member], lm[member], deadSet);
-                        // 空数组也保留（成员占位），避免成员列表丢失
-                        out[wk][team][member] = merged;
+                        // 成员已删除 → 任何一方都无法把它带回来
+                        if (isMemberDead(team, member)) continue;
+                        out[wk][team][member] = mergeItemLists(cm[member], lm[member], deadItems);
                     }
                 }
             }
             return out;
         }
 
-        // 合并 users：密码仅本人可改；角色由总管理员/云端配置为准
+        // 合并 users：记录级 LWW（账号/角色/密码修改都会带 _ts），墓碑优先删除
         function mergeUsers(cloudUsers, localUsers) {
-            const out = JSON.parse(JSON.stringify(cloudUsers || {}));
-            const me = currentUser ? currentUser.username : '';
-            for (const u of Object.keys(localUsers || {})) {
-                const cu = out[u];
-                const lu = localUsers[u];
+            const out = {};
+            const names = new Set([...Object.keys(cloudUsers || {}), ...Object.keys(localUsers || {})]);
+            for (const u of names) {
+                if (isUserDead(u)) continue;              // 账号已删除
+                const cu = (cloudUsers || {})[u];
+                const lu = (localUsers || {})[u];
                 if (!cu) { out[u] = { ...lu }; continue; }
-                const pwdChanged = sessionStorage.getItem('_pwd_' + u) === '1';
-                // 只有本人或总管理员可修改密码
-                if (pwdChanged && (u === me || (currentUser && currentUser.role === 'admin'))) {
-                    cu.password = lu.password;
-                }
-                // 角色/负责小组：总管理员本地变更为准
-                if (u === me && currentUser && currentUser.role === 'admin') {
-                    cu.role = lu.role;
-                    if (lu.managedTeam) cu.managedTeam = lu.managedTeam;
-                    else delete cu.managedTeam;
-                }
+                if (!lu) { out[u] = { ...cu }; continue; }
+                out[u] = (tsOf(lu) > tsOf(cu)) ? { ...lu } : { ...cu };
             }
             return out;
+        }
+
+        // 本地完整载荷（含墓碑）
+        function localPayload() {
+            return {
+                weeks: _memData.weeks || {},
+                users: _memData.users || {},
+                history: _memData.history || {},
+                tombstones: _tombstones || [],
+                memberTombs: _memberTombs || [],
+                userTombs: _userTombs || []
+            };
+        }
+
+        // 统一合并入口：返回可直接写入云端的完整载荷
+        function mergeAll(cloud, local) {
+            const c = cloud || {}, l = local || localPayload();
+            // 墓碑先合并，条目/成员/账号合并时要用到
+            _tombstones = pruneStamps(mergeStamps(c.tombstones, l.tombstones, t => t && t.id));
+            _memberTombs = pruneStamps(mergeStamps(c.memberTombs, l.memberTombs,
+                t => t && t.team && t.member ? t.team + SEP + t.member : ''));
+            _userTombs = pruneStamps(mergeStamps(c.userTombs, l.userTombs, t => t && t.name));
+            return {
+                _schema: 2,
+                _updatedAt: new Date().toISOString(),
+                weeks: mergeWeeks(c.weeks || {}, l.weeks || {}),
+                users: mergeUsers(c.users || {}, l.users || {}),
+                history: mergeHistory(c.history || {}, l.history || {}),
+                tombstones: _tombstones,
+                memberTombs: _memberTombs,
+                userTombs: _userTombs
+            };
+        }
+
+        // 把合并结果回灌到内存
+        function applyMerged(merged) {
+            _memData.weeks = merged.weeks || {};
+            _memData.users = merged.users || {};
+            _memData.history = merged.history || {};
+            _tombstones = merged.tombstones || [];
+            _memberTombs = merged.memberTombs || [];
+            _userTombs = merged.userTombs || [];
         }
 
         // 合并 history（按 timestamp 去重，不丢任何一方）
@@ -1638,20 +1770,10 @@
                     const ci = await r.json();
                     _ghSha = ci.sha;
                     const cloud = JSON.parse(_b64d(ci.content));
-                    const cloudWeeks = cloud.weeks || {};
-                    const cloudUsers = cloud.users || {};
-                    const cloudHistory = cloud.history || {};
-
-                    // 本地有未推送变更 → 合并；否则云端直接为权威值
-                    if (_dirty) {
-                        _memData.weeks = mergeWeeks(cloudWeeks, _memData.weeks || {});
-                        _memData.users = mergeUsers(cloudUsers, _memData.users || {});
-                        _memData.history = mergeHistory(cloudHistory, _memData.history || {});
-                    } else {
-                        _memData.weeks = cloudWeeks;
-                        _memData.users = cloudUsers;
-                        _memData.history = cloudHistory;
-                    }
+                    // 一律「合并」而非「整体替换」：
+                    // 本机可能刚改过而尚未推送，直接替换会让最新修改被云端旧值吃掉
+                    const merged = mergeAll(cloud, localPayload());
+                    applyMerged(merged);
                     _lastPullErr = '';
                     persistLocal();
                     updateSyncBadge('✅', '已同步');
@@ -1676,6 +1798,8 @@
                 localStorage.setItem(USERS_KEY, JSON.stringify(_memData.users || {}));
                 localStorage.setItem(HISTORY_KEY, JSON.stringify(_memData.history || {}));
                 localStorage.setItem('quality_tombstones', JSON.stringify(_tombstones || []));
+                localStorage.setItem('quality_member_tombs', JSON.stringify(_memberTombs || []));
+                localStorage.setItem('quality_user_tombs', JSON.stringify(_userTombs || []));
             } catch (e) { console.warn('persistLocal:', e); }
         }
 
@@ -1761,10 +1885,7 @@
                     }
                     return n;
                 })();
-                const merged = {};
-                merged.weeks = mergeWeeks(cloud.weeks || {}, _memData.weeks || {});
-                merged.users = mergeUsers(cloud.users || {}, _memData.users || {});
-                merged.history = mergeHistory(cloud.history || {}, _memData.history || {});
+                const merged = mergeAll(cloud, localPayload());
                 for (const wk of Object.keys(merged.weeks || {})) {
                     for (const team of Object.keys(merged.weeks[wk] || {})) {
                         for (const m of Object.keys(merged.weeks[wk][team] || {})) mergedCount += (merged.weeks[wk][team][m] || []).length;
@@ -1792,15 +1913,13 @@
                 }
 
                 // ---- 步骤 5：回写本地，保证两端一致 ----
-                _memData.weeks = merged.weeks;
-                _memData.users = merged.users;
-                _memData.history = merged.history;
-                _tombstones = (_tombstones || []).filter(x => Date.now() - (x.ts || 0) < TOMBSTONE_KEEP_MS);
+                // 写入云端时若发生版本冲突，putCloud 会二次合并并返回最终落盘数据
+                applyMerged(pr.data || merged);
                 persistLocal();
                 _dirty = false; _newIds = []; _delIds = [];
                 _justPushed = Date.now();
                 sessionStorage.removeItem('_pwd_' + (currentUser ? currentUser.username : ''));
-                for (const u of Object.keys(merged.users)) sessionStorage.removeItem('_pwd_' + u);
+                for (const u of Object.keys(_memData.users || {})) sessionStorage.removeItem('_pwd_' + u);
                 localStorage.removeItem('_syncFailed');
                 updateSyncBadge('✅', '已同步');
 
@@ -1825,9 +1944,8 @@
             }
         }
 
-        // PUT 到云端；409 冲突时重读重试
-        // PUT 到云端；冲突(409/422 sha 失效)时重读云端并二次合并后重试
-        // 返回 { ok, sha, status, msg }
+        // PUT 到云端；冲突(409/422 sha 失效)时重读云端、二次合并（含墓碑）后重试
+        // 返回 { ok, sha, status, msg, data }  —— data 为最终落盘的那份数据
         async function putCloud(data, t, retry) {
             retry = retry || 0;
             const payload = JSON.stringify(data);
@@ -1849,28 +1967,27 @@
             }
 
             if (r.ok) {
-                try { _ghSha = (await r.json()).content.sha; } catch (e) {}
-                return { ok: true, sha: _ghSha };
+                try {
+                    const j = await r.json();
+                    if (j && j.content && j.content.sha) _ghSha = j.content.sha;
+                } catch (e) {}
+                return { ok: true, sha: _ghSha, data: data };
             }
 
             // 读响应体拿具体错误信息
             let detail = '';
             try { detail = (await r.text()).slice(0, 300); } catch (e) {}
 
-            // sha 过期或冲突 → 重读云端，二次合并后重试
-            if ((r.status === 409 || r.status === 422 || r.status === 404) && retry < 2) {
+            // sha 过期/版本冲突 → 重读云端，二次合并后重试
+            if ((r.status === 409 || r.status === 422) && retry < 3) {
                 try {
                     const cr = await ghFetch(GH_API + '?t=' + Date.now() + '&r=' + retry, { headers: ghHeaders(t) }, 1);
                     if (cr.ok) {
                         const ci = await cr.json();
                         _ghSha = ci.sha;
                         const fresh = JSON.parse(_b64d(ci.content));
-                        const merged = {
-                            weeks: mergeWeeks(fresh.weeks || {}, data.weeks || {}),
-                            users: mergeUsers(fresh.users || {}, data.users || {}),
-                            history: mergeHistory(fresh.history || {}, data.history || {})
-                        };
-                        return await putCloud(merged, t, retry + 1);
+                        const mergedAgain = mergeAll(fresh, data);   // data 已含墓碑
+                        return await putCloud(mergedAgain, t, retry + 1);
                     }
                 } catch (e) {
                     return { ok: false, status: r.status, msg: '冲突重试失败：' + ((e && e.message) || '') };
@@ -1892,6 +2009,20 @@
             clearTimeout(window._pushTimer);
             // 数据变更后自动同步云端（防抖 1.5 秒，避免频繁请求）
             window._pushTimer = setTimeout(function () { syncPush(false, false); }, 1500);
+        }
+
+        // 立即同步（不防抖）：用于「补充任务」「删除成员」等必须马上落云端的操作
+        async function pushNow(reason) {
+            clearTimeout(window._pushTimer);
+            _dirty = true;
+            persistLocal();
+            if (!ghToken()) {
+                showToast('⚠️ 尚未配置 API Key，改动只保存在本机浏览器', 'error', 4000);
+                return false;
+            }
+            syncPanelOpen(reason || '立即同步');
+            setSyncPanelState('run', '已启动');
+            return await syncPush(true, true);
         }
 
         function updateSyncBadge(icon, text) {
@@ -1990,11 +2121,14 @@
 
         function saveUsers(users) {
             _memData.users = users;
+            _dirty = true;
             try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch(e) {}
             schedulePush();
         }
 
         // 初始化用户（若不存在则创建）
+        // 注意：只补「不存在」的账号，绝不覆盖已有角色的显式修改
+        //       （旧版每次加载都强制回写 SUB_ADMIN_TEAMS，会把管理员刚改的角色改回去）
         function initUsers() {
             let users = getUsers();
             let changed = false;
@@ -2002,7 +2136,7 @@
             // 添加所有管理员
             for (const [username, password] of Object.entries(ADMIN_ACCOUNTS)) {
                 if (!users[username]) {
-                    users[username] = { password: password, role: 'admin' };
+                    users[username] = { password: password, role: 'admin', _ts: Date.now() };
                     changed = true;
                 }
             }
@@ -2015,26 +2149,31 @@
                 }
             }
             for (const name of allMembers) {
+                if (isUserDead(name)) continue;      // 账号已回收，不再自动重建
                 if (!users[name]) {
                     const pinyin = PINYIN_MAP[name] || name.toLowerCase();
-                    users[name] = { password: pinyin, role: 'member' };
+                    users[name] = { password: pinyin, role: 'member', _ts: Date.now() };
                     changed = true;
                 }
             }
 
-            // 小组管理员（默认为各小组负责人）：可查看本小组全员数据，不可修改他人数据
+            // 小组管理员默认值：仅对「从未被显式改过」（无 _ts）的历史账号做一次性归一
             for (const [team, adminName] of Object.entries(SUB_ADMIN_TEAMS)) {
+                if (isUserDead(adminName) || isMemberDead(team, adminName)) continue;
                 if (!users[adminName]) {
-                    users[adminName] = { password: PINYIN_MAP[adminName] || adminName.toLowerCase(), role: 'sub-admin' };
+                    users[adminName] = { password: PINYIN_MAP[adminName] || adminName.toLowerCase(), role: 'sub-admin', managedTeam: team, _ts: Date.now() };
                     changed = true;
+                    continue;
                 }
-                if (users[adminName].role !== 'sub-admin' && users[adminName].role !== 'admin') {
-                    users[adminName].role = 'sub-admin';
-                    changed = true;
-                }
-                if (users[adminName].managedTeam !== team) {
-                    users[adminName].managedTeam = team;
-                    changed = true;
+                if (!users[adminName]._ts) {         // 历史遗留：尚未被任何人显式修改
+                    if (users[adminName].role !== 'sub-admin' && users[adminName].role !== 'admin') {
+                        users[adminName].role = 'sub-admin';
+                        changed = true;
+                    }
+                    if (users[adminName].role === 'sub-admin' && users[adminName].managedTeam !== team) {
+                        users[adminName].managedTeam = team;
+                        changed = true;
+                    }
                 }
             }
 
@@ -2043,6 +2182,7 @@
                 if (users[username] && users[username].role !== 'admin') {
                     users[username].role = 'admin';
                     delete users[username].managedTeam;
+                    users[username]._ts = Date.now();
                     changed = true;
                 }
             }
@@ -2068,6 +2208,7 @@
             if (!user) return false;
             if (user.password !== oldPwd) return false;
             user.password = newPwd;
+            user._ts = Date.now();      // 记录级时间戳：合并时保证「后改的赢」
             sessionStorage.setItem('_pwd_' + username, '1');
             saveUsers(users);
             return true;
@@ -2150,6 +2291,11 @@
                     changed = true;
                 }
                 for (const member of members) {
+                    // 已被总管理员删除的成员不再自动补回（否则「删除」形同虚设）
+                    if (isMemberDead(team, member)) {
+                        if (weekData[team][member]) { delete weekData[team][member]; changed = true; }
+                        continue;
+                    }
                     if (!weekData[team][member]) {
                         weekData[team][member] = [];
                         changed = true;
@@ -2248,6 +2394,7 @@
 
                 const team = rec.team, member = rec.member;
                 if (!TEAMS_CONFIG[team]) continue;
+                if (isMemberDead(team, member)) continue;   // 已删除成员不再带入
                 if (!curWeek[team]) curWeek[team] = {};
                 if (!curWeek[team][member]) curWeek[team][member] = [];
                 const curItems = curWeek[team][member];
@@ -2276,6 +2423,7 @@
             for (const [team, members] of Object.entries(TEAMS_CONFIG)) {
                 if (!curWeek[team]) curWeek[team] = {};
                 for (const m of members) {
+                    if (isMemberDead(team, m)) continue;
                     if (!curWeek[team][m]) curWeek[team][m] = [];
                 }
             }
@@ -2303,44 +2451,107 @@
             if (members[memberName]) return false;
             members[memberName] = [];
             setTeamMembers(weekKey, teamName, members);
-            pushHistory(weekKey);
+            // 重新添加 → 撤销该成员的删除墓碑（否则会被判为已删除而看不到）
+            _memberTombs = (_memberTombs || []).filter(t => !(t && t.team === teamName && t.member === memberName));
+            _userTombs = (_userTombs || []).filter(t => !(t && t.name === memberName));
             // 同时创建用户
             const users = getUsers();
             if (!users[memberName]) {
                 const pinyin = PINYIN_MAP[memberName] || memberName.toLowerCase();
-                users[memberName] = { password: pinyin, role: 'member' };
+                users[memberName] = { password: pinyin, role: 'member', _ts: Date.now() };
                 saveUsers(users);
             }
+            persistLocal();
+            pushHistory(weekKey);
             return true;
         }
 
-        function deleteMember(weekKey, teamName, memberName) {
-            _dirty = true;
-            const members = getTeamMembers(weekKey, teamName);
-            if (!members[memberName]) return false;
-            delete members[memberName];
-            setTeamMembers(weekKey, teamName, members);
-            pushHistory(weekKey);
-            // 删除用户（但管理员不删）
-            if (!ADMIN_ACCOUNTS[memberName]) {
-                const users = getUsers();
-                if (users[memberName]) {
-                    delete users[memberName];
-                    saveUsers(users);
+        // 该姓名在全平台（所有周次、所有团队）中还存在于哪些团队
+        function teamsOfNameAnyWeek(memberName) {
+            const set = new Set();
+            const all = loadAllData();
+            for (const wk of Object.keys(all || {})) {
+                const teams = all[wk] || {};
+                for (const team of Object.keys(teams)) {
+                    const members = teams[team] || {};
+                    if (Object.prototype.hasOwnProperty.call(members, memberName) && !isMemberDead(team, memberName)) {
+                        set.add(team);
+                    }
                 }
             }
-            return true;
+            return Array.from(set);
         }
 
-        function addItem(weekKey, teamName, memberName, item) {
+        // 删除成员：跨全部周次清除其在该团队下的数据 + 写墓碑 + 回收空账号
+        function deleteMember(weekKey, teamName, memberName) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showToast('⛔ 仅总管理员可删除成员', 'error');
+                return false;
+            }
+            if (ADMIN_ACCOUNTS[memberName]) {
+                showToast('⛔ 管理员账号不可删除', 'error');
+                return false;
+            }
+            const me = currentUser.username;
             _dirty = true;
+            const now = Date.now();
+
+            // 1) 先把该成员在各周次下的条目逐条记墓碑（必须在删除前采集）
+            const deadItems = [];
+            const all = loadAllData();
+            for (const wk of Object.keys(all || {})) {
+                const teamData = all[wk] && all[wk][teamName];
+                if (!teamData || !Object.prototype.hasOwnProperty.call(teamData, memberName)) continue;
+                for (const it of (teamData[memberName] || [])) {
+                    if (it && it.id) {
+                        deadItems.push({ id: it.id, ts: Math.max(now, tsOf(it) + 1), week: wk, team: teamName, member: memberName, by: me });
+                    }
+                }
+            }
+            _tombstones = mergeStamps(_tombstones, deadItems, t => t && t.id);
+
+            // 2) 所有周次：删掉该团队下的该成员（含其全部任务数据）
+            let removedWeeks = 0, removedItems = 0;
+            for (const wk of Object.keys(all || {})) {
+                const teamData = all[wk] && all[wk][teamName];
+                if (!teamData || !Object.prototype.hasOwnProperty.call(teamData, memberName)) continue;
+                removedItems += (teamData[memberName] || []).length;
+                delete teamData[memberName];
+                removedWeeks++;
+            }
+
+            // 3) 成员墓碑（关键：没有它，云端并集合并会立刻把成员复活）
+            _memberTombs = mergeStamps(_memberTombs,
+                [{ team: teamName, member: memberName, ts: now, by: me }],
+                t => t && t.team && t.member ? t.team + SEP + t.member : '');
+
+            // 4) 账号：若已不属于任何团队 → 回收账号并写账号墓碑
+            const stillIn = teamsOfNameAnyWeek(memberName);
+            const users = getUsers();
+            if (stillIn.length === 0 && users[memberName]) {
+                delete users[memberName];
+                _userTombs = mergeStamps(_userTombs, [{ name: memberName, ts: now, by: me }], t => t && t.name);
+                saveUsers(users);
+            }
+
+            persistLocal();
+            pushHistory(weekKey);
+            console.info('[deleteMember]', memberName, 'team=', teamName, 'weeks=', removedWeeks, 'items=', removedItems, 'restTeams=', stillIn);
+            return removedWeeks > 0 || deadItems.length > 0;
+        }
+
+        function addItem(weekKey, teamName, memberName, item, opts) {
+            _dirty = true;
+            opts = opts || {};
             const me = currentUser ? currentUser.username : '';
             const items = getMemberItems(weekKey, teamName, memberName);
+            const now = Date.now();
             const newItem = {
                 id: generateId(),
-                _ts: Date.now(),
-                _by: me,          // 创建者
-                _owner: me,       // 归属人（最后编辑者）：只有本人可再修改
+                _ts: now,
+                _by: me,                            // 创建者
+                _owner: memberName || me,           // 归属人（数据所在行的人）：本人可继续维护
+                _updBy: me,
                 dimension: item.dimension || '重点工作',
                 category: item.category || '',
                 name: item.name || '',
@@ -2355,20 +2566,40 @@
                 longTermMeasure: item.longTermMeasure || '',
                 nextPlan: item.nextPlan || '',
                 description: item.description || '',
-                responsible: item.responsible || '',
+                responsible: item.responsible || memberName || '',
                 deadline: item.deadline || '',
                 progress: item.progress || '',
                 status: item.status || '开展中',
                 deviation: item.deviation || '',
                 action: item.action || '', comments: [], notes: [], confirmed: false,
-                _taskStatus: window._isTask ? 'pending' : ''
+                _taskStatus: (opts.assign || window._isTask) ? 'pending' : ''
             };
+            // 管理员/小组管理员补充的任务：记录派发人，便于本人确认与追溯
+            if (opts.assign) {
+                newItem._assignedBy = me;
+                newItem._assignedAt = new Date(now).toISOString();
+                newItem._assignee = memberName;
+            }
             items.push(newItem);
             _newIds.push(newItem.id);
             setMemberItems(weekKey, teamName, memberName, items);
             pushHistory(weekKey);
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
+            persistLocal();
             return newItem;
+        }
+
+        // 条目是否可由当前用户修改/删除
+        function canOperateItem(item, team) {
+            if (!currentUser || !item) return false;
+            if (currentUser.role === 'admin') return true;
+            const me = currentUser.username;
+            const owner = item._owner || item._by || '';
+            if (owner === me) return true;                 // 本人数据
+            if ((item._by || '') === me) return true;      // 本人创建
+            if ((item._assignedBy || '') === me) return true; // 本人补充的任务
+            if (currentUser.role === 'sub-admin' && team && team === currentUser.managedTeam
+                && (item._assignee || '') === me) return true;
+            return false;
         }
 
         function editItem(weekKey, teamName, memberName, itemId, updates) {
@@ -2377,16 +2608,15 @@
             const items = getMemberItems(weekKey, teamName, memberName);
             const idx = items.findIndex(it => it.id === itemId);
             if (idx === -1) return false;
-            // 归属校验：非总管理员只能修改本人创建/归属的数据
-            const owner = items[idx]._owner || items[idx]._by || '';
-            if (currentUser && currentUser.role !== 'admin' && owner && owner !== me) {
+            if (!canOperateItem(items[idx], teamName)) {
                 showToast('⛔ 只能修改本人的数据', 'error');
                 return false;
             }
-            items[idx] = { ...items[idx], ...updates, _ts: Date.now(), _by: me, _owner: me };
+            // _ts 必须严格递增：否则同一毫秒内的连续修改会在合并时被判为「更旧」
+            items[idx] = { ...items[idx], ...updates, _ts: nextTs(items[idx]._ts), _by: items[idx]._by || me, _updBy: me };
             setMemberItems(weekKey, teamName, memberName, items);
+            persistLocal();
             pushHistory(weekKey);
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
             return true;
         }
 
@@ -2396,20 +2626,19 @@
             const items = getMemberItems(weekKey, teamName, memberName);
             const target = items.find(it => it.id === itemId);
             if (!target) return false;
-            // 归属校验
-            const owner = target._owner || target._by || '';
-            if (currentUser && currentUser.role !== 'admin' && owner && owner !== me) {
+            if (!canOperateItem(target, teamName)) {
                 showToast('⛔ 只能删除本人的数据', 'error');
                 return false;
             }
             const filtered = items.filter(it => it.id !== itemId);
             // 记录删除墓碑（同步时从云端一并移除，避免被其他设备的旧数据复活）
             _delIds.push(itemId);
-            _tombstones.push({ id: itemId, week: weekKey, team: teamName, member: memberName, ts: Date.now(), by: me });
+            _tombstones = mergeStamps(_tombstones,
+                [{ id: itemId, week: weekKey, team: teamName, member: memberName, ts: Math.max(Date.now(), tsOf(target) + 1), by: me }],
+                t => t && t.id);
             setMemberItems(weekKey, teamName, memberName, filtered);
+            persistLocal();
             pushHistory(weekKey);
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
-            try { localStorage.setItem('quality_tombstones', JSON.stringify(_tombstones)); } catch(e) {}
             return true;
         }
 
@@ -2486,18 +2715,56 @@
         function restoreHistoryVersion(weekKey, index) {
             const versions = getHistoryVersions(weekKey);
             if (index < 0 || index >= versions.length) return false;
-            const snapshotData = versions[index].data;
-            // 子管理员：只恢复所管团队数据，其他团队保持不变
-            if (currentUser && currentUser.role === 'sub-admin' && currentUser.managedTeam) {
+            const snap = JSON.parse(JSON.stringify(versions[index].data || {}));
+            const me = currentUser ? currentUser.username : '';
+            const now = Date.now();
+            const isSub = currentUser && currentUser.role === 'sub-admin' && currentUser.managedTeam;
+            const scopeTeams = isSub ? [currentUser.managedTeam] : Object.keys(snap);
+
+            // 恢复出来的条目必须打上「最新」时间戳，否则合并时会被云端更旧的副本压住
+            for (const team of scopeTeams) {
+                const members = snap[team] || {};
+                for (const m of Object.keys(members)) {
+                    for (const it of (members[m] || [])) {
+                        if (!it) continue;
+                        it._ts = nextTs(now);
+                        it._updBy = me;
+                    }
+                }
+            }
+
+            // 当前有、快照里没有的条目 → 写墓碑，避免恢复后又被并集合并带回来
+            const cur = getWeekData(weekKey);
+            const snapIds = new Set();
+            for (const team of scopeTeams) {
+                for (const m of Object.keys(snap[team] || {})) {
+                    for (const it of (snap[team][m] || [])) if (it && it.id) snapIds.add(it.id);
+                }
+            }
+            const dead = [];
+            for (const team of scopeTeams) {
+                for (const m of Object.keys(cur[team] || {})) {
+                    for (const it of (cur[team][m] || [])) {
+                        if (it && it.id && !snapIds.has(it.id)) {
+                            dead.push({ id: it.id, week: weekKey, team, member: m, ts: Math.max(now, tsOf(it) + 1), by: me });
+                        }
+                    }
+                }
+            }
+            if (dead.length) _tombstones = mergeStamps(_tombstones, dead, t => t && t.id);
+
+            _dirty = true;
+            if (isSub) {
                 const team = currentUser.managedTeam;
                 const currentWeek = getWeekData(weekKey);
                 // 只替换所管团队的数据
-                currentWeek[team] = snapshotData[team] || {};
+                currentWeek[team] = snap[team] || {};
                 setWeekData(weekKey, currentWeek);
             } else {
                 // 管理员：全量恢复
-                setWeekData(weekKey, snapshotData);
+                setWeekData(weekKey, snap);
             }
+            persistLocal();
             return true;
         }
 
@@ -2585,9 +2852,15 @@
             const wc = item.workClass || '';
             const map = { '部门重点': 'dep', '小组重点': 'team', '个人重点': 'personal' };
             const cls = map[wc];
+            let tag = '';
+            if (item._assignedBy) {
+                const state = item._taskStatus === 'pending' ? '待确认'
+                            : item._taskStatus === 'rejected' ? '已拒绝' : '已接收';
+                tag = `<span class="assign-tag" title="由 ${escapeHtml(item._assignedBy)} 补充 · ${state}">📋${escapeHtml(item._assignedBy)}</span>`;
+            }
             return '<td>' + (cls
                 ? `<span class="workclass-tag ${cls}">${wc}</span>`
-                : '<span style="color:#cbd5e1;">—</span>') + '</td>';
+                : '<span style="color:#cbd5e1;">—</span>') + tag + '</td>';
         }
 
         // 评论/备注查看单元格（所有角色可见，点击查看）
@@ -2629,6 +2902,28 @@
             if (currentMember !== me) return false;
             if (currentView === 'abnormal' || currentView === 'summary') return false;
             return getTeamsOfMember(me).includes(currentTeam);
+        }
+
+        // 是否有权为「所辖团队」内的成员补充任务
+        //   总管理员：全部团队；小组管理员：仅其所管团队；普通成员：无
+        function canAssignTask(team, member) {
+            if (!currentUser || !team || !member) return false;
+            if (currentUser.role === 'admin') return true;
+            if (currentUser.role === 'sub-admin') {
+                const mt = currentUser.managedTeam;
+                return !!mt && team === mt;
+            }
+            return false;
+        }
+
+        // 可选指派对象（当前团队成员，排除已删除成员）
+        function assigneeOptions(team) {
+            const out = [];
+            const seen = new Set();
+            const push = (m) => { if (!m || seen.has(m)) return; if (isMemberDead(team, m)) return; seen.add(m); out.push(m); };
+            for (const m of Object.keys(getTeamMembers(currentWeekKey, team) || {})) push(m);
+            for (const m of (TEAMS_CONFIG[team] || [])) push(m);
+            return out;
         }
 
         // 判断当前用户是否可以查看该成员数据
@@ -2840,14 +3135,17 @@
                         if (confirm(`确定取消 "${member}" 的子管理员权限吗？`)) {
                             users[member].role = 'member';
                             delete users[member].managedTeam;
+                            users[member]._ts = Date.now();
                             saveUsers(users);
                             renderAll();
                             showToast(`已取消 ${member} 的子管理员权限`, 'info');
                         }
                     } else {
-                        if (confirm(`确定将 "${member}" 设为 "${team}" 的子管理员吗？\n\n设好后该成员可以查看和编辑 "${team}" 内所有成员的数据。`)) {
+                        if (confirm(`确定将 "${member}" 设为 "${team}" 的子管理员吗？\n\n设好后该成员可以查看 "${team}" 内所有成员的数据。`)) {
+                            if (!users[member]) users[member] = { password: PINYIN_MAP[member] || member.toLowerCase(), role: 'member' };
                             users[member].role = 'sub-admin';
                             users[member].managedTeam = team;
+                            users[member]._ts = Date.now();
                             saveUsers(users);
                             renderAll();
                             showToast(`✅ ${member} 已成为 "${team}" 子管理员`, 'success');
@@ -2865,16 +3163,26 @@
                     }
                     const team = this.dataset.team;
                     const member = this.dataset.member;
-                    if (confirm(`确定要删除成员 "${member}" 吗？其所有任务数据将被清除！`)) {
+                    if (confirm(`确定要删除成员 "${member}"（${team}）吗？
+
+· 该成员在【所有周次】内的任务数据都会被清除
+· 若其不再属于任何小组，账号一并回收
+· 删除会立即同步到云端，其他设备同样生效
+
+此操作不可撤销。`)) {
                         if (deleteMember(currentWeekKey, team, member)) {
                             if (currentTeam === team && currentMember === member) {
                                 currentTeam = '';
                                 currentMember = '';
                             }
                             renderAll();
-                            showToast(`已删除成员 ${member}`, 'info');
+                            showToast(`已删除成员 ${member}，正在同步云端…`, 'info');
+                            pushNow('删除成员').then(ok => {
+                                showToast(ok ? `✅ 已删除 ${member}，云端已同步` : `⚠️ 已在本机删除 ${member}，云端同步未完成，请点「保存」重试`,
+                                    ok ? 'success' : 'error', 3600);
+                            });
                         } else {
-                            showToast('删除失败', 'error');
+                            showToast('删除失败：该成员不存在', 'error');
                         }
                     }
                 });
@@ -2951,6 +3259,7 @@
             const majorItems = items.filter(it => it.dimension === '重大批量质量问题改进');
 
             const canEditCurrent = canEdit();
+            const canAssignCurrent = canAssignTask(currentTeam, currentMember);
 
             // ---- 核心指标 ----
             const coreBody = document.getElementById('coreBody');
@@ -3003,7 +3312,7 @@
             }
             document.getElementById('coreSection').style.display = 'block';
             document.getElementById('addCoreBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
-            document.getElementById('taskCoreBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
+            document.getElementById('taskCoreBtn').style.display = canAssignCurrent ? 'inline-flex' : 'none';
 
             // ---- 重点工作 ----
             const keyBody = document.getElementById('keyBody');
@@ -3054,7 +3363,7 @@
                 }
             }
             document.getElementById('keySection').style.display = 'block';
-            document.getElementById('taskKeyBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
+            document.getElementById('taskKeyBtn').style.display = canAssignCurrent ? 'inline-flex' : 'none';
             document.getElementById('addKeyBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
 
             // ---- 重大批量质量问题改进 ----
@@ -3107,7 +3416,7 @@
                 }
             }
             document.getElementById('majorSection').style.display = 'block';
-            document.getElementById('taskMajorBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
+            document.getElementById('taskMajorBtn').style.display = canAssignCurrent ? 'inline-flex' : 'none';
             document.getElementById('addMajorBtn').style.display = canEditCurrent ? 'inline-flex' : 'none';
         }
 
@@ -4259,14 +4568,21 @@
         }
 
         function openModal(mode, item = null) {
-            if (!canEdit()) {
-                showToast('您没有权限编辑此内容', 'error');
-                return;
-            }
+            const assignMode = !!window._assignMode && mode === 'add';
             const team = currentTeam;
             const member = currentMember;
             if (!team || !member) {
                 showToast('请先选择成员', 'error');
+                return;
+            }
+            if (assignMode) {
+                if (!canAssignTask(team, member)) {
+                    showToast('⛔ 您只能给所辖团队内的成员补充任务', 'error');
+                    window._assignMode = false;
+                    return;
+                }
+            } else if (!canEdit()) {
+                showToast('您没有权限编辑此内容', 'error');
                 return;
             }
 
@@ -4284,10 +4600,24 @@
             if (window._isTask) { window._prefillResponsible = member; }
             editDimension.value = dimension;
 
-            const data = item || {};
-            modalFields.innerHTML = buildFormFields(dimension, data);
+            const data = item || (window._isTask ? { responsible: member } : {});
+            let prefix = '';
+            if (assignMode) {
+                const opts = assigneeOptions(team);
+                prefix = `
+                    <div class="form-group">
+                        <label for="f_assignee">指派给（${escapeHtml(team)}）*</label>
+                        <select id="f_assignee">
+                            ${opts.map(m => `<option value="${escapeHtml(m)}" ${m === member ? 'selected' : ''}>${escapeHtml(m)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="assign-hint">📋 补充任务：提交后会立即写入云端，对方登录即可看到并确认接收。</div>`;
+            }
+            modalFields.innerHTML = prefix + buildFormFields(dimension, data);
 
-            if (mode === 'add') {
+            if (assignMode) {
+                modalTitle.textContent = `📋 补充任务 (${dimension}) · ${team}`;
+            } else if (mode === 'add') {
                 modalTitle.textContent = `➕ 添加 (${dimension}) · ${member}`;
             } else {
                 modalTitle.textContent = `✎ 编辑 (${dimension}) · ${member}`;
@@ -4298,14 +4628,25 @@
 
         function closeModal() {
             modalOverlay.classList.remove('active');
+            window._assignMode = false;
+            window._isTask = false;
         }
 
         modalForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const team = editTeamName.value;
-            const member = editMemberName.value;
             const id = editItemId.value;
             const dimension = editDimension.value;
+            const assignMode = !!window._assignMode && !id;
+            let member = editMemberName.value;
+            if (assignMode) {
+                const sel = document.getElementById('f_assignee');
+                if (sel && sel.value) member = sel.value;
+                if (!canAssignTask(team, member)) {
+                    showToast('⛔ 您只能给所辖团队内的成员补充任务', 'error');
+                    return;
+                }
+            }
 
             let updates = {};
             const workClass = document.getElementById('f_workClass') ? document.getElementById('f_workClass').value : '个人重点';
@@ -4421,12 +4762,26 @@
                 } else {
                     showToast('更新失败', 'error');
                 }
+                closeModal();
+                renderAll();
+            } else if (assignMode) {
+                // 补充任务：立即写入云端（不等 1.5 秒防抖）
+                addItem(currentWeekKey, team, member, updates, { assign: true });
+                window._assignMode = false;
+                closeModal();
+                renderAll();
+                showToast(`📋 已给 ${member} 补充任务，正在上传云端…`, 'info', 1800);
+                pushNow('补充任务').then(ok => {
+                    showToast(ok ? `✅ 任务已补充给 ${member}，云端已同步`
+                                 : '⚠️ 已保存到本机，云端同步未完成，请点「保存」重试',
+                              ok ? 'success' : 'error', 3600);
+                });
             } else {
                 addItem(currentWeekKey, team, member, updates);
+                closeModal();
+                renderAll();
                 showToast('✅ 已添加', 'success');
             }
-            closeModal();
-            renderAll();
         });
 
         document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
@@ -4437,32 +4792,38 @@
         document.getElementById('addCoreBtn').addEventListener('click', function() {
             window._addDimension = '核心指标';
             window._isTask = false;
+            window._assignMode = false;
             openModal('add');
         });
         document.getElementById('addKeyBtn').addEventListener('click', function() {
             window._addDimension = '重点工作';
             window._isTask = false;
+            window._assignMode = false;
             openModal('add');
         });
         document.getElementById('addMajorBtn').addEventListener('click', function() {
             window._addDimension = '重大批量质量问题改进';
             window._isTask = false;
+            window._assignMode = false;
             openModal('add');
         });
-        // 补充任务按钮
+        // 补充任务按钮（总管理员 / 小组管理员）
         document.getElementById('taskCoreBtn').addEventListener('click', function() {
             window._addDimension = '核心指标';
             window._isTask = true;
+            window._assignMode = true;
             openModal('add');
         });
         document.getElementById('taskKeyBtn').addEventListener('click', function() {
             window._addDimension = '重点工作';
             window._isTask = true;
+            window._assignMode = true;
             openModal('add');
         });
         document.getElementById('taskMajorBtn').addEventListener('click', function() {
             window._addDimension = '重大批量质量问题改进';
             window._isTask = true;
+            window._assignMode = true;
             openModal('add');
         });
 
@@ -4625,8 +4986,9 @@
                 if (text && text.trim()) {
                     if (!item.comments) item.comments = [];
                     item.comments.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
+                    touchItem(item, currentUser.username);   // 更新时间戳，避免评论被云端旧版本覆盖
                     _dirty = true;
-                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
+                    persistLocal();
                     schedulePush();
                     renderAll();
                     showToast('💬 评论已添加', 'success');
@@ -4640,8 +5002,9 @@
                 if (text && text.trim()) {
                     if (!item.notes) item.notes = [];
                     item.notes.push({ author: currentUser.username, text: text.trim(), time: new Date().toISOString() });
+                    touchItem(item, currentUser.username);
                     _dirty = true;
-                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
+                    persistLocal();
                     schedulePush();
                     renderAll();
                     showToast('📝 任务备注已添加', 'success');
@@ -4667,7 +5030,8 @@
                     showToast(item.confirmed ? '✅ 已确认接收' : '↩ 已取消确认', 'success');
                 }
                 _dirty = true;
-                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_memData.weeks)); } catch(e) {}
+                touchItem(item, currentUser.username);   // 确认/拒绝也是修改，必须刷新时间戳
+                persistLocal();
                 schedulePush();
                 renderAll();
             }
@@ -4781,8 +5145,13 @@
         //  初始化
         // ============================================================
         async function init() {
-            // 载入本地墓碑（删除记录）
+            // 载入本地的三类墓碑（条目 / 成员 / 账号）
             try { _tombstones = JSON.parse(localStorage.getItem('quality_tombstones') || '[]'); } catch (e) { _tombstones = []; }
+            try { _memberTombs = JSON.parse(localStorage.getItem('quality_member_tombs') || '[]'); } catch (e) { _memberTombs = []; }
+            try { _userTombs = JSON.parse(localStorage.getItem('quality_user_tombs') || '[]'); } catch (e) { _userTombs = []; }
+            if (!Array.isArray(_tombstones)) _tombstones = [];
+            if (!Array.isArray(_memberTombs)) _memberTombs = [];
+            if (!Array.isArray(_userTombs)) _userTombs = [];
 
             // 未配置 Key 时提示用户手动录入
             if (!ghToken()) _selfHealNote = '尚未配置 API Key，请点右上角 🔑 填写';
@@ -4890,24 +5259,34 @@
             }, 120000);
         }
 
-        // 为历史遗留条目补齐 _owner / _ts（仅补缺失字段，不改动已有值）
+        // 为历史遗留条目补齐 _owner / _ts
+        // 归属人统一为「数据所在行的成员」：旧版会写成最后编辑人（甚至是「自动带入」/管理员），
+        // 导致本人反而不能修改自己的数据 —— 这里做一次性归一
         function backfillOwners() {
             let changed = false;
             const all = _memData.weeks || {};
+            const users = _memData.users || {};
+            const isAdminName = (n) => !!ADMIN_ACCOUNTS[n];
             for (const wk of Object.keys(all)) {
                 for (const team of Object.keys(all[wk] || {})) {
                     for (const member of Object.keys(all[wk][team] || {})) {
                         for (const it of (all[wk][team][member] || [])) {
-                            if (it._owner == null) {
-                                // 数据所属成员即归属人；自动带入的条目归属该成员
-                                it._owner = it._by || member;
-                                changed = true;
+                            if (it._ts == null) it._ts = 0;   // 缺失视为最旧，绝不用「现在」补
+                            const owner = it._owner;
+                            // 缺失 / 非真实账号 / 非本人的管理员 → 归位到行成员
+                            if (owner == null || owner === '' ||
+                                ((!users[owner]) && owner !== member) ||
+                                (isAdminName(owner) && owner !== member)) {
+                                if (owner !== member) {
+                                    it._owner = member;
+                                    changed = true;
+                                }
                             }
                         }
                     }
                 }
             }
-            if (changed) { _dirty = true; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch (e) {} }
+            if (changed) { _dirty = true; persistLocal(); }
         }
 
         document.addEventListener('DOMContentLoaded', init);
